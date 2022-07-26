@@ -1,0 +1,7 @@
+taq module
+==========
+
+.. automodule:: taq
+   :members:
+   :undoc-members:
+   :show-inheritance:

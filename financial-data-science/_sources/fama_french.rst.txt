@@ -1,0 +1,7 @@
+fama\_french module
+===================
+
+.. automodule:: fama_french
+   :members:
+   :undoc-members:
+   :show-inheritance:

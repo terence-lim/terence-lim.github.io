@@ -1,0 +1,7 @@
+hack module
+===========
+
+.. automodule:: hack
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+unstructured module
+===================
+
+.. automodule:: unstructured
+   :members:
+   :undoc-members:
+   :show-inheritance:

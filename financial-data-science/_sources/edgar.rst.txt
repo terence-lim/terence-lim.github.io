@@ -1,0 +1,7 @@
+edgar module
+============
+
+.. automodule:: edgar
+   :members:
+   :undoc-members:
+   :show-inheritance:

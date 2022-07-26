@@ -1,0 +1,7 @@
+alfred module
+=============
+
+.. automodule:: alfred
+   :members:
+   :undoc-members:
+   :show-inheritance:

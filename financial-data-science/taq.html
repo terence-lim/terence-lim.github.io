@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>taq module &mdash; Financial Data Science 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="unstructured module" href="unstructured.html" />
+    <link rel="prev" title="structured module" href="structured.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">finds</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="alfred.html">alfred module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backtesting.html">backtesting module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="busday.html">busday module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html">database module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="display.html">display module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edgar.html">edgar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">graph module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyR.html">pyR module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html">recipes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sectors.html">sectors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured.html">structured module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">taq module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unstructured.html">unstructured module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">finds</a> &raquo;</li>
+      <li>taq module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/taq.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-taq">
+<span id="taq-module"></span><h1>taq module<a class="headerlink" href="#module-taq" title="Permalink to this heading"></a></h1>
+<p>Class and methods to process TAQ trade and quotes tick data</p>
+<ul class="simple">
+<li><p>NYSE Daily TAQ: Master, NBBO, Trades</p></li>
+<li><p>marker microstructure: bid-ask spreads, trade conditions, tick test</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="taq.TAQ">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">TAQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taq_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.TAQ" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class to manipulate a daily TAQ .csv.gz file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>taq_file</strong> – raw .csv.gz input data file name</p></li>
+<li><p><strong>index_file</strong> – name of new (csv.gz) file to write indexed-gzip index</p></li>
+<li><p><strong>symbols_file</strong> – name of new (csv.gz) file to write symbols index</p></li>
+</ul>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>NYSE historical samples:
+<a class="reference external" href="ftp://ftp.nyxdata.com/Historical%20Data%20Samples/">ftp://ftp.nyxdata.com/Historical%20Data%20Samples/</a></p></li>
+<li><p>Uses indexed_gzip package for random access into gzip file</p></li>
+<li><p>Implements 3 methods to access raw daily TAQ csv.gz files, e.g.:</p>
+<ul>
+<li><p>trade(n) - next n csv lines</p></li>
+<li><p>iter(trade) - iterable, by chunk with same stock symbol</p></li>
+<li><p>trade[‘AAPL’] - getitem, by symbol</p></li>
+</ul>
+</li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.series.Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#taq.TAQ.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Return symbol location and size in daily taq gzip file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#taq.TAQ.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Get chunk of all rows for the input symbol as a data frame</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taq.TAQ.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close getitem file handle</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.index_symbols">
+<span class="sig-name descname"><span class="pre">index_symbols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.TAQ.index_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Generate indexed_gzip and symbols index files</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">taq_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.TAQ.open" title="Permalink to this definition"></a></dt>
+<dd><p>Open with context manager protocol for sequential line reads</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="taq.TAQ.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#taq.TAQ.read" title="Permalink to this definition"></a></dt>
+<dd><p>Read entire file as a DataFrame</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.align_trades">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">align_trades</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#taq.align_trades" title="Permalink to this definition"></a></dt>
+<dd><p>Align each trade with prevailing and forward quotes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ct</strong> – Input dataframe of trades</p></li>
+<li><p><strong>cq</strong> – Input dataframe of nbbo quotes</p></li>
+<li><p><strong>open_t</strong> – drop quotes prior to open time</p></li>
+<li><p><strong>inplace</strong> – whether to overwrite trades dataframe or return as new copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of trades with additional columns, if not inplace. else None</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>prevailing quote at -1ns, forward quote at +5m, drop quotes before open_t</p></li>
+<li><p>See Holden and Jacobsen (2014), “Liquidity Measurement”</p></li>
+<li><p>Prevailing_Mid: midquote prevailing before each trade</p></li>
+<li><p>Forward_Mid: midquote prevailing 5 minutes after trade</p></li>
+<li><p>Tick_Test: Whether trade price above, below or equals previous trade</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.bin_quotes">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">bin_quotes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'m'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">16:00:00')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#taq.bin_quotes" title="Permalink to this definition"></a></dt>
+<dd><p>Resample quotes into time interval bins</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cq</strong> – Input dataframe of nbbo quote</p></li>
+<li><p><strong>value</strong> – number of time units per bin width</p></li>
+<li><p><strong>unit</strong> – time unit in {‘h’, ‘m’, ‘s’, ‘ms’, ‘us’, ‘ns’}</p></li>
+<li><p><strong>open_t</strong> – exclusive left bound of first bin</p></li>
+<li><p><strong>close_t</strong> – inclusive right bound of last bin</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of resampled derived quote liquidity metrics</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>quoted: time-weighted quoted half-spread</p></li>
+<li><p>depth: time-weighted average of average bid and offer sizes</p></li>
+<li><p>offersize: time-weighted average offer size</p></li>
+<li><p>bidsize: time-weighted average bid size</p></li>
+<li><p>mid: last midquote</p></li>
+<li><p>firstmid: first midquote</p></li>
+<li><p>maxmid: max midquote</p></li>
+<li><p>minmid: min midquote</p></li>
+<li><p>retq: last midquote-to-last midquote return</p></li>
+</ul>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resample</span><span class="p">(</span><span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">agg</span><span class="p">(</span><span class="n">Series</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">open_t</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.bin_trades">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">bin_trades</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'m'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">16:00:00')</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#taq.bin_trades" title="Permalink to this definition"></a></dt>
+<dd><p>Resample trades into time interval bins</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ct</strong> – Input dataframe of trades</p></li>
+<li><p><strong>value</strong> – number of time units per bin width</p></li>
+<li><p><strong>unit</strong> – time unit in {‘h’, ‘m’, ‘s’, ‘ms’, ‘us’, ‘ns’}</p></li>
+<li><p><strong>open_t</strong> – exclusive left bound of first bin</p></li>
+<li><p><strong>close_t</strong> – inclusive right bound of last bin</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame of resampled derived trade liquidity metrics</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>counts: number of trades in bin</p></li>
+<li><p>last: last trade price in bin (ffill if none)</p></li>
+<li><p>first: first trade price in bin</p></li>
+<li><p>maxtrade: max trade price in bin</p></li>
+<li><p>mintrade: min trade price in bin</p></li>
+<li><p>ret: last-to-last trade price return</p></li>
+<li><p>vwap: volume weighted average trade price</p></li>
+<li><dl class="simple">
+<dt>effective: volume-weighted effective relative half-spread</dt><dd><p>(trade price divided by prevailing midquote, minus 1)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>realized: volume-weighted effective relative half-spread</dt><dd><p>(trade price divided by 5-minute forward midquote, minus 1)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>impact: volume-weighted realized relative half-spread</dt><dd><p>(5-minute forward midquote divided by prevailing, minus 1)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">resample</span><span class="p">(</span><span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">agg</span><span class="p">(</span><span class="n">Series</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">open_t</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.clean_nbbo">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">clean_nbbo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['Best_Bid_Price',</span> <span class="pre">'Best_Bid_Size',</span> <span class="pre">'Best_Offer_Price',</span> <span class="pre">'Best_Offer_Size']</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#taq.clean_nbbo" title="Permalink to this definition"></a></dt>
+<dd><p>Remove bad quotes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Dataframe containing one day’s nbbo quotes of a stock</p></li>
+<li><p><strong>keep</strong> – List of columns to keep</p></li>
+</ul>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>requires prices and size &gt; 0 and offer &gt; bid price</p></li>
+<li><p>spread &lt;= $5</p></li>
+<li><p>cancel correction != ‘B’</p></li>
+<li><p>condition in [‘A’,’B’,’H’,’O’,’R’,’W’])</p></li>
+<li><p>keep largest sequence number if same time stamp</p></li>
+<li><p>drop duplicated records</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.clean_trade">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">clean_trade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">16:00:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cond</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MOZBTLGWJK145789'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#taq.clean_trade" title="Permalink to this definition"></a></dt>
+<dd><p>Remove bad trades</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Dataframe containing one day’s trades of a stock</p></li>
+<li><p><strong>open_t</strong> – Exclude records on or before this opening time</p></li>
+<li><p><strong>close_t</strong> – Exclude records after this closing time</p></li>
+<li><p><strong>cond</strong> – condition chars to exclude</p></li>
+</ul>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>Requires correction code = 0, price and volume &gt; 0</p></li>
+<li><p>Sale Conditions to exclude by default:</p>
+<ul>
+<li><p>M = Market Center Close Price</p></li>
+<li><p>O = Market Center Opening Trade</p></li>
+<li><p>Z = Sold (Out of Sequence)</p></li>
+<li><p>L = Sold Last (Late Reporting)</p></li>
+<li><p>B = Bunched Trade</p></li>
+<li><p>G = Bunched Sold Trade</p></li>
+<li><p>W = Average Price Trade</p></li>
+<li><p>4 = Derivatively Priced</p></li>
+<li><p>5 = Re-opening Prints</p></li>
+<li><p>7 = Qualified Contingent Trade</p></li>
+<li><p>8 = Placeholder for 611 Exempt</p></li>
+<li><p>9 = Corrected Consolidated Close Price per the Listing Market</p></li>
+<li><p>K = Rule 127 (NYSE only) or Rule 155 Trade (NYSE MKT only)</p></li>
+<li><p>T = Extended Hours Trade</p></li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.itertaq">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">itertaq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trades</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#taq.TAQ" title="taq.TAQ"><span class="pre">TAQ</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">quotes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#taq.TAQ" title="taq.TAQ"><span class="pre">TAQ</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">master</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cusips</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_shares</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.itertaq" title="Permalink to this definition"></a></dt>
+<dd><p>Iterates over and filters daily taq trades and quotes by symbol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trades</strong> – Instance of TAQ trades object</p></li>
+<li><p><strong>quotes</strong> – Instance of TAQ nbbo quotes object</p></li>
+<li><p><strong>master</strong> – Reference table from Master file, indexed by symbol</p></li>
+<li><p><strong>cusips</strong> – List of cusips to select</p></li>
+<li><p><strong>symbols</strong> – List of symbols (space separated security class) to select.</p></li>
+<li><p><strong>open_t</strong> – Earliest Timestamp of valid trades and quotes</p></li>
+<li><p><strong>close_t</strong> – Latest Timestamp to keep trades and quotes, inclusive</p></li>
+<li><p><strong>verbose</strong> – Whether to echo messages for debugging</p></li>
+<li><p><strong>has_shares</strong> – If True, require ‘Shares_Outstanding’ &gt; 0 in master table</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.opentaq">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">opentaq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taqdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.opentaq" title="Permalink to this definition"></a></dt>
+<dd><p>Helper to initialize all master dataframe, trade and quote objects</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.plot_taq">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">plot_taq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">open_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Timestamp</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Timestamp</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#taq.plot_taq" title="Permalink to this definition"></a></dt>
+<dd><p>Convenience method for 1x2 primary/secondary-y subplots of tick data</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="taq.taq_from_csv">
+<span class="sig-prename descclassname"><span class="pre">taq.</span></span><span class="sig-name descname"><span class="pre">taq_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#taq.taq_from_csv" title="Permalink to this definition"></a></dt>
+<dd><p>Convert csv from TAQ to dataframe with correct dtypes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk</strong> – A chunk of csv text</p></li>
+<li><p><strong>columns</strong> – List of column names, else in first line of chunk</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>DataFrame with correct dtypes and column names</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>column names (provided or parsed from first line) indicate
+the corresponding known list of dtypes for nbbo, trade or mast</p></li>
+</ul>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="structured.html" class="btn btn-neutral float-left" title="structured module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="unstructured.html" class="btn btn-neutral float-right" title="unstructured module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

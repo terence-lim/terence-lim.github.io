@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyR module &mdash; Financial Data Science 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="recipes module" href="recipes.html" />
+    <link rel="prev" title="graph module" href="graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">finds</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="alfred.html">alfred module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backtesting.html">backtesting module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="busday.html">busday module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="database.html">database module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="display.html">display module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="edgar.html">edgar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graph.html">graph module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyR module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html">recipes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sectors.html">sectors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structured.html">structured module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="taq.html">taq module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unstructured.html">unstructured module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="modules.html">finds</a> &raquo;</li>
+      <li>pyR module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pyR.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyR">
+<span id="pyr-module"></span><h1>pyR module<a class="headerlink" href="#module-pyR" title="Permalink to this heading"></a></h1>
+<p>Wrapper class over rpy2 package to interface with R environment</p>
+<p>Deconstruct and expose an rpy2 or numpy/pandas object interchangeably.</p>
+<ul class="simple">
+<li><p>rpy2</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyR.PyR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyR.</span></span><span class="sig-name descname"><span class="pre">PyR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">StrVector</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ListVector</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyR.PyR" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Store and expose as rpy2 or numpy/pandas objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> – input R object, or numpy array, or pandas DataFrame or Series</p></li>
+<li><p><strong>names</strong> – named labels of object items</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyR.PyR.iloc">
+<span class="sig-name descname"><span class="pre">iloc</span></span><a class="headerlink" href="#pyR.PyR.iloc" title="Permalink to this definition"></a></dt>
+<dd><p>dict or numpy array</p>
+<ul class="simple">
+<li><p>internally, objects are stored as either numpy array,
+or dict of objects (when input was R ListVector or DataFrame,
+or Python dict).</p></li>
+<li><p>TODO: should use other safer property getters to view object
+in target types: e,g, .frame (pandas), .ro (RObject),
+or .values (python dict or ndarray)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyR.PyR.dim">
+<span class="sig-name descname"><span class="pre">dim</span></span><a class="headerlink" href="#pyR.PyR.dim" title="Permalink to this definition"></a></dt>
+<dd><p>dimensions of data objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>tuple of int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">names,</span> <span class="pre">rownames,</span> <span class="pre">colnames</span></span></dt>
+<dd><p>named labels of object items</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>StrVectors</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Notes:</p>
+<ul class="simple">
+<li><p>input item can be of either Python or R object type</p></li>
+<li><p>input labels in each dimension can be explicitly provided, and should have
+same dim as object, as error checking is minimal</p></li>
+<li><p>In R, matrices are column-major ordered (aka Fortran-like index order,
+with the first index changing fastest) although the R constructor
+matrix() accepts a boolean argument byrow that, when true, will build
+the matrix as if row-major ordered (aka C-like, which is also Python numpy
+default order, where the last axis index changes fastest)</p></li>
+<li><p>A suggested convention is to append ‘_’ to R function names and
+‘_r’ to R objects, and capitalize initial letter of PyR instances.</p></li>
+<li><p>r[‘plot’] may need to explicitliy set xlab=’’, ylab=’’</p></li>
+<li><p>TODO: if hasattri(‘slots’), esp ‘ts’ class, e.g. nile.slots.items()</p></li>
+</ul>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rpy2.robjects</span> <span class="kn">import</span> <span class="n">r</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rpy2.robjects.packages</span> <span class="kn">import</span> <span class="n">importr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">amen_r</span> <span class="o">=</span> <span class="n">importr</span><span class="p">(</span><span class="s1">&#39;amen&#39;</span><span class="p">)</span>                    <span class="c1"># use R library</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">c_</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>                                 <span class="c1"># link R routines</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Nodevars</span> <span class="o">=</span> <span class="n">PyR</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;IR90s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rx2</span><span class="p">[</span><span class="s1">&#39;nodevars&#39;</span><span class="p">])</span>  <span class="c1"># retrieve R data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Gdp</span> <span class="o">=</span> <span class="n">Nodevars</span><span class="p">[:,</span> <span class="s1">&#39;gdp&#39;</span><span class="p">]</span>                    <span class="c1"># getitem subset with slice</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">topgdp</span> <span class="o">=</span> <span class="n">Gdp</span><span class="o">.</span><span class="n">values</span> <span class="o">&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Gdp</span><span class="o">.</span><span class="n">py</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">30</span><span class="p">]</span> <span class="c1"># python calcs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Dyadvars</span> <span class="o">=</span> <span class="n">PyR</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;IR90s&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rx2</span><span class="p">[</span><span class="s1">&#39;dyadvars&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">Dyadvars</span><span class="p">[</span><span class="n">topgdp</span><span class="p">,</span> <span class="n">topgdp</span><span class="p">,</span> <span class="s1">&#39;exports&#39;</span><span class="p">]</span>  <span class="c1"># getitem with boolean index</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span><span class="o">.</span><span class="n">iloc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">iloc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>          <span class="c1"># update with python calculations</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR.PyR.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyR.PyR.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Returns copy of subset of data object from given slice or index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR.PyR.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyR.PyR.assign" title="Permalink to this definition"></a></dt>
+<dd><p>Directly update internal data object (must be same numpy shape)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyR.PyR.frame">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">frame</span></span><a class="headerlink" href="#pyR.PyR.frame" title="Permalink to this definition"></a></dt>
+<dd><p>Expose a view as pandas DataFrame</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR.PyR.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyR.PyR.index" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to lookup index/es of (list of) str label in names</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyR.PyR.ncol">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ncol</span></span><a class="headerlink" href="#pyR.PyR.ncol" title="Permalink to this definition"></a></dt>
+<dd><p>Length of second dimension, as R IntVector type</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyR.PyR.nrow">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nrow</span></span><a class="headerlink" href="#pyR.PyR.nrow" title="Permalink to this definition"></a></dt>
+<dd><p>Length of first dimension, as R IntVector type</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyR.PyR.ro">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ro</span></span><a class="headerlink" href="#pyR.PyR.ro" title="Permalink to this definition"></a></dt>
+<dd><p>Expose a view as RObject, so that can pass to R environment</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyR.PyR.savefig">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">savefig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">12)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyR.PyR.savefig" title="Permalink to this definition"></a></dt>
+<dd><p>Save R graphics to file, or return R command. Optionally imshow</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyR.PyR.values">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">values</span></span><a class="headerlink" href="#pyR.PyR.values" title="Permalink to this definition"></a></dt>
+<dd><p>Expose view as python dict (when ListVector) or ndarray (when not)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyR.StrListVector">
+<span class="sig-prename descclassname"><span class="pre">pyR.</span></span><span class="sig-name descname"><span class="pre">StrListVector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strList</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ListVector</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">StrVector</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">rpy2.robjects.vectors.StrVector</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">rpy2.robjects.vectors.ListVector</span></span></span><a class="headerlink" href="#pyR.StrListVector" title="Permalink to this definition"></a></dt>
+<dd><p>Convert nested list input to StrVector or ListVector</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="graph.html" class="btn btn-neutral float-left" title="graph module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="recipes.html" class="btn btn-neutral float-right" title="recipes module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

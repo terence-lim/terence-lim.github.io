@@ -1,0 +1,7 @@
+busday module
+=============
+
+.. automodule:: busday
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+convolution module
+==================
+
+.. automodule:: convolution
+   :members:
+   :undoc-members:
+   :show-inheritance:
