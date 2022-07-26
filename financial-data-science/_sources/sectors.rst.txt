@@ -1,7 +1,0 @@
-sectors module
-==============
-
-.. automodule:: sectors
-   :members:
-   :undoc-members:
-   :show-inheritance:

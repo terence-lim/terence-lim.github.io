@@ -1,7 +1,0 @@
-backtesting module
-==================
-
-.. automodule:: backtesting
-   :members:
-   :undoc-members:
-   :show-inheritance:

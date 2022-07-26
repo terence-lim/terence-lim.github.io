@@ -1,7 +1,0 @@
-structured module
-=================
-
-.. automodule:: structured
-   :members:
-   :undoc-members:
-   :show-inheritance:

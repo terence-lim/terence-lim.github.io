@@ -1,7 +1,0 @@
-pyR module
-==========
-
-.. automodule:: pyR
-   :members:
-   :undoc-members:
-   :show-inheritance:
