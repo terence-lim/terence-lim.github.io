@@ -1,29 +1,28 @@
+
 ## Terence's Repos
 
 # Financial Data Science
 
-Code library and examples in python, for retrieving and manipulating structured and unstructured financial data sets, and exploring data science and machine learning methods: <https://github.com/terence-lim/financial-data-science>
+Code library and examples in Python, for retrieving and manipulating structured and unstructured financial data sets, and exploring data science and machine learning methods: <https://github.com/terence-lim/financial-data-science>
 
-1. *FinDS* package: <https://github.com/terence-lim/financial-data-science/tree/master/finds>
+1. *FinDS* package: <https://github.com/terence-lim/financial-data-science.git>
 
-2. Exercises in python: <https://github.com/terence-lim/financial-data-science/tree/master/examples>
+2. Exercises in Python: <https://github.com/terence-lim/financial-data-science/tree/master/examples>
 
-3. Documentation in sphinx-format: <https://terence-lim.github.io/financial-data-science-docs/>
-
-
-# Math for Life Contingencies
-
-Python module implements the general formulas and shortcut equations for solving the SOA FAM-L 
-sample exam questions, and more.
-
-1. [Executable Colab notebook](https://colab.research.google.com/drive/1qguTCMQSk0m273IHApXA7IpUJwSoKEb-?usp=sharing)
-
-2. Code documentation and formulas <https://terence-lim.github.io/notes/faml.pdf>
-
-3. Github repo: <https://github.com/terence-lim/mathlc/tree/master/>
+3. Documentation in sphinx html: <https://terence-lim.github.io/financial-data-science-docs/>
 
 
-# Misc Notes
+# Solving Actuarial Math with Python
+
+Life Contingent Risks: Implements the general formulas and shortcut equations for solving the SOA FAM-L sample exam questions, and more, in Python.
+
+1. Executable Colab Notebook: [actuarialmath.ipynb](https://colab.research.google.com/drive/1qguTCMQSk0m273IHApXA7IpUJwSoKEb-?usp=sharing)
+
+2. Documentation and formulas: https://terence-lim.github.io/notes/actuarialmath.pdf
+
+3. Github repo: https://github.com/terence-lim/actuarialmath.git/
+
+# Review Notes
 
 motivated by:
 
