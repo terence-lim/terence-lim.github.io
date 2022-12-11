@@ -1,82 +1,37 @@
-# Actuarial Math
+## Terence's Repos
 
-## Actuarial Math - Life Contingent Risks
+# Financial Data Science
 
-This `actuarialmath` package implements in Python the general
-formulas, recursive relationships and shortcut equations for
-Fundamentals of Long Term Actuarial Mathematics, to solve the SOA
-sample FAM-L questions and more.
+Code library and examples in Python, for retrieving and manipulating structured and unstructured financial data sets, and exploring data science and machine learning methods: <https://github.com/terence-lim/financial-data-science>
 
-- The concepts are developed hierarchically in [object-oriented Python](https://github.com/terence-lim/actuarialmath.git).
+1. *FinDS* package: <https://github.com/terence-lim/financial-data-science.git>
 
-- Each module incrementally introduces the [formulas used, with usage examples](https://terence-lim.github.io/notes/actuarialmath.pdf).
+2. Exercises in Python: <https://github.com/terence-lim/financial-data-science/tree/master/examples>
 
-- The SOA sample questions (released in August 2022) are solved in an
-[executable Google Colab Notebook](https://colab.research.google.com/drive/1qguTCMQSk0m273IHApXA7IpUJwSoKEb-?usp=sharing).
+3. Documentation in sphinx html: <https://terence-lim.github.io/financial-data-science-docs/>
 
-Enjoy!
+# Solving Actuarial Math with Python
 
-Terence Lim
+Life Contingent Risks: Implements the general formulas and shortcut equations for solving the SOA FAM-L sample exam questions, and more, in Python.
 
-MIT License. Copyright 2022, Terence Lim
+1. Executable Colab Notebook: [actuarialmath.ipynb](https://colab.research.google.com/drive/1qguTCMQSk0m273IHApXA7IpUJwSoKEb-?usp=sharing)
 
-## Concepts and Class Inheritance
+2. Documentation and formulas: https://terence-lim.github.io/notes/actuarialmath.pdf
 
-![actuarialmath](FAM-L.png)
+3. Github repo: https://github.com/terence-lim/actuarialmath.git/
 
-## Examples
+# Review Notes
 
-- SOA sample question 6.4: Calculate premium using normal
-  approximation for monthly whole life annuity-due.
+motivated by:
 
-```
-mthly = Mthly(m=12, life=Reserves(interest=dict(i=0.06)))
-A1, A2 = 0.4075, 0.2105
-mean = mthly.annuity_twin(A1)*15*12
-var = mthly.annuity_variance(A1=A1, A2=A2, b=15 * 12)
-S = Reserves.portfolio_percentile(mean=mean, variance=var, prob=.9, N=200)
-```
+- FDP syllabus (CAIA Association): <https://terence-lim.github.io/notes/FDP.pdf>
 
-- SOA sample question 5.7: Given $A_{35} = 0.188,~ A_{65} = 0.498,~ _{30}p_{35}=0.883$, calculate the EPV of a temporary annuity $\ddot{a}^{(2)}_{x:\overline{t|}}$ paid half-yearly using the Woolhouse approximation.
+- SRM/PA syllabus (Society of Actuaries): <https://terence-lim.github.io/notes/SRM.pdf>
 
-```
-life = Recursion(interest=dict(i=0.04))
-life.set_A(0.188, x=35).set_A(0.498, x=65).set_p(0.883, x=35, t=30)
-mthly = Woolhouse(m=2, life=life, three_term=False)
-print(1000 * mthly.temporary_annuity(35, t=30))
-```
+# OCaml LLVM Project
 
-- SOA sample question 7.20: Calculate gross premium policy value and
-  modified reserves where mortality follows the Standard Ultimate Life
-  Table.
+- MINIMAT Matrix Language: <https://github.com/terence-lim/minimat>
 
-```
-life = SULT()
-S = life.FPT_policy_value(35, t=1, b=1000)  # is 0 for FPT at t=0,1
-policy = life.Policy(benefit=1000, initial_premium=.3, initial_policy=300,
-                     renewal_premium=.04, renewal_policy=30)
-P = life.gross_premium(A=life.whole_life_insurance(35), **policy.premium_terms)
-R = life.gross_policy_value(35, t=1, policy=policy.set(premium=P))
-```
+Copyright 2022, by [Terence Lim](https://www.linkedin.com/in/terencelim)
 
-## Resources
-
-- Documentation and formulas: [actuarialmath.pdf](https://terence-lim.github.io/notes/actuarialmath.pdf)
-
-- Executable Colab Notebook: [faml.ipynb](https://colab.research.google.com/drive/1qguTCMQSk0m273IHApXA7IpUJwSoKEb-?usp=sharing)
-
-- Github repo: [https://github.com/terence-lim/actuarialmath.git](https://github.com/terence-lim/actuarialmath.git)
-
-- SOA FAM-L Sample Solutions: [copy retrieved Aug 2022](https://terence-lim.github.io/notes/2022-10-exam-fam-l-sol.pdf)
-
-- SOA FAM-L Sample Questions: [copy retrieved Aug 2022](https://terence-lim.github.io/notes/2022-10-exam-fam-l-quest.pdf)
-
-- Actuarial Mathematics for Life Contingent Risks (Dickson, Hardy and Waters), Institute and Faculty of Actuaries, published by Cambridge University Press
-
-## Contact me
-
-Linkedin: [https://www.linkedin.com/in/terencelim](https://www.linkedin.com/in/terencelim)
-
-Github: [https://terence-lim.github.io](https://terence-lim.github.io)
-
-
+MIT License
