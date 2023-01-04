@@ -6,7 +6,7 @@ Code library and examples in Python, for retrieving and manipulating structured 
 
 1. *FinDS* package: <https://github.com/terence-lim/financial-data-science.git>
 
-2. 30+ Projects in Python: <https://github.com/terence-lim/financial-data-science/>
+2. 30+ Projects in Python: <https://github.com/terence-lim/data-science-notebooks/>
 
 3. Documentation in sphinx html: <https://terence-lim.github.io/financial-data-science-docs/>
 
