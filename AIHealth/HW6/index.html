@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 6.4.7.2 (Linux)"/>
+	<meta name="created" content="2024-03-08T15:57:58.570020853"/>
+	<meta name="changed" content="2024-03-08T15:59:17.043548732"/>
+	<style type="text/css">
+		h3.cjk { font-family: "Noto Serif CJK SC" }
+		h3.ctl { font-family: "Lohit Devanagari" }
+	</style>
+</head>
+<body lang="en-US" dir="ltr"><p style="margin-bottom: 0in"><h1>LLM
+Tutorial</h1></p>
+<div id="dp-wrapper" dir="ltr"><h3 class="western"><strong>Learning
+	Outcomes</strong></h3>
+	<p>After finishing this assignment, you should be able to say:&nbsp;</p>
+	<ul>
+		<li><p style="margin-bottom: 0in">I have some basic knowledge about
+		LLM prompting methods such as in-context learning. 
+		</p>
+		<li><p>I know how to apply LLMs to health-related issues. 
+		</p>
+	</ul>
+	<h3 class="western">Rationale</h3>
+	<p>The goal of this assignment is to get familiar with generative AI
+	technologies (e.g., ChatGPT) and know how to apply them to
+	understand healthcare issues.</p>
+	<h3 class="western">Instructions</h3>
+	<p>In this tutorial, you will demonstrate how you apply generative
+	AI technologies using synthetic data or publicly available data on
+	healthcare related issues. Some areas you might explore include (but
+	are not limited to):</p>
+	<ol>
+		<li><p style="margin-bottom: 0in">Summarize medical information and
+		evaluate the summarization; 
+		</p>
+		<li><p style="margin-bottom: 0in">Convert tabular data into text
+		using different prompt engineering methods (e.g., in-context
+		learning, tree of thoughts, chain of thoughts, reasonings of GPT)
+		for disease prediction and analysis; 
+		</p>
+		<li><p>Utilize different LLMs in healthcare (such as <a href="https://github.com/chaoyi-wu/PMC-LLaMA" target="_blank">PMC-LlaMA</a>)</p>
+		<li><p>Medical notes simplification for different patient groups.
+		    (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8861686/" target="_blank">Example</a>)</p>
+</ol>
+<p style="margin-left: 0.05in">This <a href="https://www.nature.com/articles/s43856-023-00370-1" target="_blank">paper
+from <em>Nature</em></a> has several application areas using LLMs
+which contain related references and hopefully can inspire your idea
+for your LLM tutorial.</p>
+<p style="margin-left: 0.05in">Once you have an idea of what you'd
+like to focus on, create prompts and use data (see note below) to see
+how you can apply LLMs to it. For full credit, you will need to try
+several <a href="https://aclanthology.org/2022.deelio-1.10.pdf" target="_blank">in-context
+learning</a>
+and few shot learning methods and <a href="https://github.com/atfortes/LLM-Reasoning-Papers" target="_blank">reasoning
+methods</a>.  See the rubric below for more information.&nbsp;</p>
+<p>Note: Medical data <strong>can not be used or shared directly</strong>
+via openAI GPT API or the web interface. There are synthetic patient
+data that can be used with OpenAI GPT.</p>
+<p>Here are some publicly available synthesized data that you can use
+with openAI to analyze:</p>
+<ol>
+	<li><p><a href="https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fsynthea.mitre.org%2Fdownloads&amp;data=05%7C02%7C%7C76578ec2080f4e52f8b708dbfc6a7af8%7C31d7e2a5bdd8414e9e97bea998ebdfe1%7C0%7C0%7C638381306494522768%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=KedfUvLhsN7kLaz%2Ftu4jXzexoBrHPnV2uc4Bwvy5Wbk%3D&amp;reserved=0" target="_blank">https://synthea.mitre.org/downloads</a> 7 MB of data with 100 patients 
+	</p>
+	<li><p style="margin-bottom: 0in"><a href="https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fmitre.box.com%2Fshared%2Fstatic%2F9iglv8kbs1pfi7z8phjl9sbpjk08spze.zip&amp;data=05%7C02%7C%7C76578ec2080f4e52f8b708dbfc6a7af8%7C31d7e2a5bdd8414e9e97bea998ebdfe1%7C0%7C0%7C638381306494522768%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=vCxeO8K3LOFXosPgYSSAOohjCIRi39ZaAGe21sYOyHI%3D&amp;reserved=0" target="_blank">https://mitre.box.com/shared/static/9iglv8kbs1pfi7z8phjl9sbpjk08spze.zip</a> 54MB of 10k COVID related data. 
+	</p>
+	<li><p style="margin-bottom: 0in"><a href="https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fbepnye%2FEBM-NLP&amp;data=05%7C02%7C%7C76578ec2080f4e52f8b708dbfc6a7af8%7C31d7e2a5bdd8414e9e97bea998ebdfe1%7C0%7C0%7C638381306494522768%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=w84ZbFYoHnGo3Gz1qQus%2FDoAAjYqct6X2rKDH39f3UA%3D&amp;reserved=0" target="_blank">https://github.com/bepnye/EBM-NLP</a> (this dataset is a text corpus that can be
+	used if we need only text as input) 
+	</p>
+	<li><p style="margin-bottom: 0in"><a href="https://data.world/siyeh/synthetic-medical-data" target="_blank">https://data.world/siyeh/synthetic-medical-data</a></p>
+</ul>
+<div id="Expandable_0" dir="ltr"><p style="margin-bottom: 0in"><br/>
+
+	</p>
+	<div id="Section1" dir="ltr">
+		<h3 class="western">Submission</h3>
+		<ul>
+			<li><p style="margin-bottom: 0in">A python or other project file 
+			</p>
+			<li><p style="margin-bottom: 0in">Slides that explain 
+			</p>
+			<ul>
+				<li><p style="margin-bottom: 0in">your healthcare issue 
+				</p>
+				<li><p style="margin-bottom: 0in">which medical dataset you made
+				use of 
+				</p>
+				<li><p style="margin-bottom: 0in">prompts that you engineered 
+				</p>
+				<li><p style="margin-bottom: 0in">which methods you employed 
+				</p>
+				<li><p style="margin-bottom: 0in">an evaluation of your results 
+				</p>
+				<li><p>ideas for improvement 
+				</p>
+			</ul>
+		</ul>
+	</div>
+</div>
+<p align="center" style="margin-bottom: 0in">LLM Rubric</p>
+<table cellpadding="2" cellspacing="2">
+	<thead>
+		<tr>
+			<th style="border: none; padding: 0in"></th>
+			<th style="border: none; padding: 0in"></th>
+			<th style="border: none; padding: 0in"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th colspan="3" style="border: none; padding: 0in"><p>LLM Rubric</p>
+			</th>
+		</tr>
+		<tr>
+			<th style="border: none; padding: 0in"><p>Criteria</p>
+			</th>
+			<th style="border: none; padding: 0in"><p>Ratings</p>
+			</th>
+			<th style="border: none; padding: 0in"><p>Pts</p>
+			</th>
+		</tr>
+		<tr>
+			<th style="border: none; padding: 0in"><p style="margin-bottom: 0in">
+				LLM Criterion</p>
+				<p><br/>
+
+				</p>
+			</th>
+			<td style="border: none; padding: 0in"><p style="margin-bottom: 0in">
+				You tried LLMs reasoning methods such as chain-of-thought and
+				tree of thought.</p>
+				<p style="margin-bottom: 0in"><br/>
+
+				</p>
+				<p style="margin-bottom: 0in">You tried several different
+				in-context learning and few shot learning methods for prompt
+				engineering.</p>
+				<p style="margin-bottom: 0in"><br/>
+
+				</p>
+				<p style="margin-bottom: 0in">You tried several prompts for GPT
+				to understand some health related issues and provided thoughtful
+				evaluation and thoughts about improvement.</p>
+				<p style="margin-bottom: 0in"><br/>
+
+				</p>
+				<p>You tried several prompts for GPT to understand some health
+				related issues.</p>
+			</td>
+			<td style="border: none; padding: 0in"><p>/ 10 pts</p>
+			</td>
+		</tr>
+		<tr>
+			<th style="border: none; padding: 0in"><p style="margin-bottom: 0in">
+				Bonus Point</p>
+				<p><br/>
+
+				</p>
+			</th>
+			<td style="border: none; padding: 0in"><p>You used the combination
+				of reasoning and in-context learning on interesting usecases and
+				the last layer of LLMs for different downstream tasks, such as
+				prediction and classification.</p>
+			</td>
+			<td style="border: none; padding: 0in"><p>/ 1 pts</p>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="border: none; padding: 0in"><p>Total
+				Points: 0</p>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<p><br/>
+<br/>
+
+</p>
+</body>
+</html>
