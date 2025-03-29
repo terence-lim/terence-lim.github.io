@@ -1,0 +1,796 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>February 2025 Database Update &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'finds/README';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="../README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.5_covariance_matrix.html">Covariance Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../5.3_business_textual.html">Business Textual Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2Ffinds/README.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/finds/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>February 2025 Database Update</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="february-2025-database-update">
+<h1>February 2025 Database Update<a class="headerlink" href="#february-2025-database-update" title="Permalink to this heading">#</a></h1>
+<p>CRSP_DATE = 20241231</p>
+<ol class="arabic simple" start="0">
+<li><p>credentials, etc</p>
+<ul class="simple">
+<li><p>db, user, CRSP_DATE, data path</p></li>
+</ul>
+</li>
+<li><p>database</p>
+<ul class="simple">
+<li><p>sql</p>
+<ul>
+<li><p>run create databases</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>structured</p>
+<ul class="simple">
+<li><p>busday</p>
+<ul>
+<li><p>holidays from NYSE website</p></li>
+<li><p>run calendar</p></li>
+</ul>
+</li>
+<li><p>benchmarks</p>
+<ul>
+<li><p>crsp index: sp500.txt.gz, treasuries.txt.gz</p></li>
+<li><p>run sp500, treasuries, French library</p></li>
+</ul>
+</li>
+<li><p>crsp</p>
+<ul>
+<li><p>delist, dist, names, shares,</p></li>
+<li><p>monthly (DLSTCD, DLSTRET, PRC, RET, RETX)</p></li>
+<li><p>daily (SHROUT, BIDLO, ASKHI, PRC, VOL, RET, BID, ASK, OPENPRC, RETX)</p></li>
+<li><p>treasuries: Index / Treasury and Inflation | US Treasury and Inflation Indexes</p></li>
+</ul>
+</li>
+<li><p>ibes</p>
+<ul>
+<li><p>actpsum, adjsum, idsum, statsum, surpsum (FY1-2, QTR1-4, SEMI1-2, LTG)</p></li>
+</ul>
+</li>
+<li><p>pstat</p>
+<ul>
+<li><p>CRSP | Annual Update | CRSP/Compustat Merged | Compustat CRSP Link: Link and Identifying Info</p></li>
+<li><p>annual: 175 items (6 identifying, 1 company, 93 (92?) balance, 49 income, 17 flow, 8 misc, 2 supp)</p></li>
+<li><p>quarterly: 28 items (4 identifying, 5 company, 18 data, 1 suppl)</p></li>
+<li><p>keydev: 21 items (exclude Headline, duplicated GVKEY and RoleType)</p></li>
+<li><p>supplychain: Linking Queries by WRDS | Supply Chain with IDs (Compustat Segment)</p></li>
+</ul>
+</li>
+<li><p>cboe</p>
+<ul>
+<li><p>indexes</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>readers</p>
+<ul class="simple">
+<li><p>sectoring</p></li>
+<li><p>fomcreader</p></li>
+<li><p>bea</p></li>
+</ul>
+</li>
+<li><p>unstructured</p>
+<ul class="simple">
+<li><p>fomc</p>
+<ul>
+<li><p>run fomcreader main</p></li>
+</ul>
+</li>
+<li><p>edgar</p>
+<ul>
+<li><p>Loughran-Mcdonald: <a class="reference external" href="https://sraf.nd.edu/sec-edgar-data/cleaned-10x-files/">https://sraf.nd.edu/sec-edgar-data/cleaned-10x-files/</a></p></li>
+<li><p>or run edgar._save_10X()</p></li>
+<li><p>run edgar._extract_items()</p></li>
+<li><p>zip -r 2024.zip 2024</p></li>
+<li><p>zip -r mda10K.zip mda10K</p></li>
+<li><p>zip -r bus10K.zip bus10K</p></li>
+<li><p>zip -r qqr10K.zip qqr10K</p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>annual - 175 items</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GVKEY</span>
+<span class="n">CUSIP</span>
+<span class="n">CIK</span>
+<span class="n">FYR</span>
+<span class="n">NAICS</span>
+<span class="n">SIC</span>
+<span class="n">FYEAR</span>
+<span class="n">ACO</span>
+<span class="n">ACOX</span>
+<span class="n">ACT</span>
+<span class="n">AO</span>
+<span class="n">AOX</span>
+<span class="n">AP</span>
+<span class="n">AT</span>
+<span class="n">CAPS</span>
+<span class="n">CEQ</span>
+<span class="n">CEQL</span>
+<span class="n">CEQT</span>
+<span class="n">CH</span>
+<span class="n">CHE</span>
+<span class="n">DC</span>
+<span class="n">DCLO</span>
+<span class="n">DCPSTK</span>
+<span class="n">DCVSR</span>
+<span class="n">DCVSUB</span>
+<span class="n">DCVT</span>
+<span class="n">DD</span>
+<span class="n">DD1</span>
+<span class="n">DD2</span>
+<span class="n">DD3</span>
+<span class="n">DD4</span>
+<span class="n">DD5</span>
+<span class="n">DLC</span>
+<span class="n">DLTO</span>
+<span class="n">DLTP</span>
+<span class="n">DLTT</span>
+<span class="n">DM</span>
+<span class="n">DN</span>
+<span class="n">DPACT</span>
+<span class="n">DPVIEB</span>
+<span class="n">DS</span>
+<span class="n">FATB</span>
+<span class="n">FATL</span>
+<span class="n">GDWL</span>
+<span class="n">ICAPT</span>
+<span class="n">INTAN</span>
+<span class="n">INVFG</span>
+<span class="n">INVRM</span>
+<span class="n">INVT</span>
+<span class="n">INVWIP</span>
+<span class="n">ITCB</span>
+<span class="n">IVAEQ</span>
+<span class="n">IVAO</span>
+<span class="n">IVST</span>
+<span class="n">LCO</span>
+<span class="n">LCOX</span>
+<span class="n">LCT</span>
+<span class="n">LIFR</span>
+<span class="n">LO</span>
+<span class="n">LSE</span>
+<span class="n">LT</span>
+<span class="n">MIB</span>
+<span class="n">MRC1</span>
+<span class="n">MRC2</span>
+<span class="n">MRC3</span>
+<span class="n">MRC4</span>
+<span class="n">MRC5</span>
+<span class="n">MRCT</span>
+<span class="n">MSA</span>
+<span class="n">NP</span>
+<span class="n">OB</span>
+<span class="n">PPEGT</span>
+<span class="n">PPENT</span>
+<span class="n">PPEVEB</span>
+<span class="n">PSTK</span>
+<span class="n">PSTKC</span>
+<span class="n">PSTKL</span>
+<span class="n">PSTKN</span>
+<span class="n">PSTKR</span>
+<span class="n">PSTKRV</span>
+<span class="n">REA</span>
+<span class="n">REAJO</span>
+<span class="n">RECCO</span>
+<span class="n">RECD</span>
+<span class="n">RECT</span>
+<span class="n">RECTA</span>
+<span class="n">RECTR</span>
+<span class="n">REUNA</span>
+<span class="n">SEQ</span>
+<span class="n">TLCF</span>
+<span class="n">TSTK</span>
+<span class="n">TSTKC</span>
+<span class="n">TXDB</span>
+<span class="n">TXDITC</span>
+<span class="n">TXP</span>
+<span class="n">TXR</span>
+<span class="n">WCAP</span>
+<span class="n">XACC</span>
+<span class="n">XPP</span>
+<span class="n">AQI</span>
+<span class="n">AQS</span>
+<span class="n">COGS</span>
+<span class="n">DO</span>
+<span class="n">DP</span>
+<span class="n">DVC</span>
+<span class="n">DVP</span>
+<span class="n">DVT</span>
+<span class="n">EBIT</span>
+<span class="n">EBITDA</span>
+<span class="n">EPSFX</span>
+<span class="n">EPSPX</span>
+<span class="n">ESUB</span>
+<span class="n">FCA</span>
+<span class="n">GP</span>
+<span class="n">GWO</span>
+<span class="n">IB</span>
+<span class="n">IBADJ</span>
+<span class="n">IBCOM</span>
+<span class="n">IDIT</span>
+<span class="n">INTC</span>
+<span class="n">ITCI</span>
+<span class="n">MII</span>
+<span class="n">NI</span>
+<span class="n">NIADJ</span>
+<span class="n">NOPI</span>
+<span class="n">NOPIO</span>
+<span class="n">OIADP</span>
+<span class="n">OIBDP</span>
+<span class="n">PI</span>
+<span class="n">REVT</span>
+<span class="n">SALE</span>
+<span class="n">SPI</span>
+<span class="n">TXC</span>
+<span class="n">TXDI</span>
+<span class="n">TXFED</span>
+<span class="n">TXFO</span>
+<span class="n">TXS</span>
+<span class="n">TXT</span>
+<span class="n">TXW</span>
+<span class="n">XAD</span>
+<span class="n">XIDO</span>
+<span class="n">XINT</span>
+<span class="n">XLR</span>
+<span class="n">XOPR</span>
+<span class="n">XPR</span>
+<span class="n">XRD</span>
+<span class="n">XRENT</span>
+<span class="n">XSGA</span>
+<span class="n">AQC</span>
+<span class="n">CAPX</span>
+<span class="n">CAPXV</span>
+<span class="n">CHECH</span>
+<span class="n">DLTIS</span>
+<span class="n">DPC</span>
+<span class="n">DV</span>
+<span class="n">ESUBC</span>
+<span class="n">FOPO</span>
+<span class="n">IBC</span>
+<span class="n">IVCH</span>
+<span class="n">OANCF</span>
+<span class="n">PRSTKC</span>
+<span class="n">SCSTKC</span>
+<span class="n">SPPE</span>
+<span class="n">SSTK</span>
+<span class="n">XIDOC</span>
+<span class="n">CSHFD</span>
+<span class="n">CSHO</span>
+<span class="n">CSHRC</span>
+<span class="n">EMP</span>
+<span class="n">LIFRP</span>
+<span class="n">MIBT</span>
+<span class="n">TSTKN</span>
+<span class="n">XRDP</span>
+<span class="n">PRCC_F</span>
+<span class="n">SICH</span>
+</pre></div>
+</div>
+<p>quarterly - 28 items</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUSIP</span>
+<span class="n">CIK</span>
+<span class="n">NAICS</span>
+<span class="n">SIC</span>
+<span class="n">DATACQTR</span>
+<span class="n">DATAFQTR</span>
+<span class="n">FQTR</span>
+<span class="n">FYEARQ</span>
+<span class="n">RDQ</span>
+<span class="n">ACTQ</span>
+<span class="n">ATQ</span>
+<span class="n">CEQQ</span>
+<span class="n">CHEQ</span>
+<span class="n">COGSQ</span>
+<span class="n">CSHOQ</span>
+<span class="n">DLCQ</span>
+<span class="n">IBQ</span>
+<span class="n">LCTQ</span>
+<span class="n">LTQ</span>
+<span class="n">PPENTQ</span>
+<span class="n">PSTKQ</span>
+<span class="n">PSTKRQ</span>
+<span class="n">REVTQ</span>
+<span class="n">SALEQ</span>
+<span class="n">SEQQ</span>
+<span class="n">TXTQ</span>
+<span class="n">XSGAQ</span>
+<span class="n">PRCCQ</span>
+</pre></div>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./finds"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

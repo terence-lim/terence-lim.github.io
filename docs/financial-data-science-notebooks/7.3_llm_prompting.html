@@ -186,6 +186,7 @@
 <li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.5_covariance_matrix.html">Covariance Matrix</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
@@ -195,6 +196,7 @@
 <li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.3_business_textual.html">Business Textual Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
@@ -414,8 +416,11 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -688,6 +693,7 @@ document.write(`
 <li><p>The 1B model supports a 32K-token context window, while the larger models (4B and above) provide a 128K-token context window.</p></li>
 <li><p>Multilingual support out-of-the-box for over 35 languages.</p></li>
 </ul>
+<p><a class="reference external" href="https://ai.google.dev/gemma/docs/get_started#models-list">https://ai.google.dev/gemma/docs/get_started#models-list</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model name for Gemma-3-4B model in Ollama</span>
@@ -1155,7 +1161,87 @@ weighted avg       0.81      0.81      0.81      4831
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4831/4831 [25:46&lt;00:00,  3.12it/s] 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 1/4831 [00:06&lt;8:53:32,  6.63s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Labeled sentiment=&#39;neutral&#39;.  RESPONSE=
+(&#39;```json\n&#39;
+ &#39;{\n&#39;
+ &#39;  &quot;sentiment&quot;: &quot;neutral&quot;,\n&#39;
+ &#39;  &quot;reasoning&quot;: &quot;The text announces the establishment of a new sales and &#39;
+ &#39;marketing group. While this could potentially lead to positive outcomes &#39;
+ &#39;(increased sales, market share), the announcement itself is a procedural &#39;
+ &quot;change and doesn&#39;t inherently convey positive or negative financial news. &quot;
+ &quot;It&#39;s a statement of action rather than a report of financial performance. &quot;
+ &#39;Therefore, from a retail investor\&#39;s perspective, it\&#39;s neutral.&quot;\n&#39;
+ &#39;}\n&#39;
+ &#39;```&#39;)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 2/4831 [00:08&lt;5:20:08,  3.98s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Labeled sentiment=&#39;neutral&#39;.  RESPONSE=
+(&#39;```json\n&#39;
+ &#39;{\n&#39;
+ &#39;  &quot;sentiment&quot;: &quot;neutral&quot;,\n&#39;
+ &#39;  &quot;reasoning&quot;: &quot;The text describes a typical order value range. It doesn\&#39;t &#39;
+ &quot;express any positive or negative financial performance. It&#39;s simply stating &quot;
+ &#39;a common value, which is informational rather than indicative of a positive &#39;
+ &#39;or negative outcome for investors. Therefore, the sentiment is neutral.&quot;\n&#39;
+ &#39;}\n&#39;
+ &#39;```&#39;)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 3/4831 [00:10&lt;4:05:11,  3.05s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Labeled sentiment=&#39;negative&#39;.  RESPONSE=
+(&#39;```json\n&#39;
+ &#39;{\n&#39;
+ &#39;  &quot;sentiment&quot;: &quot;negative&quot;,\n&#39;
+ &#39;  &quot;reasoning&quot;: &quot;The headline explicitly states an \&#39;operating loss\&#39; which &#39;
+ &quot;contrasts with a &#39;profit&#39; in the previous year. The shift from profit to &quot;
+ &#39;loss is a clear indicator of negative financial performance. This would &#39;
+ &#39;likely be concerning for retail investors.&quot;\n&#39;
+ &#39;}\n&#39;
+ &#39;```&#39;)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 4/4831 [00:13&lt;3:59:07,  2.97s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Labeled sentiment=&#39;positive&#39;.  RESPONSE=
+(&#39;```json\n&#39;
+ &#39;{\n&#39;
+ &#39;  &quot;sentiment&quot;: &quot;neutral&quot;,\n&#39;
+ &#39;  &quot;reasoning&quot;: &quot;The text describes a decision made by shareholders regarding &#39;
+ &#39;a buyout of minority shares. While a buyout can have implications, the text &#39;
+ &quot;itself doesn&#39;t express a positive or negative outcome. It&#39;s a factual &quot;
+ &quot;statement of an action taken. From a retail investor&#39;s perspective, it&#39;s &quot;
+ &quot;information but doesn&#39;t inherently signal positive or negative financial &quot;
+ &#39;performance. Therefore, the sentiment is classified as neutral.&quot;\n&#39;
+ &#39;}\n&#39;
+ &#39;```&#39;)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 5/4831 [00:15&lt;3:39:55,  2.73s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Labeled sentiment=&#39;positive&#39;.  RESPONSE=
+(&#39;```json\n&#39;
+ &#39;{\n&#39;
+ &#39;  &quot;sentiment&quot;: &quot;positive&quot;,\n&#39;
+ &#39;  &quot;reasoning&quot;: &quot;The headline indicates that Raute Corporation has received &#39;
+ &#39;orders worth a significant amount (EUR 12 million). Receiving orders is &#39;
+ &#39;generally a positive sign for a company, suggesting demand for its products &#39;
+ &#39;or services. This is a positive development for retail investors as it &#39;
+ &#39;implies potential revenue and growth for the company.&quot;\n&#39;
+ &#39;}\n&#39;
+ &#39;```&#39;)
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4831/4831 [3:26:46&lt;00:00,  2.57s/it]  
 </pre></div>
 </div>
 </div>
@@ -1172,16 +1258,16 @@ weighted avg       0.81      0.81      0.81      4831
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.413
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.829
               precision    recall  f1-score   support
 
-    negative       0.11      0.11      0.11        73
-     neutral       0.55      0.60      0.57       355
-    positive       0.19      0.15      0.17       168
+    negative       0.83      0.90      0.86       602
+     neutral       0.82      0.91      0.87      2870
+    positive       0.85      0.62      0.72      1359
 
-    accuracy                           0.41       596
-   macro avg       0.28      0.29      0.28       596
-weighted avg       0.39      0.41      0.40       596
+    accuracy                           0.83      4831
+   macro avg       0.83      0.81      0.82      4831
+weighted avg       0.83      0.83      0.82      4831
 </pre></div>
 </div>
 <div class="output text_html"><div>
@@ -1214,21 +1300,21 @@ weighted avg       0.39      0.41      0.40       596
   <tbody>
     <tr>
       <th>negative</th>
-      <td>8</td>
-      <td>52</td>
-      <td>13</td>
+      <td>541</td>
+      <td>59</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>neutral</th>
-      <td>48</td>
-      <td>213</td>
-      <td>94</td>
+      <td>99</td>
+      <td>2620</td>
+      <td>151</td>
     </tr>
     <tr>
       <th>positive</th>
-      <td>19</td>
-      <td>124</td>
-      <td>25</td>
+      <td>10</td>
+      <td>503</td>
+      <td>846</td>
     </tr>
   </tbody>
 </table>
@@ -1236,8 +1322,11 @@ weighted avg       0.39      0.41      0.40       596
 </div>
 </section>
 </section>
+<section id="multimodal">
+<h2>Multimodal<a class="headerlink" href="#multimodal" title="Permalink to this heading">#</a></h2>
+<p>The model can process both text and image inputs, enabling tasks such as visual question answering and image captioning.</p>
 <section id="vision-language">
-<h2>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h2>
+<h3>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h3>
 <p>Analyze a chart image, specifically Figure 4 from Malo et al (2014)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1304,18 +1393,18 @@ from 2 to 12, with integer values.
 
 **Key Observations:**
 
-*   The distribution is somewhat skewed, with a peak around a sequence
-length of 6 or 7.
-*   There&#39;s a noticeable number of sequences with lengths between 6
+*   The distribution is somewhat skewed, with a peak around sequence
+lengths of 6 and 8.
+*   There are a significant number of sequences with lengths between 4
 and 10.
 *   The density decreases as the sequence length moves away from the
-peak.
+peak values.
 
 **Overall Impression:**
 
 The histogram provides a visual summary of how long the entity
 sequences are, before any pruning or filtering is applied. It suggests
-that most sequences are relatively short (between 2 and 10 units), but
+that most sequences are relatively short (between 4 and 10 units), but
 there&#39;s also a presence of longer sequences.
 </pre></div>
 </div>
@@ -1323,8 +1412,8 @@ there&#39;s also a presence of longer sequences.
 </div>
 </section>
 <section id="multi-lingual">
-<h2>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h2>
-<p>Translate to Mandarin and french</p>
+<h3>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h3>
+<p>Translate to Mandarin and French</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mandarin</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
@@ -1347,118 +1436,121 @@ there&#39;s also a presence of longer sequences.
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Okay, here&#39;s a Mandarin translation, aiming for accuracy and clarity.
-I&#39;ve included explanations after each section to clarify choices and
-offer alternatives.  I&#39;ve also broken it down into sections mirroring
-the original.  **Please read the notes at the very end – they are
-crucial for understanding the nuances of the translation.**
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Okay, here&#39;s a Mandarin translation of the description, aiming for
+accuracy and clarity. I&#39;ve included explanations after each section to
+clarify choices and offer alternatives.  I&#39;ve also provided a more
+conversational version at the very end.
 
 **1. Type of Chart:**
 
-* **Mandarin:**  这张图片显示的是一个直方图。 (Zhè zhāng túpiàn xiǎnshì de shì yī gè
-zhífāngtú.)
+* **Mandarin:** 图片显示的是一个直方图。(Pìngtú xiǎnshì de shì yīgè zhítǔtú.)
 * **Explanation:**
-    * `这张图片 (zhè zhāng túpiàn)`: &quot;This image&quot; - standard way to refer
-to an image.
-    * `显示 (xiǎnshì)`: &quot;Displays/Shows&quot; - a common and neutral verb.
-    * `直方图 (zhífāngtú)`: &quot;Histogram&quot; - the standard term.
+    * `图片 (pìngtú)`: Image
+    * `显示 (xiǎnshì)`: Displays, shows
+    * `是 (shì)`: Is (linking verb)
+    * `一个 (yīgè)`: A, one
+    * `直方图 (zhítǔtú)`: Histogram (standard term)
 
 **2. Data Represented:**
 
-* **Mandarin:**  这个直方图展示了来自一个包含 5000
-句话的金融短语库中的“序列长度”的分布情况。序列长度是在修剪之前的数据。 (Zhège zhífāngtú zhǎnshì le láizì
-yī gè bāohán 5000 gè jùzi de jīnróng duǎnyǔ kù zhōng de “xùliè
-chángdù” de fēnbù qíngkuàng. Xùliè chángdù shì zài xiūjiǎn zhīqián de
-shùjù.)
+* **Mandarin:** 直方图展示了来自一个包含 5000
+句话的金融短语库中的“序列长度”的分布情况。序列长度是在修剪之前的数据。(Zhítǔtú zhǎnshì le láizì yīgè
+bāohán 5000 句话的 jīnróng duǎnyǔ kù zhōng de “xùliè chángdù” de fēnbù
+qíngkuàng. Xùliè chángdù shì zài xiūjiǎn zhīqián de shùjù.)
 * **Explanation:**
-    * `展示 (zhǎnshì)`: &quot;Shows/Displays&quot; - used again for consistency.
-    * `来自 (láizì)`: &quot;From&quot; - indicates the source of the data.
-    * `包含 (bāohán)`: &quot;Containing/Consisting of&quot;
-    * `金融短语库 (jīnróng duǎnyǔ kù)`: &quot;Financial phrase bank&quot; - a direct
-translation.
-    * `句子 (jùzi)`: &quot;Sentences&quot;
-    * `“序列长度” (“xùliè chángdù”)`:  &quot;Sequence Length&quot; -  The quotation
-marks are important to indicate it&#39;s a specific term.  `序列 (xùliè)`
-means &quot;sequence&quot; and `长度 (chángdù)` means &quot;length.&quot;
-    * `分布情况 (fēnbù qíngkuàng)`: &quot;Distribution situation/pattern&quot; - a
-common way to describe a distribution.
-    * `修剪 (xiūjiǎn)`: &quot;Pruning&quot; - a good translation for the technical
-term.
-    * `之前 (zhīqián)`: &quot;Before&quot;
+    * `展示 (zhǎnshì)`: Shows, presents (more formal than `显示`)
+    * `来自 (láizì)`: From
+    * `包含 (bāohán)`: Contains, includes
+    * `句话 (jùhuà)`: Sentences (literally &quot;sentence-measure word&quot;)
+    * `金融短语库 (jīnróng duǎnyǔ kù)`: Financial phrase bank
+    * `“序列长度” (“xùliè chángdù”)`: &quot;Sequence Length&quot; (using quotation
+marks to indicate a specific term)
+    * `分布情况 (fēnbù qíngkuàng)`: Distribution (situation, condition)
+    * `修剪 (xiūjiǎn)`: Pruning (more formal and precise than just
+&quot;cutting&quot;)
+    * `之前 (zhīqián)`: Before
 
 **3. Axes:**
 
 * **Mandarin:**
-    * **X轴 (水平):** 代表“序列长度”，范围从 2 到 12，值为整数。 (X zhóu (shuǐpíng):
+    * **X轴 (水平):** 代表“序列长度”，范围从 2 到 12，值为整数。(X zhóu (shuǐpíng):
 Dàibiǎo “xùliè chángdù”, fànwéi cóng 2 dào 12, zhíwèi zhěngshù.)
-    * **Y轴 (垂直):** 代表“密度”，范围从 0 到 0.20。 (Y zhóu (chōngcù): Dàibiǎo
+    * **Y轴 (垂直):** 代表“密度”，范围从 0 到 0.20。(Y zhóu (chóngtí): Dàibiǎo
 “mìdù”, fànwéi cóng 0 dào 0.20.)
 * **Explanation:**
-    * `X轴 (shuǐpíng)`: &quot;X-axis (Horizontal)&quot; -  `轴 (zhóu)` means
-&quot;axis,&quot; and `水平 (shuǐpíng)` means &quot;horizontal.&quot;
-    * `Y轴 (chōngcù)`: &quot;Y-axis (Vertical)&quot; - `垂直 (chōngcù)` means
-&quot;vertical.&quot;
-    * `代表 (dàibiǎo)`: &quot;Represents&quot;
-    * `范围 (fànwéi)`: &quot;Range&quot;
-    * `值为整数 (zhíwèi zhěngshù)`: &quot;Values are integers&quot;
+    * `X轴 (X zhóu)`: X-axis (using the standard &quot;axis&quot; term)
+    * `水平 (shuǐpíng)`: Horizontal
+    * `代表 (dàibiǎo)`: Represents
+    * `范围 (fànwéi)`: Range
+    * `到 (dào)`: To
+    * `值为 (zhíwèi)`: Value is
+    * `整数 (zhěngshù)`: Integer
+    * `Y轴 (Y zhóu)`: Y-axis
+    * `垂直 (chóngtí)`: Vertical
+    * `密度 (mìdù)`: Density
 
 **4. Key Observations:**
 
 * **Mandarin:**
-    *  分布情况有些倾斜，峰值出现在序列长度约为 6 或 7 左右。 (Fēnbù qíngkuàng yǒuxiē qīngxiá,
-fēngzhí chūxiàn zài xùliè chángdù suǒyú 6 huò 7 zuǒyòu.)
-    *  可以看到，在 6 到 10 之间的序列长度数量比较多。 (Kěyǐ kànjiàn, zài 6 dào 10 zhījiān
-de xùliè chángdù shùliàng bǐjiào duō.)
-    *  随着序列长度远离峰值，密度逐渐下降。 (Suízhe xùliè chángdù yuǎnlí fēngzhí, mìdù
-zhújiàn xiàjiàng.)
+    * 分布情况有些倾斜，峰值出现在序列长度约为 6 和 8 左右。(Fēnbù qíngkuàng yǒuxiē qīngxiá,
+fēngzhí chūxiàn zài xùliè chángdù yuē wèi 6 hé 8 zuǒyòu.)
+    * 有相当数量的序列长度在 4 到 10 之间。(Yǒu xiāngdāng shùliàng de xùliè chángdù
+zài 4 dào 10 zhījiān.)
+    * 随着序列长度偏离峰值，密度会下降。(Suízhe xùliè chángdù piānlí fēngzhí, mìdù huì
+xiàjiàng.)
 * **Explanation:**
-    * `有些倾斜 (yǒuxiē qīngxiá)`: &quot;Somewhat skewed&quot; - a good translation
-for &quot;skewed.&quot;
-    * `峰值 (fēngzhí)`: &quot;Peak&quot;
-    * `出现在 (chūxiàn zài)`: &quot;Appears at&quot;
-    * `约为 (suǒyú)`: &quot;Approximately&quot;
-    * `左右 (zuǒyòu)`: &quot;Around/Approximately&quot; - softens the number.
-    * `可以看到 (kěyǐ kànjiàn)`: &quot;It can be seen that&quot;
-    * `数量比较多 (shùliàng bǐjiào duō)`: &quot;The number is relatively large&quot;
-    * `随着 (suízhe)`: &quot;As/With&quot;
-    * `远离 (yuǎnlí)`: &quot;Away from&quot;
-    * `逐渐下降 (zhújiàn xiàjiàng)`: &quot;Gradually decreases&quot;
+    * `有些 (yǒuxiē)`: Somewhat
+    * `倾斜 (qīngxiá)`: Skewed
+    * `峰值 (fēngzhí)`: Peak
+    * `约为 (yuē wèi)`: Approximately
+    * `左右 (zuǒyòu)`: Around, approximately
+    * `相当数量 (xiāngdāng shùliàng)`: A significant number
+    * `之间 (zhījiān)`: Between
+    * `随着 (suízhe)`: As, with
+    * `偏离 (piānlí)`: Deviates from
+    * `下降 (xiàjiàng)`: Decreases
 
 **5. Overall Impression:**
 
-* **Mandarin:**  这个直方图提供了关于实体序列长度的视觉总结，在应用任何修剪或过滤之前。它表明大多数序列相对较短（在 2 到
-10 个单位之间），但也存在较长的序列。 (Zhège zhífāngtú tígōng le guānyú shítǐ xùliè
-chángdù de shìjué zǒngjié, zài yìngyòng rènhé xiūjiǎn huò guòlǜ
-zhīqián. Tā biǎomíng dàdū zhī xùliè xiāngduì jiào duǎn (zài 2 dào 10
-gè dānwèi zhījiān), yě yǒng yǒu jiào cháng de xùliè.)
+* **Mandarin:** 直方图提供了实体序列长度的视觉摘要，在应用任何修剪或过滤之前。它表明大多数序列相对较短（在 4 到 10
+个单位之间），但也存在较长的序列。(Zhítǔtú tígōng le shítǐ xùliè chángdù de shìjué
+zǒnghé, zài yìngyòng rènhé xiūjiǎn huò guòlǜ zhīqián. Tā biǎomíng dàdū
+shùliàng de xùliè chángdù xiāngduì jiào duǎn (zài 4 dào 10 gè dānwèi
+zhījiān), yě yǒu cúnzài jiào cháng de xùliè.)
 * **Explanation:**
-    * `提供了 (tígōng le)`: &quot;Provides&quot;
-    * `视觉总结 (shìjué zǒngjié)`: &quot;Visual summary&quot;
-    * `应用 (yìngyòng)`: &quot;Apply&quot;
-    * `过滤 (guòlǜ)`: &quot;Filtering&quot;
-    * `相对较短 (xiāngduì jiào duǎn)`: &quot;Relatively short&quot;
-    * `单位 (dānwèi)`: &quot;Units&quot;
-    * `但也存在 (yě yǒng yǒu)`: &quot;But there also exists&quot;
+    * `提供了 (tígōng le)`: Provides
+    * `视觉摘要 (shìjué zǒnghé)`: Visual summary
+    * `应用 (yìngyòng)`: Apply
+    * `过滤 (guòlǜ)`: Filtering
+    * `单位 (dānwèi)`: Units
+    * `存在 (cúnzài)`: Exists, there is
 
+---
 
+**More Conversational Version (for a less formal setting):**
 
-**IMPORTANT NOTES:**
+“这张图是一个直方图，它显示了金融短语库里 5000 句话的序列长度的分布情况。序列长度是在修剪之前的数据。X 轴代表序列长度，从 2 到
+12，都是整数。Y 轴代表密度，从 0 到 0.20。  总的来说，这个图显示了序列长度的分布，在修剪之前。大部分序列长度在 4 到 10
+之间，但也有一些比较长的序列。”
 
-* **Technical Jargon:**  I&#39;m assuming a reasonably technical audience.
-If the audience is less familiar with data analysis terms, some
-phrases might need simplification.
-* **&quot;Entity Sequences&quot;:**  The translation of &quot;entity sequences&quot; is a
-bit tricky.  `实体序列 (shítǐ xùliè)` is a literal translation, but
-depending on the context, a more descriptive phrase might be better.
-* **Naturalness:** While I&#39;m aiming for accuracy, a native speaker
-might phrase some sentences slightly differently for a more natural
-flow.
-* **Context is Key:** The best translation always depends on the
-specific context and the intended audience.  If you can provide more
-context, I can refine the translation further.
-* **Simplified vs. Traditional Chinese:** This translation is in
-Simplified Chinese, which is most commonly used in mainland China. If
-you need Traditional Chinese, let me know.
+(Zhè zhāng tú shì yīgè zhítǔtú, tā xiǎnshì le jīnróng duǎnyǔ kù lǐ
+5000 句话 de xùliè chángdù de fēnbù qíngkuàng. Xùliè chángdù shì zài
+xiūjiǎn zhīqián de shùjù. X zhóu dàibiǎo xùliè chángdù, cóng 2 dào 12,
+dōu shì zhěngshù. Y zhóu dàibiǎo mìdù, cóng 0 dào 0.20. Zǒng de lái
+shuō, zhège tú xiǎnshì le xùliè chángdù de fēnbù, zài xiūjiǎn zhīqián.
+Dàdū shùliàng de xùliè chángdù zài 4 dào 10 zhījiān, dàn yě yǒu yīxiē
+bǐjiào cháng de xùliè.)
+
+**Key Considerations:**
+
+* **Audience:** The level of formality should match your audience.
+* **Technical Jargon:**  If your audience isn&#39;t familiar with
+statistical terms, you might need to simplify the language.
+* **Context:** The specific context of the description might require
+adjustments.
+
+I hope this comprehensive translation and explanation is helpful! Let
+me know if you have any other questions.
 </pre></div>
 </div>
 </div>
@@ -1487,16 +1579,16 @@ you need Traditional Chinese, let me know.
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Okay, here&#39;s a French translation of the description, aiming for
 accuracy and clarity. I&#39;ve included a couple of options for certain
-phrases to give you some flexibility.  I&#39;ve also added notes after the
-translation to explain some choices.
+phrases to give you some flexibility.  I&#39;ve also added notes after
+each section explaining choices made.
 
-**Option 1 (More Formal):**
+**Option 1 (More Formal/Technical):**
 
-&quot;Voici une description de l&#39;image que vous avez envoyée :
+Voici une description de l&#39;image que vous avez envoyée :
 
 **Type de graphique :**
 
-L&#39;image présente un histogramme.
+L&#39;image présente un histogramme.  *(Straightforward translation)*
 
 **Données représentées :**
 
@@ -1504,110 +1596,111 @@ L&#39;histogramme illustre la distribution des &quot;longueurs de séquences&quo
 (probablement faisant référence à la longueur des séquences d&#39;entités)
 provenant d&#39;une banque de phrases financières composée de 5000
 phrases. Les longueurs de séquences sont représentées avant élagage.
+*(“Élagage” is a good technical term for pruning)*
 
 **Axes :**
 
 *   **Axe des abscisses (horizontal) :** Représente la &quot;Longueur de
-séquence&quot;, variant de 2 à 12, avec des valeurs entières.
-*   **Axe des ordonnées (vertical) :** Représente la &quot;Densité&quot;,
-variant de 0 à 0,20.
+séquence,&quot; variant de 2 à 12, avec des valeurs entières. *(“Axe des
+abscisses” is the formal term for the x-axis)*
+*   **Axe des ordonnées (vertical) :** Représente la &quot;Densité,&quot;
+variant de 0 à 0,20. *(“Axe des ordonnées” is the formal term for the
+y-axis)*
 
 **Observations principales :**
 
-*   La distribution est légèrement asymétrique, avec un pic autour
-d&#39;une longueur de séquence de 6 ou 7.
-*   On observe un nombre notable de séquences dont la longueur se
-situe entre 6 et 10.
+*   La distribution est quelque peu asymétrique, avec un pic autour
+des longueurs de séquence de 6 et 8. *(“Asymétrique” is the best
+translation for skewed)*
+*   Il existe un nombre important de séquences de longueurs comprises
+entre 4 et 10.
 *   La densité diminue à mesure que la longueur de la séquence
-s&#39;éloigne du pic.
+s&#39;éloigne des valeurs de pic.
 
 **Impression générale :**
 
 L&#39;histogramme fournit un résumé visuel de la longueur des séquences
 d&#39;entités, avant toute élagage ou filtrage. Il suggère que la plupart
-des séquences sont relativement courtes (entre 2 et 10 unités), mais
-qu&#39;il existe également des séquences plus longues.&quot;
+des séquences sont relativement courtes (entre 4 et 10 unités), mais
+qu&#39;il existe également une présence de séquences plus longues.
 
 **Option 2 (Slightly Less Formal):**
 
-&quot;Voici une description de l&#39;image que vous avez envoyée :
+Voici une description de l&#39;image que vous avez envoyée :
 
 **Type de graphique :**
 
-L&#39;image montre un histogramme.
+L&#39;image montre un histogramme. *(“Montre” is a simpler verb than
+“présente”)
 
 **Données représentées :**
 
-L&#39;histogramme montre la distribution des &quot;longueurs de séquences&quot;
+L&#39;histogramme illustre la distribution des &quot;longueurs de séquences&quot;
 (probablement la longueur des séquences d&#39;entités) provenant d&#39;une
 banque de phrases financières contenant 5000 phrases. Les longueurs de
-séquences sont affichées avant l&#39;élagage.
+séquences sont représentées avant l&#39;élagage. *(“Contenant” is a
+simpler alternative to “composée de”)
 
 **Axes :**
 
-*   **Axe horizontal (abscisses) :** Représente la &quot;Longueur de
-séquence&quot;, allant de 2 à 12, avec des valeurs entières.
-*   **Axe vertical (ordonnées) :** Représente la &quot;Densité&quot;, allant de
-0 à 0,20.
+*   **Axe horizontal :** Représente la &quot;Longueur de séquence,&quot; allant
+de 2 à 12, avec des valeurs entières. *(Omitting &quot;des abscisses&quot; makes
+it less formal)*
+*   **Axe vertical :** Représente la &quot;Densité,&quot; allant de 0 à 0,20.
+*(Omitting &quot;des ordonnées&quot; makes it less formal)*
 
 **Observations principales :**
 
-*   La distribution est un peu asymétrique, avec un pic autour d&#39;une
-longueur de séquence de 6 ou 7.
-*   Il y a un nombre important de séquences dont la longueur se situe
-entre 6 et 10.
+*   La distribution est un peu asymétrique, avec un pic autour des
+longueurs de séquence de 6 et 8. *(“Un peu” is a simpler way to say
+“somewhat”)
+*   On observe un nombre important de séquences de longueurs comprises
+entre 4 et 10.  *(“On observe” is a more conversational way to say
+“there are”)
 *   La densité diminue à mesure que la longueur de la séquence
-s&#39;éloigne du pic.
+s&#39;éloigne des valeurs maximales. *(“Valeurs maximales” is a simpler
+alternative to “valeurs de pic”)
 
 **Impression générale :**
 
 L&#39;histogramme donne un aperçu visuel de la longueur des séquences
-d&#39;entités, avant tout élagage ou filtrage. Il indique que la plupart
-des séquences sont relativement courtes (entre 2 et 10 unités), mais
-qu&#39;il y a aussi des séquences plus longues.&quot;
+d&#39;entités, avant tout élagage ou filtrage. Il laisse entendre que la
+plupart des séquences sont relativement courtes (entre 4 et 10
+unités), mais qu&#39;il existe aussi des séquences plus longues. *(“Laisse
+entendre” is a more conversational way to say “suggests”)
 
-**Notes on Choices &amp; Vocabulary:**
+**Key Considerations &amp; Notes:**
 
-*   **&quot;Histogramme&quot;**: This is the standard French translation of
-&quot;histogram.&quot;
-*   **&quot;Longueurs de séquences&quot;**:  This is a direct translation of
-&quot;sequence lengths.&quot;
-*   **&quot;Banque de phrases financières&quot;**:  &quot;Financial phrase bank&quot;
-translates well to this.
-*   **&quot;Élagage&quot;**: This is the best translation for &quot;pruning&quot; in this
-context. It implies removing or shortening sequences.
-*   **&quot;Asymétrique&quot;**:  This is the standard term for &quot;skewed&quot; in a
-statistical context.
-*   **&quot;Axe des abscisses/ordonnées&quot; vs. &quot;Axe horizontal/vertical&quot;**:
-The first is more technically correct, the second is more
-conversational. I&#39;ve included both options.
-*   **&quot;Fournit un résumé visuel&quot; vs. &quot;Donne un aperçu visuel&quot;**: Both
-are good translations of &quot;provides a visual summary.&quot;
-*   **&quot;Indique&quot; vs. &quot;Suggère&quot;**: Both are good translations of
-&quot;suggests.&quot; &quot;Indique&quot; is a bit stronger.
-*   **&quot;Contenant&quot; vs. &quot;composée de&quot;**: Both are good translations of
-&quot;consisting of&quot;. &quot;Contenant&quot; is slightly less formal.
+*   **&quot;Pruning&quot;:**  &quot;Élagage&quot; is the most accurate technical term for
+pruning in this context.
+*   **&quot;Skewed&quot;:** &quot;Asymétrique&quot; is the best translation for &quot;skewed&quot;
+in a statistical context.
+*   **Formality:** Option 2 is slightly less formal and might be more
+suitable for a broader audience.
+*   **Context:** The best option will depend on the intended audience
+and the overall tone of the document.
+*   **&quot;Sequence Length&quot;:**  I&#39;m keeping &quot;longueur de séquence&quot; as it&#39;s
+the most direct translation.  You could potentially rephrase it
+depending on the specific terminology used in your field.
 
-**Which option to choose?**
 
-*   **Option 1** is more suitable for a formal report or technical
-document.
-*   **Option 2** is more appropriate for a more casual explanation.
 
-I hope this helps! Let me know if you have any other questions.
+To help me refine the translation further, could you tell me:
+
+*   Who is the intended audience for this translation?
+*   What is the overall tone of the document?
 </pre></div>
 </div>
 </div>
 </div>
 <p>References:</p>
-<ul class="simple">
-<li><p>Malo, P., Sinha, A., Takala, P., Korhonen, P. and Wallenius, J. (2014): “Good debt or bad debt: Detecting semantic orientations in economic texts.” Journal of the American Society for Information Science and Technology.</p></li>
-<li><p>Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc Le and Denny Zhou, 2023, Chain-of-Thought Prompting Elicits Reasoning in Large Language Models, <a class="reference external" href="https://arxiv.org/abs/2201.11903">https://arxiv.org/abs/2201.11903</a></p></li>
-<li><p>Greg Durrett, 2023, “CS388 Natural Language Processing course materisl”, retrieved from <a class="reference external" href="https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html">https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html</a></p></li>
-<li><p><a class="reference external" href="https://llama.meta.com/docs/how-to-guides/prompting/">https://llama.meta.com/docs/how-to-guides/prompting/</a></p></li>
-<li><p><a class="reference external" href="https://www.promptingguide.ai/techniques/cot">https://www.promptingguide.ai/techniques/cot</a></p></li>
-<li><p><a class="reference external" href="https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a">https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a</a></p></li>
-</ul>
+<p>Malo, P., Sinha, A., Takala, P., Korhonen, P. and Wallenius, J. (2014): “Good debt or bad debt: Detecting semantic orientations in economic texts.” Journal of the American Society for Information Science and Technology.</p>
+<p>Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc Le and Denny Zhou, 2023, Chain-of-Thought Prompting Elicits Reasoning in Large Language Models, <a class="reference external" href="https://arxiv.org/abs/2201.11903">https://arxiv.org/abs/2201.11903</a></p>
+<p>Greg Durrett, 2023, “CS388 Natural Language Processing course materisl”, retrieved from <a class="reference external" href="https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html">https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html</a></p>
+<p><a class="reference external" href="https://llama.meta.com/docs/how-to-guides/prompting/">https://llama.meta.com/docs/how-to-guides/prompting/</a></p>
+<p><a class="reference external" href="https://www.promptingguide.ai/techniques/cot">https://www.promptingguide.ai/techniques/cot</a></p>
+<p><a class="reference external" href="https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a">https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a</a></p>
+</section>
 </section>
 </section>
 
@@ -1688,8 +1781,11 @@ I hope this helps! Let me know if you have any other questions.
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
