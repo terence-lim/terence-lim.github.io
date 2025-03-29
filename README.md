@@ -1,3 +1,18 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.16.1
+---
+
+### Contact
+
+[https://www.linkedin.com/in/terencelim](https://www.linkedin.com/in/terencelim)
+
+<!-- #region -->
 # 1. Financial Data Science
 
 As financial markets produce vast volumes of structured and unstructured data,
@@ -88,8 +103,3 @@ Review notes motivated by:
 
 - SRM/PA syllabus (Society of Actuaries): <https://terence-lim.github.io/notes/SRM.pdf>
 
-
-
-# Contact
-
-[https://www.linkedin.com/in/terencelim](https://www.linkedin.com/in/terencelim)
