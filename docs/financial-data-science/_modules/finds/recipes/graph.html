@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.recipes.graph &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.recipes.graph</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.recipes.graph</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Graph network convenience wrappers</span>
+
+<span class="sd">- iterate over Graph edges and attributes:</span>
+
+<span class="sd">for edge_tuple, attributes_dict in G.edges.items()</span>
+
+<span class="sd">- iterate over Graph nodes and attributes:</span>
+
+<span class="sd">for node, attributes_dict in G.nodes.items()</span>
+
+<span class="sd">- neighbors of a Node:</span>
+
+<span class="sd">nx.all_neighgors</span>
+<span class="sd">nx.neighbors</span>
+<span class="sd">list(g[1004])</span>
+<span class="sd">G.degree[1004]</span>
+
+<span class="sd">- populate a graph:</span>
+
+<span class="sd">G = nx.Graph(social_pairs)</span>
+<span class="sd">G = nx.DiGraph(social_pairs)</span>
+<span class="sd">G.add_nodes_from(vertices)</span>
+<span class="sd">G.add_edges_from(edges)</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">networkx.algorithms.community</span> <span class="k">as</span> <span class="nn">nx_comm</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;secs:&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+<div class="viewcode-block" id="graph_info"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.graph_info">[docs]</a><span class="k">def</span> <span class="nf">graph_info</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">fast</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return summary of graph properties</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fast: True to skip slow triadic census, clustering and distance measures</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict of property name and value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c1"># Clustering</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;transitivity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">transitivity</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;average_clustering&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_clustering</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+    <span class="c1"># Components</span>
+    <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_directed</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;weakly_connected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weakly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;weakly_connected_components&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">nx</span><span class="o">.</span><span class="n">number_weakly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;size_largest_weak_component&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">weakly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;strongly_connected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_strongly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;strongly_connected_components&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">nx</span><span class="o">.</span><span class="n">number_strongly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;size_largest_strong_component&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">strongly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;connected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;connected_components&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;size_largest_component&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="nb">len</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">))</span>
+
+    <span class="c1"># Attributes</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;directed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_directed</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;weighted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;negatively_weighted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_negatively_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_of_edges</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;selfloops&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">number_of_selfloops</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="graph_draw"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.graph_draw">[docs]</a><span class="k">def</span> <span class="nf">graph_draw</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+               <span class="n">num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+               <span class="n">figsize</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+               <span class="n">savefig</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="n">font_weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+               <span class="n">font_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+               <span class="n">font_family</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;helvetica&#39;</span><span class="p">,</span>
+               <span class="n">k</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.</span><span class="p">,</span>
+               <span class="n">pos</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+               <span class="n">center_name</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>               
+               <span class="n">arrowsize</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.</span><span class="p">,</span>
+               <span class="n">arrowstyle</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;-|&gt;&#39;</span><span class="p">,</span>
+               <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span>
+               <span class="n">width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">.5</span><span class="p">,</span>
+               <span class="n">edge_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+               <span class="n">nodelist</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
+               <span class="n">node_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+               <span class="n">node_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">|</span> <span class="n">List</span> <span class="o">=</span> <span class="mf">20.</span><span class="p">,</span>
+               <span class="n">node_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">|</span> <span class="n">List</span> <span class="o">=</span> <span class="s1">&#39;#1f78b4&#39;</span><span class="p">,</span>
+               <span class="n">labels</span><span class="p">:</span> <span class="n">List</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience wrapper over nx.draw_network</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        G: Directed or undirected graph to draw</span>
+<span class="sd">        savefig: JPG filename to save as</span>
+<span class="sd">        figsize: Figure size in inches</span>
+<span class="sd">        title: Text to display in top left of plot</span>
+<span class="sd">        font_weight: {&#39;normal&#39;, bold&#39; &#39;light&#39;}</span>
+<span class="sd">        k: Extent of separatation between nodes</span>
+<span class="sd">        center_name: Node to place in center of plot</span>
+<span class="sd">        pos: Layout dict or callable, default uses nx.spring_layout()</span>
+<span class="sd">        arrowsize: Size of arrow head to draw edges</span>
+<span class="sd">        arrowstyle: Format of arrow to draw</span>
+<span class="sd">        width: Width of arrow</span>
+<span class="sd">        edge_color: Color of edge arrow</span>
+<span class="sd">        style: Edge style in {&#39;-&#39;, &#39;--&#39;, &#39;-.&#39;, &#39;:&#39;}</span>
+<span class="sd">        nodelist: List of nodes to draw</span>
+<span class="sd">        node_scale: Relative scaling of nodes</span>
+<span class="sd">        node_size: List of node size, or a lookup dict</span>
+<span class="sd">        node_color: List of node color, or a lookup dict</span>
+<span class="sd">        labels: List of node labels, or a lookup dict</span>
+<span class="sd">        **kwargs : parameters passed on to networkx.draw</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict of pos with nodes as keys and positions as values</span>
+
+<span class="sd">    Other pos layouts:</span>
+
+<span class="sd">    - pos = nx.circular_layout(G)</span>
+<span class="sd">    - pos = nx.spectral_layout(G)</span>
+<span class="sd">    - pos = nx.kamada_kawai_layout(G)</span>
+<span class="sd">    - pos = nx.fruchterman_reingold_layout(G)</span>
+<span class="sd">    - pos = nx.spring_layout(G)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nodelist</span><span class="p">:</span>
+        <span class="n">nodelist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_size</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>   <span class="c1"># node_size must be list, or float</span>
+        <span class="n">maxsz</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">node_size</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">node_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">node_scale</span> <span class="o">*</span> <span class="mi">5000</span> <span class="o">*</span> <span class="n">node_size</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">/</span><span class="n">maxsz</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_color</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># node_color must be list, or str</span>
+        <span class="n">node_color</span> <span class="o">=</span> <span class="p">[</span><span class="n">node_color</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">nodelist</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># all labels (dict) must be in nodes</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">labels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">()}</span>  
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">center_name</span><span class="p">:</span>
+            <span class="n">fixed</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">center_name</span><span class="p">],</span> <span class="p">{</span><span class="n">center_name</span> <span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fixed</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span>
+                                   <span class="n">fixed</span><span class="o">=</span><span class="n">fixed</span><span class="p">,</span>
+                                   <span class="n">pos</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                                   <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                                   <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">)))</span>
+        
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+            <span class="n">font_weight</span><span class="o">=</span><span class="n">font_weight</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="n">edge_color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">arrowsize</span><span class="o">=</span><span class="n">arrowsize</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="n">node_color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">xmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">-</span> <span class="p">(</span><span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span><span class="p">)</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">savefig</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pos</span></div>
+
+
+<div class="viewcode-block" id="nodes_centrality"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.nodes_centrality">[docs]</a><span class="k">def</span> <span class="nf">nodes_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.99</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return dict of vertex centrality measures</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        G: Graph may be directed or indirected, weighted or unweighted</span>
+<span class="sd">        weight: name of edge attribute for weights, Set to None for unweighted</span>
+<span class="sd">        cost: If True, then weights are costs; else weights are importances</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict of {label (str) : score (float)}</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - centrality: degree, eigenvector, closeness, betweenness</span>
+<span class="sd">    - link_analysis: pagerank, hits</span>
+
+<span class="sd">    if weight is cost: &#39;eigenvector&#39;, &#39;pagerank&#39;, &#39;hub&#39;, &#39;authority&#39; ignore weights</span>
+
+<span class="sd">    if weight is not cost: &#39;betweenness&#39;, &#39;closeness&#39; ignore weights</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;clustering&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">clustering</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;clustering&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">clustering</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>        
+    <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_directed</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;in_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">in_degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;out_degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">out_degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;triangles&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">triangles</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cost</span> <span class="ow">and</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;eigenvector&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">nx</span><span class="o">.</span><span class="n">eigenvector_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;pagerank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">pagerank</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;eigenvector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">eigenvector_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;pagerank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">pagerank</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;hub&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;authority&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">hits</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cost</span> <span class="ow">and</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_weighted</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;betweenness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;closeness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">closeness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;betweenness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;closeness&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">closeness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+    <span class="c1"># if connected:</span>
+    <span class="c1"># out[&#39;eccentricity&#39;] = nx.eccentricity(G)  # max distance of node to other</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="community_detection"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.community_detection">[docs]</a><span class="k">def</span> <span class="nf">community_detection</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">methods</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> 
+                        <span class="n">weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                        <span class="n">seed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;Run built-in community detection algorithms on an undirected graph</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      G: Undirected networkx Graph</span>
+<span class="sd">      methods: Algorithms to run, in {&#39;label&#39;, &#39;louvain&#39;, &#39;greedy&#39;}</span>
+<span class="sd">      weight: Name of edge attribute for weights</span>
+<span class="sd">      resolution: If less than 1, favors large communities.</span>
+<span class="sd">      seed</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary, keyed by algorithm, of community lists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">methods</span> <span class="ow">or</span> <span class="s1">&#39;label&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx_comm</span><span class="o">.</span><span class="n">label_propagation_communities</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;label_propogation&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">methods</span> <span class="ow">or</span> <span class="s1">&#39;louvain&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;louvain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx_comm</span><span class="o">.</span><span class="n">louvain_communities</span><span class="p">(</span>
+            <span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;louvain&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">methods</span> <span class="ow">or</span> <span class="s1">&#39;greedy&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;greedy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx_comm</span><span class="o">.</span><span class="n">greedy_modularity_communities</span><span class="p">(</span>
+            <span class="n">G</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;greedy&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="community_quality"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.community_quality">[docs]</a><span class="k">def</span> <span class="nf">community_quality</span><span class="p">(</span><span class="n">G</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">communities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">],</span>
+                      <span class="n">methods</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Run built-in community performance metrics</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      G: Undirected networkx Graph</span>
+<span class="sd">      communties: Communities list of lists</span>
+<span class="sd">      methods: Metrics to compute, in {&#39;modularity&#39;, &#39;quality&#39;}</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Dictionary, keyed by metric label, of metric values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;communities&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">communities</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">methods</span> <span class="ow">or</span> <span class="s1">&#39;modularity&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;modularity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx_comm</span><span class="o">.</span><span class="n">modularity</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">communities</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">methods</span> <span class="ow">or</span> <span class="s1">&#39;quality&#39;</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="s1">&#39;coverage&#39;</span><span class="p">],</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;performance&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">nx_comm</span><span class="o">.</span><span class="n">partition_quality</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">communities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="link_prediction"><a class="viewcode-back" href="../../../finds.recipes.graph.html#finds.recipes.graph.link_prediction">[docs]</a><span class="k">def</span> <span class="nf">link_prediction</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Run link prediction algorihms</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        edge-and-score for all nonexistent edges in graph, by algorithm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">links</span><span class="p">(</span><span class="n">links</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of edge-score 3-tuples sorted by highest score&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">links</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1">#[link for link in links if link[2] &gt; 0],</span>
+
+    <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">resource</span> <span class="o">=</span> <span class="n">links</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">resource_allocation_index</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+    <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;resource_allocations&#39;</span><span class="p">)</span>
+    
+    <span class="n">jaccard</span> <span class="o">=</span> <span class="n">links</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">jaccard_coefficient</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+    <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;jaccard_coefficient&#39;</span><span class="p">)</span>
+                     
+    <span class="n">adamic</span> <span class="o">=</span> <span class="n">links</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">adamic_adar_index</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+    <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;adamic_adar&#39;</span><span class="p">)</span>
+                    
+    <span class="n">preferential</span> <span class="o">=</span> <span class="n">links</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">preferential_attachment</span><span class="p">(</span><span class="n">G</span><span class="p">))</span>
+    <span class="n">_print</span><span class="p">(</span><span class="n">tic</span><span class="p">,</span> <span class="s1">&#39;preferential_attachment&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;resource_allocation&#39;</span><span class="p">:</span> <span class="n">resource</span><span class="p">,</span>
+            <span class="s1">&#39;jaccard_coefficient&#39;</span><span class="p">:</span> <span class="n">jaccard</span><span class="p">,</span>
+            <span class="s1">&#39;adamic_adar&#39;</span><span class="p">:</span> <span class="n">adamic</span><span class="p">,</span>
+            <span class="s1">&#39;preferential_attachment&#39;</span><span class="p">:</span> <span class="n">preferential</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.readers.alfred" href="finds.readers.alfred.html" />
+    <link rel="prev" title="finds.unstructured.vocab" href="finds.unstructured.vocab.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">finds.readers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html">finds.readers.alfred</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.bea.html">finds.readers.bea</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html">finds.readers.taq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.ffreader.html">finds.readers.ffreader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.fomcreader.html">finds.readers.fomcreader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.sectoring.html">finds.readers.sectoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.readers.html">finds.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">finds.readers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.readers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="finds-readers">
+<h1>finds.readers<a class="headerlink" href="#finds-readers" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.alfred.html">finds.readers.alfred</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred"><code class="docutils literal notranslate"><span class="pre">Alfred</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.__call__"><code class="docutils literal notranslate"><span class="pre">Alfred.__call__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.__getitem__"><code class="docutils literal notranslate"><span class="pre">Alfred.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.categories"><code class="docutils literal notranslate"><span class="pre">Alfred.categories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.clear"><code class="docutils literal notranslate"><span class="pre">Alfred.clear()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.construct_series"><code class="docutils literal notranslate"><span class="pre">Alfred.construct_series()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.date_spans"><code class="docutils literal notranslate"><span class="pre">Alfred.date_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.dump"><code class="docutils literal notranslate"><span class="pre">Alfred.dump()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.get_category"><code class="docutils literal notranslate"><span class="pre">Alfred.get_category()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.get_series"><code class="docutils literal notranslate"><span class="pre">Alfred.get_series()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.header"><code class="docutils literal notranslate"><span class="pre">Alfred.header()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.keys"><code class="docutils literal notranslate"><span class="pre">Alfred.keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.load"><code class="docutils literal notranslate"><span class="pre">Alfred.load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.multpl"><code class="docutils literal notranslate"><span class="pre">Alfred.multpl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.observations"><code class="docutils literal notranslate"><span class="pre">Alfred.observations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.pop"><code class="docutils literal notranslate"><span class="pre">Alfred.pop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.popular"><code class="docutils literal notranslate"><span class="pre">Alfred.popular()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.request_category"><code class="docutils literal notranslate"><span class="pre">Alfred.request_category()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series"><code class="docutils literal notranslate"><span class="pre">Alfred.request_series()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series_categories"><code class="docutils literal notranslate"><span class="pre">Alfred.request_series_categories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series_observations"><code class="docutils literal notranslate"><span class="pre">Alfred.request_series_observations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.splice"><code class="docutils literal notranslate"><span class="pre">Alfred.splice()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.transform"><code class="docutils literal notranslate"><span class="pre">Alfred.transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.values"><code class="docutils literal notranslate"><span class="pre">Alfred.values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.splice_"><code class="docutils literal notranslate"><span class="pre">Alfred.splice_</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.Alfred.tcode"><code class="docutils literal notranslate"><span class="pre">Alfred.tcode</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.csv_from_zip"><code class="docutils literal notranslate"><span class="pre">csv_from_zip()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.fred_md"><code class="docutils literal notranslate"><span class="pre">fred_md()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html#finds.readers.alfred.fred_qd"><code class="docutils literal notranslate"><span class="pre">fred_qd()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.bea.html">finds.readers.bea</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA"><code class="docutils literal notranslate"><span class="pre">BEA</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.get"><code class="docutils literal notranslate"><span class="pre">BEA.get()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.read_ioUse"><code class="docutils literal notranslate"><span class="pre">BEA.read_ioUse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.read_ioUse_xls"><code class="docutils literal notranslate"><span class="pre">BEA.read_ioUse_xls()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.sectoring"><code class="docutils literal notranslate"><span class="pre">BEA.sectoring()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.params"><code class="docutils literal notranslate"><span class="pre">BEA.params</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.bea.html#finds.readers.bea.BEA.short_desc"><code class="docutils literal notranslate"><span class="pre">BEA.short_desc</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.taq.html">finds.readers.taq</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ"><code class="docutils literal notranslate"><span class="pre">TAQ</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.__call__"><code class="docutils literal notranslate"><span class="pre">TAQ.__call__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.__getitem__"><code class="docutils literal notranslate"><span class="pre">TAQ.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.close"><code class="docutils literal notranslate"><span class="pre">TAQ.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.index_symbols"><code class="docutils literal notranslate"><span class="pre">TAQ.index_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.open"><code class="docutils literal notranslate"><span class="pre">TAQ.open()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.TAQ.read"><code class="docutils literal notranslate"><span class="pre">TAQ.read()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.align_trades"><code class="docutils literal notranslate"><span class="pre">align_trades()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.bin_quotes"><code class="docutils literal notranslate"><span class="pre">bin_quotes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.bin_trades"><code class="docutils literal notranslate"><span class="pre">bin_trades()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.clean_nbbo"><code class="docutils literal notranslate"><span class="pre">clean_nbbo()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.clean_trade"><code class="docutils literal notranslate"><span class="pre">clean_trade()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.itertaq"><code class="docutils literal notranslate"><span class="pre">itertaq()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.opentaq"><code class="docutils literal notranslate"><span class="pre">opentaq()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.plot_taq"><code class="docutils literal notranslate"><span class="pre">plot_taq()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html#finds.readers.taq.taq_from_csv"><code class="docutils literal notranslate"><span class="pre">taq_from_csv()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.ffreader.html">finds.readers.ffreader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader"><code class="docutils literal notranslate"><span class="pre">FFReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.__getitem__"><code class="docutils literal notranslate"><span class="pre">FFReader.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.fetch"><code class="docutils literal notranslate"><span class="pre">FFReader.fetch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.keys"><code class="docutils literal notranslate"><span class="pre">FFReader.keys()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.sectoring"><code class="docutils literal notranslate"><span class="pre">FFReader.sectoring()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.daily"><code class="docutils literal notranslate"><span class="pre">FFReader.daily</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.ffreader.html#finds.readers.ffreader.FFReader.monthly"><code class="docutils literal notranslate"><span class="pre">FFReader.monthly</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.fomcreader.html">finds.readers.fomcreader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.fomcreader.html#finds.readers.fomcreader.FOMCReader"><code class="docutils literal notranslate"><span class="pre">FOMCReader</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.fomcreader.html#finds.readers.fomcreader.FOMCReader.__getitem__"><code class="docutils literal notranslate"><span class="pre">FOMCReader.__getitem__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.sectoring.html">finds.readers.sectoring</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.sectoring.html#finds.readers.sectoring.Crosswalk"><code class="docutils literal notranslate"><span class="pre">Crosswalk</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.sectoring.html#finds.readers.sectoring.Crosswalk.sectoring"><code class="docutils literal notranslate"><span class="pre">Crosswalk.sectoring()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.sectoring.html#finds.readers.sectoring.Sectoring"><code class="docutils literal notranslate"><span class="pre">Sectoring</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.sectoring.html#finds.readers.sectoring.Sectoring.__getitem__"><code class="docutils literal notranslate"><span class="pre">Sectoring.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="finds.readers.sectoring.html#finds.readers.sectoring.Sectoring.load"><code class="docutils literal notranslate"><span class="pre">Sectoring.load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.readers.html">finds.readers.readers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.readers.html#finds.readers.readers.requests_get"><code class="docutils literal notranslate"><span class="pre">requests_get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.unstructured.vocab.html" class="btn btn-neutral float-left" title="finds.unstructured.vocab" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.readers.alfred.html" class="btn btn-neutral float-right" title="finds.readers.alfred" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

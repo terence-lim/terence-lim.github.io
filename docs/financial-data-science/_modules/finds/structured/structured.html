@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.structured &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.structured</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.structured</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base class for structured data sets</span>
+
+<span class="sd">- CRSP (daily, monthly, names, delistings, distributions, shares outstanding)</span>
+<span class="sd">- S&amp;P/CapitalIQ Compustat (Annual, Quarterly, Key Development, customers)</span>
+<span class="sd">- IBES Summary</span>
+
+<span class="sd">Notes:</span>
+
+<span class="sd">- Optionally cache SQL query results to Redis store</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">BigInteger</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">as_dtypes</span>
+<span class="kn">from</span> <span class="nn">finds.database.redisdb</span> <span class="kn">import</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">.busday</span> <span class="kn">import</span> <span class="n">BusDay</span>
+
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Structured"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured">[docs]</a><span class="k">class</span> <span class="nc">Structured</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for interface to structured datasets, stored in SQL</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sql: Connection instance to mysql database</span>
+<span class="sd">      bd: Custom business calendar instance</span>
+<span class="sd">      tables: Sqlalchemy Tables and names defined for this datasets group</span>
+<span class="sd">      identifier: Name of field of unique identifier key</span>
+<span class="sd">      name: Display name for this datasets group</span>
+<span class="sd">      rdb: Connector to Redis cache store, if desired</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">      identifier: Field name of identifier key by this dataset group</span>
+<span class="sd">      name: Display name for this dataset group</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">bd</span><span class="p">:</span> <span class="n">BusDay</span><span class="p">,</span> 
+                 <span class="n">tables</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Table</span><span class="p">],</span> 
+                 <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">rdb</span><span class="p">:</span> <span class="n">RedisDB</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a connection to structured datasets&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bd</span> <span class="o">=</span> <span class="n">bd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span> <span class="o">=</span> <span class="n">tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="o">=</span> <span class="n">rdb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        
+    <span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;helper to print verbose messages&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;String to identify this class of datasets group&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Structured.__getitem__"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the table object corresponding to a dataset name&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Structured.drop_all"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.drop_all">[docs]</a>    <span class="k">def</span> <span class="nf">drop_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Drop all associated tables from SQL database&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Structured.load_dataframe"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.load_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+                       <span class="n">table</span><span class="p">:</span> <span class="n">Table</span><span class="p">,</span>
+                       <span class="n">to_replace</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load dataframe to SQLAlchemy table object using associated schema</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          df: DataFrame to load from</span>
+<span class="sd">          table: Destination Table object</span>
+<span class="sd">          to_replace: Original value or list of values to replace</span>
+<span class="sd">          value: Value to replace with</span>
+<span class="sd">          overwrite: Whether to overwrite or append</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Number of rows loaded</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - DataFrame should contain same column names as Table,</span>
+<span class="sd">        - DataFrame columns types are converted to Table column types</span>
+<span class="sd">        - Duplicate primary fields are removed, keeping first        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">as_dtypes</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">v</span><span class="o">.</span><span class="n">type</span>
+                                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="k">if</span> <span class="n">to_replace</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">to_replace</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">primary</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">primary_key</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">primary</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">primary</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">primary</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>        <span class="c1"># NaN&#39;s last</span>
+        <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">checkfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#table.create(checkfirst=True)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(structured store)&quot;</span><span class="p">,</span> <span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="Structured.read_dataframe"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.read_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Read signal values from sql and return as data frame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          table: Table to read from</span>
+<span class="sd">          where: Where clause str for sql select</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame of query results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">where</span><span class="p">)</span><span class="o">*</span><span class="s1">&#39;WHERE &#39;</span> <span class="o">+</span> <span class="n">where</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT * FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="Structured.load_csv"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.load_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">csvfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">drop</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="n">keep</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{},</span>                  
+                 <span class="n">replace</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{},</span> 
+                 <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span> 
+                 <span class="n">encoding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;latin-1&#39;</span><span class="p">,</span> 
+                 <span class="n">header</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
+                 <span class="n">low_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">na_filter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Insert ignore into SQL table from csvfile, and return as DataFrame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          dataset: dataset name</span>
+<span class="sd">          csvfile: csv file name</span>
+<span class="sd">          keep: {column: values} keep rows whose columns have any of values</span>
+<span class="sd">          drop: {column: values} drop rows with any given value in column</span>
+<span class="sd">          replace: {column: [old,new]} specifies values to replace in column</span>
+<span class="sd">          sep, encoding, header, low_memory, na_filter: args for pd.read_csv</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame containing loaded data</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - Create new table, if not exists, using associated schema</span>
+<span class="sd">        - New records with duplicate key are dropped (insert ignore used)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Load csv to DataFrame</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>    <span class="c1"># Table object for dataset</span>
+        <span class="k">assert</span> <span class="n">table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span>
+                         <span class="n">low_memory</span><span class="o">=</span><span class="n">low_memory</span><span class="p">,</span> <span class="n">na_filter</span><span class="o">=</span><span class="n">na_filter</span><span class="p">)</span>
+        <span class="c1"># &#39;utf-8&#39; codec can&#39;t decode byte 0xf6 =&gt; encoding=&#39;latin-1&#39;</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(read_csv)&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">csvfile</span><span class="p">)</span>
+
+        <span class="c1"># drop rows where col has value val        </span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">drop</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;Dropping&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="s1">&#39;rows with&#39;</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rows</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># clean up column dtypes and rows</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">as_dtypes</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">v</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+            <span class="n">drop_duplicates</span><span class="o">=</span><span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">primary_key</span><span class="p">],</span>
+            <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(load_csv)&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">table</span><span class="p">)</span>
+
+        <span class="c1"># drop again in case dtypes got changed</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">drop</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rows</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="c1"># keep rows where col has value vals</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span>
+        <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">keep</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rows</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;Keeping&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="s1">&#39;rows with&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">rows</span><span class="p">]</span>
+            
+        <span class="c1"># Create sql table and load from DataFrame</span>
+        <span class="c1">#table.create(self.sql.engine, checkfirst=True)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="Structured.build_lookup"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.build_lookup">[docs]</a>    <span class="k">def</span> <span class="nf">build_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to build lookup of target from source identifiers</span>
+<span class="sd">        Args:</span>
+<span class="sd">          source: Name of source identifier key</span>
+<span class="sd">          target: Name of target identifier key to return</span>
+<span class="sd">          date_field: Name of date field in database table</span>
+<span class="sd">          dataset: Internal name of table containing identifier mappings</span>
+<span class="sd">          fillna: Value to return if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>    <span class="c1"># physical name of table</span>
+        <span class="k">assert</span> <span class="n">table</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">assert</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">c</span>
+        <span class="k">return</span> <span class="n">Lookup</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span>
+                      <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                      <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                      <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                      <span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                      <span class="n">fillna</span><span class="o">=</span><span class="n">fillna</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Structured.get_permnos"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.get_permnos">[docs]</a>    <span class="k">def</span> <span class="nf">get_permnos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                    <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                    <span class="n">link_perm</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                    <span class="n">permno</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns matching permnos as of a prevailing date from &#39;links&#39; table</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          keys: Input list of identifiers to lookup</span>
+<span class="sd">          date: Prevailing date of link</span>
+<span class="sd">          link_perm: Name of permno field in &#39;links&#39; table</span>
+<span class="sd">          link_date: Name of link date field in &#39;links&#39; table</span>
+<span class="sd">          permno: Name of field to output permnos to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          List of Linked permnos, as of prevailing date; missing set to 0</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2">,&quot;</span>
+             <span class="s2">&quot;       </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_perm}</span><span class="s2"> AS </span><span class="si">{permno}</span><span class="s2">, &quot;</span>
+             <span class="s2">&quot;       </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_date}</span><span class="s2"> FROM&quot;</span>
+             <span class="s2">&quot;  (SELECT </span><span class="si">{key}</span><span class="s2">, MAX(</span><span class="si">{link_date}</span><span class="s2">)&quot;</span>
+             <span class="s2">&quot;    AS dt FROM </span><span class="si">{links}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;    WHERE </span><span class="si">{link_date}</span><span class="s2"> &lt;= </span><span class="si">{date}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;      AND </span><span class="si">{link_perm}</span><span class="s2"> &gt; 0 &quot;</span>
+             <span class="s2">&quot;      GROUP BY </span><span class="si">{key}</span><span class="s2">, </span><span class="si">{link_date}</span><span class="s2">) AS a&quot;</span>
+             <span class="s2">&quot;    INNER JOIN </span><span class="si">{links}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;      ON </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2"> = a.</span><span class="si">{key}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;         AND </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_date}</span><span class="s2"> = a.dt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>   <span class="c1"># Table object for links dataset</span>
+                <span class="n">link_perm</span><span class="o">=</span><span class="n">link_perm</span><span class="p">,</span>   
+                <span class="n">link_date</span><span class="o">=</span><span class="n">link_date</span><span class="p">,</span>   
+                <span class="n">permno</span><span class="o">=</span><span class="n">permno</span><span class="p">)</span>
+        <span class="n">permnos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="n">permnos</span> <span class="o">=</span> <span class="n">permnos</span><span class="p">[</span><span class="o">~</span><span class="n">permnos</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)]</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">permnos</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)[</span><span class="n">permno</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Structured.get_linked"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Structured.get_linked">[docs]</a>    <span class="k">def</span> <span class="nf">get_linked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                   <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">link_perm</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                   <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Query a dataset, and join &#39;links&#39; table to return data with permno</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          dataset: Name internal Table to query data from</span>
+<span class="sd">          fields: Data fields to retrieve</span>
+<span class="sd">          date_field: Name of date field in data table</span>
+<span class="sd">          link_date: Name of link date field in &#39;links&#39; table</span>
+<span class="sd">          link_perm: Name of permno field in &#39;links&#39; table</span>
+<span class="sd">          where: Where clause (optional)</span>
+<span class="sd">          limit: Maximum rows to return (optional)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame containing result of query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+            <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span> <span class="o">+</span> <span class="n">where</span>
+        <span class="n">limit</span> <span class="o">=</span> <span class="s2">&quot; LIMIT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">date_field</span><span class="p">]</span>
+                                         <span class="o">+</span> <span class="n">fields</span><span class="p">)])</span>        
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_perm}</span><span class="s2"> as </span><span class="si">{permno}</span><span class="s2">, &quot;</span>
+             <span class="s2">&quot;       </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_date}</span><span class="s2">, &quot;</span>
+             <span class="s2">&quot;       </span><span class="si">{fields}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;LEFT JOIN </span><span class="si">{links}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;  ON </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2"> = </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;     AND </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_date}</span><span class="s2"> = &quot;</span>
+             <span class="s2">&quot;         (SELECT MAX(c.</span><span class="si">{link_date}</span><span class="s2">) AS </span><span class="si">{link_date}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;            FROM </span><span class="si">{links}</span><span class="s2"> AS c &quot;</span>
+             <span class="s2">&quot;            WHERE c.</span><span class="si">{key}</span><span class="s2"> = </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;              AND (c.</span><span class="si">{link_date}</span><span class="s2"> &lt;= </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;                   OR c.</span><span class="si">{link_date}</span><span class="s2"> = 0)) &quot;</span>
+             <span class="s2">&quot;WHERE </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_perm}</span><span class="s2"> IS NOT NULL AND </span><span class="si">{links}</span><span class="s2">.</span><span class="si">{link_perm}</span><span class="s2"> &gt; 0&quot;</span>
+             <span class="s2">&quot;  AND </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{key}</span><span class="s2"> IS NOT NULL </span><span class="si">{where}</span><span class="s2"> </span><span class="si">{limit}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">links</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">permno</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span>
+                <span class="n">link_perm</span><span class="o">=</span><span class="n">link_perm</span><span class="p">,</span>
+                <span class="n">link_date</span><span class="o">=</span><span class="n">link_date</span><span class="p">,</span>
+                <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span>
+                <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(get_linked)&quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Lookup"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Lookup">[docs]</a><span class="k">class</span> <span class="nc">Lookup</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Loads dated identifier mappings to memory, to lookup by date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          sql: SQL connection instance</span>
+<span class="sd">          source: Name of source identifier key</span>
+<span class="sd">          target: Name of target identifier key to return</span>
+<span class="sd">          date_field: Name of date field in database table</span>
+<span class="sd">          table: Physical SQL table name containing identifier mappings</span>
+<span class="sd">          fillna: Value to return if not found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="n">lookups</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> as source,&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> AS target,&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">date_field</span><span class="si">}</span><span class="s2"> AS date&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;  FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;  WHERE </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> IS NOT NULL&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;    AND </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> IS NOT NULL&quot;</span><span class="p">)</span>
+        <span class="n">lookups</span> <span class="o">=</span> <span class="n">lookups</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">lookups</span> <span class="o">=</span> <span class="n">lookups</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lookups</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">lookups</span> <span class="o">=</span> <span class="n">lookups</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lookups</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookups</span> <span class="o">=</span> <span class="n">lookups</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookups</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fillna</span> <span class="o">=</span> <span class="n">fillna</span>
+
+<div class="viewcode-block" id="Lookup.__call__"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Lookup.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="n">List</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">99999999</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return target identifiers matched to source as of date&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">label</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookups</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">date</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>  
+            <span class="k">return</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">else</span>   <span class="c1"># latest before prevailing date</span>
+                    <span class="n">a</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>   <span class="c1"># else first</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fillna</span></div>
+
+<div class="viewcode-block" id="Lookup.__getitem__"><a class="viewcode-back" href="../../../finds.structured.structured.html#finds.structured.structured.Lookup.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

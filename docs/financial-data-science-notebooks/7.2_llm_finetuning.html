@@ -1,0 +1,1469 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Fine-tuning &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '7.2_llm_finetuning';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Prompting" href="7.3_llm_prompting.html" />
+    <link rel="prev" title="Large Language Models" href="7.1_large_language_models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F7.2_llm_finetuning.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/7.2_llm_finetuning.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fine-tuning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meta-llama-3-1-model">Meta Llama-3.1 model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning-sft">Supervised fine-tuning (SFT)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface-framework">Huggingface framework</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizer">Tokenizer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantization">Quantization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#automodel">AutoModel</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-efficient-fine-tuning">Parameter-efficient fine-tuning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#industry-text-classification">Industry text classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface-dataset-module">HuggingFace <code class="docutils literal notranslate"><span class="pre">dataset</span></code> module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline">Pipeline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trainer">Trainer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="fine-tuning">
+<h1>Fine-tuning<a class="headerlink" href="#fine-tuning" title="Permalink to this heading">#</a></h1>
+<p><em>To improve is to change; to be perfect is to change often</em> - Winston Churchill</p>
+<p>Large language models (LLMs) have demonstrated remarkable general capabilities, but tailoring them to specific tasks or domains may require fine-tuning – adjusting model weights by further training on task-specific data. We examine the fine-tuning of Meta’s <strong>Llama-3.1</strong> model using tools from the Hugging Face ecosystem, applying efficient techniques such as quantization and low-rank adaptation (LoRA) to an industry text classification task using firm-level 10-K filings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">bitsandbytes</span> <span class="k">as</span> <span class="nn">bnb</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">peft</span> <span class="kn">import</span> <span class="n">LoraConfig</span><span class="p">,</span> <span class="n">PeftConfig</span>
+<span class="kn">from</span> <span class="nn">trl</span> <span class="kn">import</span> <span class="n">SFTTrainer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AutoModelForCausalLM</span><span class="p">,</span> 
+                          <span class="n">AutoTokenizer</span><span class="p">,</span> 
+                          <span class="n">BitsAndBytesConfig</span><span class="p">,</span> 
+                          <span class="n">pipeline</span><span class="p">,</span> 
+                          <span class="n">logging</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="p">(</span><span class="n">accuracy_score</span><span class="p">,</span> 
+                             <span class="n">classification_report</span><span class="p">,</span> 
+                             <span class="n">confusion_matrix</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.unstructured</span> <span class="kn">import</span> <span class="n">Edgar</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span><span class="p">,</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">PSTAT</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Sectoring</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">Store</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">paths</span><span class="p">,</span> <span class="n">CRSP_DATE</span><span class="p">,</span> <span class="n">credentials</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">set_verbosity_error</span><span class="p">()</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_TRAIN_EPOCHS</span> <span class="o">=</span> <span class="mi">2</span>   <span class="c1"># 0 # 1</span>
+<span class="n">RESUME_FROM_CHECKPOINT</span> <span class="o">=</span> <span class="kc">False</span>   <span class="c1"># False # True</span>
+<span class="n">MAX_SEQ_LENGTH</span> <span class="o">=</span> <span class="mi">1024</span>  <span class="c1">#512 #2048</span>
+<span class="n">LOGGING_STEPS</span> <span class="o">=</span> <span class="mi">200</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+<span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">pstat</span> <span class="o">=</span> <span class="n">PSTAT</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">ed</span> <span class="o">=</span> <span class="n">Edgar</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;10X&#39;</span><span class="p">],</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">store</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="s1">&#39;assets&#39;</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pkl&#39;</span><span class="p">)</span>
+<span class="n">permnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;nouns&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> 
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>   <span class="c1"># comparable sample</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>len(permnos)=3474
+</pre></div>
+</div>
+</div>
+</div>
+<section id="meta-llama-3-1-model">
+<h2>Meta Llama-3.1 model<a class="headerlink" href="#meta-llama-3-1-model" title="Permalink to this heading">#</a></h2>
+<p>Meta’s <strong>Llama 3.1</strong> is an open-source large language model released in July 2024 under the Llama 3.1 Community License, permitting broad use, including commercial applications. Key highlights include:</p>
+<ul class="simple">
+<li><p>Model variants:</p>
+<ul>
+<li><p>8B: 8 billion parameters.</p></li>
+<li><p>70B: 70 billion parameters.</p></li>
+<li><p>405B: 405 billion parameters.</p></li>
+</ul>
+</li>
+<li><p>Context length of up to 128,000 tokens.</p></li>
+<li><p>Pre-trained on over 15 trillion tokens sourced from publicly available datasets.</p></li>
+<li><p>Fine-tuned using supervised fine-tuning (SFT) and reinforcement learning with human feedback (RLHF).</p></li>
+<li><p>Multilingual support, including English, French, German, Hindi, Italian, Portuguese, Spanish, and Thai.</p></li>
+</ul>
+<p><a class="reference external" href="https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct">https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_model</span> <span class="o">=</span> <span class="s1">&#39;meta-llama/Llama-3.1-8B-Instruct&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show current memory stats</span>
+<span class="n">gpu_stats</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">max_memory</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">gpu_stats</span><span class="o">.</span><span class="n">total_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GPU = </span><span class="si">{</span><span class="n">gpu_stats</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. Max memory = </span><span class="si">{</span><span class="n">max_memory</span><span class="si">}</span><span class="s2"> GB.&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">cuda_memory</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">trainer_stats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show final memory and optional trainer stats&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+        <span class="n">total_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span>
+        <span class="n">reserved_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_reserved</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">allocated_memory</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">memory_allocated</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">free_memory</span> <span class="o">=</span> <span class="n">total_memory</span> <span class="o">-</span> <span class="n">reserved_memory</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;------ </span><span class="si">{</span><span class="n">title</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1"> ------&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">trainer_stats</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">trainer_stats</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;train_runtime&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> seconds used for training.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total memory: </span><span class="si">{</span><span class="n">total_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved memory: </span><span class="si">{</span><span class="n">reserved_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Allocated memory: </span><span class="si">{</span><span class="n">allocated_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Free memory: </span><span class="si">{</span><span class="n">free_memory</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPU = NVIDIA GeForce RTX 3080 Laptop GPU. Max memory = 15.739 GB.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="supervised-fine-tuning-sft">
+<h2>Supervised fine-tuning (SFT)<a class="headerlink" href="#supervised-fine-tuning-sft" title="Permalink to this heading">#</a></h2>
+<p>Supervised Fine-Tuning is the process of enhancing a pre-trained language model by fine-tuning it on labeled input–output pairs using standard supervised learning. Common use cases include:</p>
+<ul class="simple">
+<li><p>Instruction tuning: The model learns to follow new instructions</p></li>
+<li><p>Chatbot fine-tuning (e.g., with help-desk data)</p></li>
+<li><p>Domain adaptation (e.g., legal, medical)</p></li>
+</ul>
+<section id="huggingface-framework">
+<h3>Huggingface framework<a class="headerlink" href="#huggingface-framework" title="Permalink to this heading">#</a></h3>
+<p>Several ecosystems support fine-tuning and training of LLMs. The Hugging Face Ecosystem includes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">transformers</span></code>: Model architectures and training components.</p></li>
+<li><p>Transformers Reinforcement Learning (<code class="docutils literal notranslate"><span class="pre">trl</span></code>): Training large language models (LLMs) with reinforcement learning techniques, especially for alignment tasks like RLHF (Reinforcement Learning with Human Feedback) and DPO (Direct Preference Optimization).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bitsandbytes</span></code>: Enables efficient low-bit model quantization, allowing large language models to run on limited GPU memory without much loss in performance.</p></li>
+<li><p>Parameter-Efficient Fine-Tuning (<code class="docutils literal notranslate"><span class="pre">peft</span></code>): Tools to fine-tune large language models by training only a small number of additional parameters.</p></li>
+<li><p>Accelerate: Distributed training optimization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">datasets</span></code>: For loading, processing, and managing datasets</p></li>
+</ul>
+<p>It provides access to 100k+ pre-trained transformer models, and tools for efficient-tuning of these models using low memory and quantized weights.</p>
+<p>If you encounter a gated model repository on Hugging Face, it means the model requires manual access approval from the authors before you can use or download it. You should log in to your <a class="reference external" href="http://huggingface.ro">huggingface.ro</a> account, go to the Model Page, and click on the “Request Access” button – approval may take up to a few days. When authorized, make sure you have set your Hugging Face token in your environment (e.g. <code class="docutils literal notranslate"><span class="pre">huggingface-cli</span> <span class="pre">login</span></code>), see <a class="reference external" href="https://huggingface.co/settings/tokens">https://huggingface.co/settings/tokens</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Locations to save fine-tuned model weights</span>
+<span class="n">output_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">],</span> <span class="s2">&quot;fine-tuned-model&quot;</span><span class="p">))</span>   <span class="c1"># training checkpoints</span>
+<span class="n">model_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">],</span> <span class="s2">&quot;Llama-3.1-8B-Instruct-FF-Sector&quot;</span><span class="p">))</span>  <span class="c1"># final model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">trl</span> <span class="kn">import</span> <span class="n">SFTConfig</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">SFTConfig</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">,</span>                    <span class="c1"># directory to save and repository id</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="n">NUM_TRAIN_EPOCHS</span><span class="p">,</span> <span class="c1">####1  # number of training epochs</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>    <span class="c1">####1   # batch size per device during training</span>
+    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1">####8     # before performing a backward/update pass</span>
+    <span class="n">gradient_checkpointing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>              <span class="c1"># use gradient checkpointing to save memory</span>
+    <span class="n">optim</span><span class="o">=</span><span class="s2">&quot;paged_adamw_32bit&quot;</span><span class="p">,</span>
+    <span class="n">logging_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>                 <span class="c1"># or &quot;steps&quot; or &quot;no&quot; or &quot;epoch&quot;</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="n">LOGGING_STEPS</span><span class="p">,</span> <span class="c1">#### 1,                         </span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span>                       <span class="c1"># learning rate, based on QLoRA paper</span>
+    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">bf16</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_grad_norm</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>                        <span class="c1"># max gradient norm based on QLoRA paper</span>
+    <span class="n">max_steps</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>                        <span class="c1"># warmup ratio based on QLoRA paper</span>
+    <span class="n">group_by_length</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">lr_scheduler_type</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>               <span class="c1"># use cosine learning rate scheduler</span>
+    <span class="n">report_to</span><span class="o">=</span><span class="s2">&quot;tensorboard&quot;</span><span class="p">,</span>
+    <span class="n">max_seq_length</span><span class="o">=</span><span class="n">MAX_SEQ_LENGTH</span><span class="p">,</span>  <span class="c1">#512,  ### should be 1024? or MAX_CHARS // 4</span>
+    <span class="n">packing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">dataset_kwargs</span><span class="o">=</span><span class="p">{</span>
+    <span class="s2">&quot;add_special_tokens&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;append_concat_token&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="tokenizer">
+<h3>Tokenizer<a class="headerlink" href="#tokenizer" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">AutoTokenizer</span></code> in Hugging Face is a smart utility that automatically loads the correct tokenizer for a given pretrained model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the tokenizer and set the pad token id. </span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model</span><span class="p">)</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="quantization">
+<h3>Quantization<a class="headerlink" href="#quantization" title="Permalink to this heading">#</a></h3>
+<p>Quantization converts high-precision data to lower-precision data, for instance, by representing model weights and activation values as 4-bit or 8-bit integers instead of 32-bit floating point numbers. The <code class="docutils literal notranslate"><span class="pre">bitsandbytes</span></code> library for efficient low-bit model quantization is integrated with Hugging Face and works seamlessly with parameter-efficient fine-tuning like QLora.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the Llama-3.1-8b-instruct model in 4-bit quantization to save GPU memory</span>
+<span class="n">bnb_config</span> <span class="o">=</span> <span class="n">BitsAndBytesConfig</span><span class="p">(</span>
+    <span class="n">load_in_4bit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">bnb_4bit_use_double_quant</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">bnb_4bit_quant_type</span><span class="o">=</span><span class="s2">&quot;nf4&quot;</span><span class="p">,</span>
+    <span class="n">bnb_4bit_compute_dtype</span><span class="o">=</span><span class="s2">&quot;float16&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="automodel">
+<h3>AutoModel<a class="headerlink" href="#automodel" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">AutoModel</span></code> class in Hugging Face is a convenient interface that automatically loads the correct model architecture based on the model name or path. Its variants automatically load the correct model head (e.g., classification layer, decoder head) based on your specific task, e.g.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Task</p></th>
+<th class="head"><p>Output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModel</span></code></p></td>
+<td><p>Base model (no head)</p></td>
+<td><p>Hidden states</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForSequenceClassification</span></code></p></td>
+<td><p>Text classification (e.g. sentiment)</p></td>
+<td><p>Class logits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForTokenClassification</span></code></p></td>
+<td><p>Token labeling (e.g. NER, POS)</p></td>
+<td><p>Token-level logits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForQuestionAnswering</span></code></p></td>
+<td><p>Extractive QA</p></td>
+<td><p>Start/end logits for answer spans</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForCausalLM</span></code></p></td>
+<td><p>Text generation (GPT-style)</p></td>
+<td><p>Next-token logits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForMaskedLM</span></code></p></td>
+<td><p>Mask filling (BERT-style)</p></td>
+<td><p>Predictions for masked tokens</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForSeq2SeqLM</span></code></p></td>
+<td><p>Translation, summarization (T5, BART)</p></td>
+<td><p>Generated sequences</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForMultipleChoice</span></code></p></td>
+<td><p>Multiple-choice QA (e.g. SWAG)</p></td>
+<td><p>Choice logits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForVision2Seq</span></code></p></td>
+<td><p>Image captioning</p></td>
+<td><p>Generated text</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForImageClassification</span></code></p></td>
+<td><p>Vision tasks</p></td>
+<td><p>Class logits</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">AutoModelForSpeechSeq2Seq</span></code></p></td>
+<td><p>Speech translation</p></td>
+<td><p>Generated text from audio</p></td>
+</tr>
+</tbody>
+</table>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">base_model</span><span class="p">,</span>
+    <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">torch_dtype</span><span class="o">=</span><span class="s2">&quot;float16&quot;</span><span class="p">,</span>
+    <span class="n">quantization_config</span><span class="o">=</span><span class="n">bnb_config</span><span class="p">,</span> 
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pretraining_tp</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="parameter-efficient-fine-tuning">
+<h3>Parameter-efficient fine-tuning<a class="headerlink" href="#parameter-efficient-fine-tuning" title="Permalink to this heading">#</a></h3>
+<p><strong>Parameter-Efficient Fine-Tuning (PEFT)</strong> is both a technique and a Hugging Face library for adapting large language models (LLMs) to new tasks by training only a small subset of parameters. Instead of updating the entire model, the base (pretrained) model is kept frozen, and lightweight, trainable components called <strong>adapters</strong> are added. These adapters typically involve only a few million parameters, making fine-tuning faster and more memory-efficient.</p>
+<ul class="simple">
+<li><p><strong>Low-rank factorization</strong>: This is a compression technique which decomposes a large matrix of weights into a smaller, lower-rank matrix, resulting in a more compact approximation that requires fewer parameters and computations.</p></li>
+<li><p><strong>LoRA</strong>: A small number of trainable low-rank matrices are added to the model’s attention layers. The original weights are frozen and just these adapters are fine-tuned.</p></li>
+<li><p><strong>QLora</strong>: Combines LoRA with Quantization: The base model is converted to 4-bit precision, reducing memory usage dramatically without losing much performance.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract the linear module names from the model using the bits and bytes library. </span>
+<span class="k">def</span> <span class="nf">find_all_linear_names</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">bnb</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear4bit</span>
+    <span class="n">lora_module_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_modules</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">lora_module_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s1">&#39;lm_head&#39;</span> <span class="ow">in</span> <span class="n">lora_module_names</span><span class="p">:</span>  <span class="c1"># needed for 16 bit</span>
+        <span class="n">lora_module_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;lm_head&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">lora_module_names</span><span class="p">)</span>
+<span class="n">modules</span> <span class="o">=</span> <span class="n">find_all_linear_names</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="n">modules</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;q_proj&#39;, &#39;down_proj&#39;, &#39;v_proj&#39;, &#39;gate_proj&#39;, &#39;o_proj&#39;, &#39;up_proj&#39;, &#39;k_proj&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure LoRA for the target modules, task type, and other training arguments </span>
+<span class="n">peft_config</span> <span class="o">=</span> <span class="n">LoraConfig</span><span class="p">(</span>
+    <span class="n">lora_alpha</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">lora_dropout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">r</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">bias</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+    <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;CAUSAL_LM&quot;</span><span class="p">,</span>
+    <span class="n">target_modules</span><span class="o">=</span><span class="n">modules</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="industry-text-classification">
+<h2>Industry text classification<a class="headerlink" href="#industry-text-classification" title="Permalink to this heading">#</a></h2>
+<p>We fine-tune the model for classifying firms into ten Fama-French sector categories based on their business descriptions in 10-K filings. The text data for each U.S.-domiciled common stock is drawn from the most recent year’s Business Description section of their 10-K filings.</p>
+<p>Load 10-K business description text for industry classification task</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieve universe of stocks</span>
+<span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">begyr</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="p">),</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">beg</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="n">end</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">univ</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># lookup company names</span>
+<span class="n">comnam</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;comnam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comnam</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c1"># lookup company names</span>
+<span class="n">comnam</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;comnam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comnam</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c1"># lookup ticker symbols</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;ticker&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c1"># lookup sic codes from Compustat, and map to FF 10-sector code</span>
+<span class="n">sic</span> <span class="o">=</span> <span class="n">pstat</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;sic&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">industry</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">sic</span><span class="p">[</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">industry</span> <span class="o">=</span> <span class="n">industry</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">industry</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">univ</span><span class="p">[</span><span class="s1">&#39;siccd&#39;</span><span class="p">])</span>
+<span class="n">sectors</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;codes10&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>   <span class="c1"># supplement from crosswalk</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sectors</span><span class="p">[</span><span class="n">industry</span><span class="p">]</span>
+
+<span class="c1"># retrieve latest year&#39;s bus10K&#39;s</span>
+<span class="n">item</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="s1">&#39;bus10K&#39;</span><span class="p">,</span> <span class="s1">&#39;10-K&#39;</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">))</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">)]</span>\
+    <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span>
+
+<span class="c1"># split documents into train/test sets</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permnos</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">]</span>
+<span class="n">class_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">class_labels</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">train_index</span><span class="p">,</span> <span class="n">test_index</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">permnos</span><span class="p">,</span>
+                                           <span class="n">stratify</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+                                           <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+                                           <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>beg=20240102, end=20241231
+class_labels=array([&#39;Durbl&#39;, &#39;Enrgy&#39;, &#39;HiTec&#39;, &#39;Hlth&#39;, &#39;Manuf&#39;, &#39;NoDur&#39;, &#39;Other&#39;,
+       &#39;Shops&#39;, &#39;Telcm&#39;, &#39;Utils&#39;], dtype=object)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="huggingface-dataset-module">
+<h3>HuggingFace <code class="docutils literal notranslate"><span class="pre">dataset</span></code> module<a class="headerlink" href="#huggingface-dataset-module" title="Permalink to this heading">#</a></h3>
+<p>The training data are converted to LLM instruction statements, and implemented as a HuggingFace Dataset class. This class can be conveniently created from many different sources, including data files of various formats or from a generator function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create LLM instruction statement</span>
+<span class="n">MAX_CHARS</span> <span class="o">=</span> <span class="n">MAX_SEQ_LENGTH</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">class_text</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39; or &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span>
+<span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="n">permno</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">ed</span><span class="p">[</span><span class="n">rows</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permno</span><span class="p">,</span> <span class="s1">&#39;pathname&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)[:</span><span class="n">MAX_CHARS</span><span class="p">]</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Classify the text into one of these </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)</span><span class="si">}</span><span class="s2"> classification labels:</span>
+<span class="si">{</span><span class="n">class_text</span><span class="si">}</span><span class="s2"> </span>
+<span class="s2">and return the answer as the label.</span>
+<span class="s2">text: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">label: </span><span class="si">{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">test</span> <span class="k">else</span> <span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permno</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_memory</span><span class="p">(</span><span class="s1">&#39;before dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>------ BEFORE DATASET ------
+Total memory: 15.74 GB
+Reserved memory: 6.83 GB
+Allocated memory: 5.63 GB
+Free memory: 8.91 GB
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">train_index</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">generate_prompt</span><span class="p">(</span><span class="n">permno</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">train_index</span><span class="p">])</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">test_index</span><span class="p">,</span>
+                   <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">generate_prompt</span><span class="p">(</span><span class="n">permno</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">test_index</span><span class="p">])</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permno</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">test_index</span><span class="p">]</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">X_train</span><span class="p">[[</span><span class="s2">&quot;text&quot;</span><span class="p">]])</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">X_test</span><span class="p">[[</span><span class="s2">&quot;text&quot;</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">train_data</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Classify the text into one of these 10 classification labels: &#39;Durbl&#39;
+or &#39;Enrgy&#39; or &#39;HiTec&#39; or &#39;Hlth&#39; or &#39;Manuf&#39; or &#39;NoDur&#39; or &#39;Other&#39; or
+&#39;Shops&#39; or &#39;Telcm&#39; or &#39;Utils&#39;  and return the answer as the label.
+text: ITEM 1. BUSINESS  OVERVIEW  B. RILEY FINANCIAL, INC. (NASDAQ:
+RILY) (THE COMPANY IS A DIVERSIFIED FINANCIAL SERVICES PLATFORM THAT
+DELIVERS TAILORED SOLUTIONS TO MEET THE STRATEGIC, OPERATIONAL, AND
+CAPITAL NEEDS OF ITS CLIENTS AND PARTNERS. WE OPERATE THROUGH SEVERAL
+CONSOLIDATED SUBSIDIARIES (COLLECTIVELY, B. RILEY THAT PROVIDE
+INVESTMENT BANKING, BROKERAGE, WEALTH MANAGEMENT, ASSET MANAGEMENT,
+DIRECT LENDING, BUSINESS ADVISORY, VALUATION, AND ASSET DISPOSITION
+SERVICES TO A BROAD CLIENT BASE SPANNING PUBLIC AND PRIVATE COMPANIES,
+FINANCIAL SPONSORS, INVESTORS, FINANCIAL INSTITUTIONS, LEGAL AND
+PROFESSIONAL SERVICES FIRMS, AND INDIVIDUALS.   THE COMPANY
+OPPORTUNISTICALLY INVESTS IN AND ACQUIRES COMPANIES OR ASSETS WITH
+ATTRACTIVE RISK-ADJUSTED RETURN PROFILES TO BENEFIT OUR SHAREHOLDERS.
+WE OWN AND OPERATE SEVERAL UNCORRELATED CONSUMER BUSINESSES AND INVEST
+IN BRANDS ON A PRINCIPAL BASIS. OUR APPROACH IS FOCUSED ON HIGH
+QUALITY COMPANIES AND ASSETS IN INDUSTRIES IN WHICH WE HAVE EXTENSIVE
+KNOWLEDGE AND CAN BENEFIT FROM OUR EXPERIENCE TO MAKE OPERATIONAL
+IMPROVEMENTS AND MAXIMIZE FREE CASH FLOW. OUR PRINCIPAL INVESTMENTS
+OFTEN LEVERAGE THE FINANCIAL, RESTRUCTURING, AND OPERATIONAL EXPERTISE
+OF OUR PROFESSIONALS WHO WORK COLLABORATIVELY ACROSS DISCIPLINES.   WE
+REFER TO B. RILEY AS A PLATFORM BECAUSE OF THE UNIQUE COMPOSITION OF
+OUR BUSINESS. OUR PLATFORM HAS GROWN CONSIDERABLY AND BECOME MORE
+DIVERSIFIED OVER THE PAST SEVERAL YEARS. WE HAVE INCREASED OUR MARKET
+SHARE AND EXPANDED THE DEPTH AND BREADTH OF OUR BUSINESSES BOTH
+ORGANICALLY AND THROUGH OPPORTUNISTIC ACQUISITIONS. OUR INCREASINGLY
+DIVERSIFIED PLATFORM ENABLES US TO INVEST OPPORTUNISTICALLY AND TO
+DELIVER STRONG LONG-TERM INVESTMENT PERFORMANCE THROUGHOUT A RANGE OF
+ECONOMIC CYCLES.   OUR PLATFORM IS COMPRISED OF MORE THAN 2,700
+AFFILIATED PROFESSIONALS, INCLUDING EMPLOYEES AND INDEPENDENT
+CONTRACTORS. WE ARE HEADQUARTERED IN LOS ANGELES, CALIFORNIA AND
+MAINTAIN OFFICES THROUGHOUT THE U.S., INCLUDING IN NEW YORK, CHICAGO,
+METRO DISTRICT OF COLUMBIA, AT label: Other
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># verify max_seq_length sufficient</span>
+<span class="n">curr_max</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_data</span><span class="p">):</span>
+    <span class="n">tokenized</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+    <span class="n">curr_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">curr_max</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokenized</span><span class="p">))</span>
+<span class="c1">#    print(f&quot;{row=}, {len(tokenized)=}&quot;)</span>
+<span class="k">assert</span> <span class="n">curr_max</span> <span class="o">&lt;</span> <span class="n">args</span><span class="o">.</span><span class="n">max_seq_length</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">curr_max</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MAX_SEQ_LENGTH</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>820 MAX_SEQ_LENGTH=1024
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cuda_memory</span><span class="p">(</span><span class="s1">&#39;after dataset&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>------ AFTER DATASET ------
+Total memory: 15.74 GB
+Reserved memory: 6.83 GB
+Allocated memory: 5.63 GB
+Free memory: 8.91 GB
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="pipeline">
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Permalink to this heading">#</a></h3>
+<p>Hugging Face’s <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> function enables one-line use for easy inference, by simply specifying the model, tokenizer, generation parameters (e.g. sampling methdology, maximum new tokens), and task, e.g.:</p>
+<ul class="simple">
+<li><p>“text-classification”: Sentiment analysis, topic labeling</p></li>
+<li><p>“token-classification”: Named Entity Recognition (NER), POS tagging</p></li>
+<li><p>“question-answering”: Extractive QA from context</p></li>
+<li><p>“text-generation”: Generate text (GPT-style)</p></li>
+<li><p>“summarization”: Generate summaries from long text</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use the text generation pipeline to predict labels from the “text” </span>
+<span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a response&quot;&quot;&quot;</span>
+    <span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> 
+                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> 
+                    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
+                    <span class="n">do_sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">top_p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">top_k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">return_full_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># 2</span>
+                    <span class="n">temperature</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>    <span class="c1"># 0.1        </span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;generated_text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;label:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="n">result</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="n">answer</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answer</span>
+
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predict test set&quot;&quot;&quot;</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test</span><span class="p">))):</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="c1"># Determine the predicted category</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">class_labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">answer</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y_pred</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Create function that will use the predicted labels and true labels to compute the overall accuracy, classification report, and confusion matrix.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">class_labels</span><span class="p">)}</span>
+
+    <span class="k">def</span> <span class="nf">map_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Map to -1 if not found, should not occur with correct data</span>
+    
+    <span class="n">y_true_mapped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">map_func</span><span class="p">)(</span><span class="n">y_true</span><span class="p">)</span>
+    <span class="n">y_pred_mapped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">map_func</span><span class="p">)(</span><span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">target_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">y_pred_mapped</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">+=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">target_names</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;none&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># Calculate accuracy</span>
+    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_true_mapped</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred_mapped</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Accuracy: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Generate classification report</span>
+    <span class="n">class_report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_true_mapped</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred_mapped</span><span class="p">,</span>
+                                         <span class="n">target_names</span><span class="o">=</span><span class="n">target_names</span><span class="p">,</span>
+                                         <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Classification Report:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">class_report</span><span class="p">)</span>
+    
+    <span class="c1"># Generate confusion matrix</span>
+    <span class="n">conf_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_true_mapped</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred_mapped</span><span class="p">,</span>
+                                   <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Confusion Matrix:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">conf_matrix</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Evaluate accuracy before fine-tuning the model</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+<span class="n">Series</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 695/695 [05:45&lt;00:00,  2.01it/s]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Manuf    217
+NoDur    184
+HiTec    109
+Other     65
+none      54
+Hlth      24
+Utils     15
+Telcm     14
+Shops      8
+Enrgy      4
+Durbl      1
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.203
+
+Classification Report:
+              precision    recall  f1-score   support
+
+       Durbl       0.00      0.00      0.00        33
+       Enrgy       0.50      0.10      0.17        20
+       HiTec       0.25      0.19      0.22       139
+        Hlth       0.88      0.13      0.22       164
+       Manuf       0.22      0.70      0.34        69
+       NoDur       0.03      0.21      0.06        28
+       Other       0.25      0.10      0.15       153
+       Shops       0.75      0.10      0.17        62
+       Telcm       0.36      0.56      0.43         9
+       Utils       0.67      0.56      0.61        18
+        none       0.00      0.00      0.00         0
+
+    accuracy                           0.20       695
+   macro avg       0.35      0.24      0.21       695
+weighted avg       0.44      0.20      0.21       695
+
+
+Confusion Matrix:
+[[ 0  0  2  0 18 10  2  1  0  0  0]
+ [ 0  2  0  0  8  8  2  0  0  0  0]
+ [ 0  0 27  0 43 38 18  0  8  4  1]
+ [ 0  0 73 21 15 22 11  0  1  1 20]
+ [ 0  0  3  0 48 12  5  1  0  0  0]
+ [ 1  0  0  0 17  6  4  0  0  0  0]
+ [ 0  0  4  1 41 64 16  0  0  0 27]
+ [ 0  0  0  1 26 16  7  6  0  0  6]
+ [ 0  0  0  0  0  4  0  0  5  0  0]
+ [ 0  2  0  1  1  4  0  0  0 10  0]
+ [ 0  0  0  0  0  0  0  0  0  0  0]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="trainer">
+<h3>Trainer<a class="headerlink" href="#trainer" title="Permalink to this heading">#</a></h3>
+<p>Create the model trainer using training arguments, a LoRA configuration, and a dataset.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span> <span class="o">=</span> <span class="n">SFTTrainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
+    <span class="n">peft_config</span><span class="o">=</span><span class="n">peft_config</span><span class="p">,</span>
+<span class="c1">#    dataset_text_field=&quot;text&quot;,</span>
+    <span class="n">processing_class</span><span class="o">=</span><span class="n">tokenizer</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initiate model training</span>
+<span class="n">cuda_memory</span><span class="p">(</span><span class="s1">&#39;before training&#39;</span><span class="p">)</span>
+<span class="n">trainer_stats</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="o">=</span><span class="n">RESUME_FROM_CHECKPOINT</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>------ BEFORE TRAINING ------
+Total memory: 15.74 GB
+Reserved memory: 11.04 GB
+Allocated memory: 8.22 GB
+Free memory: 4.70 GB
+{&#39;loss&#39;: 1.1984, &#39;grad_norm&#39;: 0.1371612697839737, &#39;learning_rate&#39;: 0.0001670747898848231, &#39;num_tokens&#39;: 1091299.0, &#39;mean_token_accuracy&#39;: 0.7146163220703602, &#39;epoch&#39;: 0.5755395683453237}
+{&#39;loss&#39;: 1.1205, &#39;grad_norm&#39;: 0.16719305515289307, &#39;learning_rate&#39;: 8.029070592154895e-05, &#39;num_tokens&#39;: 2179799.0, &#39;mean_token_accuracy&#39;: 0.7273549642927366, &#39;epoch&#39;: 1.1496402877697842}
+{&#39;loss&#39;: 1.034, &#39;grad_norm&#39;: 0.19266854226589203, &#39;learning_rate&#39;: 9.47361624665869e-06, &#39;num_tokens&#39;: 3270551.0, &#39;mean_token_accuracy&#39;: 0.7437317748367787, &#39;epoch&#39;: 1.725179856115108}
+{&#39;train_runtime&#39;: 9602.662, &#39;train_samples_per_second&#39;: 0.579, &#39;train_steps_per_second&#39;: 0.072, &#39;train_loss&#39;: 1.103452600044888, &#39;num_tokens&#39;: 3784895.0, &#39;mean_token_accuracy&#39;: 0.7479746815689067, &#39;epoch&#39;: 1.99568345323741}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save trained model and tokenizer</span>
+<span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+<span class="n">cuda_memory</span><span class="p">(</span><span class="s1">&#39;after training&#39;</span><span class="p">,</span> <span class="n">trainer_stats</span><span class="o">=</span><span class="n">trainer_stats</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>------ AFTER TRAINING ------
+9602.662 seconds used for training.
+Total memory: 15.74 GB
+Reserved memory: 14.43 GB
+Allocated memory: 8.26 GB
+Free memory: 1.31 GB
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="evaluation">
+<h3>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Series</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/695 [00:00&lt;?, ?it/s]/home/terence/env3.11/lib/python3.11/site-packages/torch/utils/checkpoint.py:87: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn(
+100%|██████████| 695/695 [08:21&lt;00:00,  1.39it/s]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hlth     168
+Other    156
+HiTec    140
+Manuf     59
+Shops     59
+NoDur     34
+Durbl     29
+Enrgy     21
+Utils     19
+Telcm     10
+Name: count, dtype: int64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">evaluate</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.829
+
+Classification Report:
+              precision    recall  f1-score   support
+
+       Durbl       0.83      0.73      0.77        33
+       Enrgy       0.90      0.95      0.93        20
+       HiTec       0.79      0.80      0.80       139
+        Hlth       0.89      0.91      0.90       164
+       Manuf       0.80      0.68      0.73        69
+       NoDur       0.59      0.71      0.65        28
+       Other       0.85      0.86      0.85       153
+       Shops       0.83      0.79      0.81        62
+       Telcm       0.90      1.00      0.95         9
+       Utils       0.84      0.89      0.86        18
+
+    accuracy                           0.83       695
+   macro avg       0.82      0.83      0.83       695
+weighted avg       0.83      0.83      0.83       695
+
+
+Confusion Matrix:
+[[ 24   0   6   0   1   1   0   1   0   0]
+ [  0  19   0   0   1   0   0   0   0   0]
+ [  0   2 111   7   2   2  12   2   1   0]
+ [  0   0   9 149   1   1   3   1   0   0]
+ [  5   0   4   2  47   6   2   2   0   1]
+ [  0   0   0   1   2  20   2   3   0   0]
+ [  0   0  10   4   5   1 132   1   0   0]
+ [  0   0   0   4   0   3   4  49   0   2]
+ [  0   0   0   0   0   0   0   0   9   0]
+ [  0   0   0   1   0   0   1   0   0  16]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># merge and save model</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">from</span> <span class="nn">peft</span> <span class="kn">import</span> <span class="n">PeftModel</span>
+
+<span class="k">del</span> <span class="n">model</span>
+<span class="k">del</span> <span class="n">trainer</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+<span class="n">cuda_memory</span><span class="p">(</span><span class="s1">&#39;after empty&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reload base model and tokenizer to cpu</span>
+<span class="n">device_map</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model</span><span class="p">)</span>
+<span class="n">base_model_reload</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">base_model</span><span class="p">,</span>
+        <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">low_cpu_mem_usage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+        <span class="n">device_map</span><span class="o">=</span><span class="n">device_map</span><span class="p">,</span> <span class="c1"># &quot;cpu&quot;,   # &quot;auto&quot;,</span>
+        <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Merge adapter with base model</span>
+<span class="kn">from</span> <span class="nn">peft</span> <span class="kn">import</span> <span class="n">PeftModel</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">PeftModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">base_model_reload</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">device_map</span><span class="o">=</span><span class="n">device_map</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">merge_and_unload</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save the merged model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+<span class="n">tokenizer</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reload nerged model and tokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+<span class="n">base_model_reload</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="n">model_dir</span><span class="p">,</span>
+        <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">low_cpu_mem_usage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span>
+        <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>   <span class="c1"># &#39;cpu&#39;,</span>
+        <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check it is working</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">)</span>
+<span class="n">evaluate</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Philipp Krähenbühl, 2025, “AI395T Advances in Deep Learning course materials”, retrieved from <a class="reference external" href="https://ut.philkr.net/advances_in_deeplearning/">https://ut.philkr.net/advances_in_deeplearning/</a></p>
+<p>Tim Dettmers, “Bitsandbytes: 8-bit Optimizers and Quantization for PyTorch”, 2022.
+GitHub repository: <a class="github reference external" href="https://github.com/TimDettmers/bitsandbytes">TimDettmers/bitsandbytes</a></p>
+<p><a class="reference external" href="https://www.datacamp.com/tutorial/fine-tuning-llama-3-1">https://www.datacamp.com/tutorial/fine-tuning-llama-3-1</a></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="7.1_large_language_models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Large Language Models</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="7.3_llm_prompting.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Prompting</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#meta-llama-3-1-model">Meta Llama-3.1 model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supervised-fine-tuning-sft">Supervised fine-tuning (SFT)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface-framework">Huggingface framework</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tokenizer">Tokenizer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantization">Quantization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#automodel">AutoModel</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-efficient-fine-tuning">Parameter-efficient fine-tuning</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#industry-text-classification">Industry text classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#huggingface-dataset-module">HuggingFace <code class="docutils literal notranslate"><span class="pre">dataset</span></code> module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline">Pipeline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trainer">Trainer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

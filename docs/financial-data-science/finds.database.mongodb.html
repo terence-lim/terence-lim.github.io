@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.database.mongodb &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.database.database" href="finds.database.database.html" />
+    <link rel="prev" title="finds.database.redisdb" href="finds.database.redisdb.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="finds.database.html">finds.database</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.database.sql.html">finds.database.sql</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.database.redisdb.html">finds.database.redisdb</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.database.mongodb</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.database.mongodb.MongoDB"><code class="docutils literal notranslate"><span class="pre">MongoDB</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.database.mongodb.MongoDB.drop"><code class="docutils literal notranslate"><span class="pre">MongoDB.drop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.database.mongodb.MongoDB.show"><code class="docutils literal notranslate"><span class="pre">MongoDB.show()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.database.mongodb.parse_where"><code class="docutils literal notranslate"><span class="pre">parse_where()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.database.database.html">finds.database.database</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.database.html">finds.database</a></li>
+      <li class="breadcrumb-item active">finds.database.mongodb</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.database.mongodb.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.database.mongodb">
+<span id="finds-database-mongodb"></span><h1>finds.database.mongodb<a class="headerlink" href="#module-finds.database.mongodb" title="Permalink to this heading"></a></h1>
+<p>MongoDB client wrapper</p>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.database.mongodb.MongoDB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.database.mongodb.</span></span><span class="sig-name descname"><span class="pre">MongoDB</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">27017</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/database/mongodb.html#MongoDB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.database.mongodb.MongoDB" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="finds.database.database.html#finds.database.database.Database" title="finds.database.database.Database"><code class="xref py py-class docutils literal notranslate"><span class="pre">Database</span></code></a></p>
+<p>Interface to pymongo</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> – Name of database in MongoDB</p></li>
+<li><p><strong>host</strong> – IP address of server</p></li>
+<li><p><strong>port</strong> – Port number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>client</strong> – MongoClient instance providing MongoDB interface</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mdb</span> <span class="o">=</span> <span class="n">MongoDB</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">serverStatusResult</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">admin</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;serverStatus&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">serverStatusResult</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">collections</span> <span class="o">=</span> <span class="n">mdb</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">list_collection_names</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mdb</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="n">database</span><span class="p">][</span><span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">estimated_document_count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">count_documents</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">create_index</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">create_indexes</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
+<span class="n">delete_one</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
+<span class="n">distinct</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">drop</span><span class="p">()</span>
+<span class="n">drop_index</span><span class="p">(</span><span class="n">index_or_name</span><span class="p">)</span>
+<span class="n">drop_indexes</span><span class="p">()</span>
+<span class="n">estimated_document_count</span><span class="p">()</span>
+<span class="n">find</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="p">{},</span> <span class="n">projection</span><span class="o">=</span><span class="p">[],</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">find_one</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">insert_many</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">insert_one</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+<span class="n">list_indexes</span><span class="p">()</span>
+<span class="n">replace_one</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">update_many</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">update_many</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">update_one</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">upsert</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>MongoDB Operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$eq     Matches values that are equal to a specified value.
+$gt     Matches values that are greater than a specified value.
+$gte    Matches values that are greater than or equal to a specified value.
+$in     Matches any of the values specified in an array.
+$lt     Matches values that are less than a specified value.
+$lte    Matches values that are less than or equal to a specified value.
+$ne     Matches all values that are not equal to a specified value.
+$nin    Matches none of the values specified in an array.
+$and    Joins query clauses with a logical AND
+$not    Inverts the effect of a query expression
+$nor    Joins query clauses with a logical NOR returns
+$or     Joins query clauses with a logical OR returns
+$exists Matches documents that have the specified field.
+$type   Selects documents if a field is of the specified type.
+</pre></div>
+</div>
+<p>Unix Installation:</p>
+<p><a class="reference external" href="https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/">https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/</a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">start</span> <span class="n">mongod</span>
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">restart</span> <span class="n">mongod</span>
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">stop</span> <span class="n">mongod</span>
+<span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">enable</span> <span class="n">mongod</span>
+<span class="n">sudo</span> <span class="n">service</span> <span class="n">mongod</span> <span class="n">stop</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">purge</span> <span class="n">mongodb</span><span class="o">-</span><span class="n">org</span><span class="o">*</span>
+</pre></div>
+</div>
+<p>/etc/mongod.conf - configuration file for MongoDB:</p>
+<ul class="simple">
+<li><p>dbPath:  where the database files stored (/var/lib/mongodb)</p></li>
+<li><p>systemLog: logging options (/var/log/mongodb/mongod.log)</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.database.mongodb.MongoDB.drop">
+<span class="sig-name descname"><span class="pre">drop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/database/mongodb.html#MongoDB.drop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.database.mongodb.MongoDB.drop" title="Permalink to this definition"></a></dt>
+<dd><p>Drop a database or collection (table) by name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>database</strong> – Name of database to drop collection</p></li>
+<li><p><strong>collection</strong> – Name of collection to drop (blank to drop database)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.database.mongodb.MongoDB.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/database/mongodb.html#MongoDB.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.database.mongodb.MongoDB.show" title="Permalink to this definition"></a></dt>
+<dd><p>List all database or collection (table) names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>database</strong> – List collections in (blank to list all databases)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.database.mongodb.parse_where">
+<span class="sig-prename descclassname"><span class="pre">finds.database.mongodb.</span></span><span class="sig-name descname"><span class="pre">parse_where</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/finds/database/mongodb.html#parse_where"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.database.mongodb.parse_where" title="Permalink to this definition"></a></dt>
+<dd><p>Helper to parse dict or list-like where clause to pymongo command str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>where</strong> – keyword name may have operator suffix:</p></li>
+<li><p><strong>name_eq</strong> (<em>-</em>) – be equal to the value</p></li>
+<li><p><strong>name_ne</strong> (<em>-</em>) – be equal to the value</p></li>
+<li><p><strong>name_lt</strong> (<em>-</em>) – less than the value</p></li>
+<li><p><strong>name_le</strong> (<em>-</em>) – less than or equal to the value</p></li>
+<li><p><strong>name_gt</strong> (<em>-</em>) – greater than the value</p></li>
+<li><p><strong>name_ge</strong> (<em>-</em>) – greater than or equal to the value</p></li>
+<li><p><strong>name_in</strong> (<em>-</em>) – be included in the value</p></li>
+<li><p><strong>name_notin</strong> (<em>-</em>) – not be included in the value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary of conditions in pymongo format</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.database.redisdb.html" class="btn btn-neutral float-left" title="finds.database.redisdb" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.database.database.html" class="btn btn-neutral float-right" title="finds.database.database" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

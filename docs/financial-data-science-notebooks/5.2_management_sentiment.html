@@ -1,0 +1,1343 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Management Sentiment Analysis &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '5.2_management_sentiment';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Business Textual Analysis" href="5.3_business_textual.html" />
+    <link rel="prev" title="FOMC Topic Modeling" href="5.1_fomc_topics.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F5.2_management_sentiment.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/5.2_management_sentiment.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Management Sentiment Analysis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sentiment-analysis">Sentiment analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loughran-macdonald-dictionary">Loughran-MacDonald dictionary</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-management-discussion-and-analysis">10-K Management discussion and analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sec-edgar-website">SEC Edgar website</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finds-edgar-module">FinDS <code class="docutils literal notranslate"><span class="pre">edgar</span></code> module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#management-sentiment-and-stock-returns">Management sentiment and stock returns</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="management-sentiment-analysis">
+<h1>Management Sentiment Analysis<a class="headerlink" href="#management-sentiment-analysis" title="Permalink to this heading">#</a></h1>
+<p><em>Life is a math equation. In order to gain the most, you have to know how to convert negatives into positives</em> - Anonymous</p>
+<p>Sentiment analysis helps quantify the tone of financial disclosures, revealing whether a company’s management expresses optimism, caution, or concern. This analysis can be conducted using dictionary-based methods, which rely on predefined sentiment word lists, or more sophisticated machine learning models, such as large language models (LLMs). We explore the application of sentiment analysis in financial documents, focusing on the Loughran-MacDonald dictionary and the SEC’s EDGAR system for retrieving company filings.  Specifically, we analyze sentiment trends in 10-K Management Discussion and Analysis (MD&amp;A) sections and their relationship with stock returns.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span><span class="p">,</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">Signals</span>
+<span class="kn">from</span> <span class="nn">finds.unstructured</span> <span class="kn">import</span> <span class="n">Edgar</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Alfred</span>
+<span class="kn">from</span> <span class="nn">finds.recipes</span> <span class="kn">import</span> <span class="n">weighted_average</span><span class="p">,</span> <span class="n">fractile_split</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">Store</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">CRSP_DATE</span>
+<span class="c1"># %matplotlib qt</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">LAST_YEAR</span> <span class="o">=</span> <span class="n">CRSP_DATE</span> <span class="o">//</span> <span class="mi">10000</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+<span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="o">=</span><span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">signals</span> <span class="o">=</span> <span class="n">Signals</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<span class="n">store</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">],</span> <span class="n">ext</span><span class="o">=</span><span class="s1">&#39;pkl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="sentiment-analysis">
+<h2>Sentiment analysis<a class="headerlink" href="#sentiment-analysis" title="Permalink to this heading">#</a></h2>
+<p>Dictionary-based (or lexicon-based) sentiment analysis relies on predefined word lists, where words are assigned sentiment scores along with intensity levels. While this approach is straightforward and computationally efficient, it struggles with complex linguistic phenomena such as negations, irony, and sarcasm, which can lead to reduced accuracy. On the other hand, large language models excel at understanding context, syntax, and semantics, making them more effective for sentiment analysis of intricate financial texts. However, despite their limitations, dictionary-based methods remain popular due to their ease of implementation and transparent results.</p>
+<section id="loughran-macdonald-dictionary">
+<h3>Loughran-MacDonald dictionary<a class="headerlink" href="#loughran-macdonald-dictionary" title="Permalink to this heading">#</a></h3>
+<p>Loughran and McDonald (2011) found that general-purpose sentiment lexicons were not well-suited for financial statement analysis. To address this, they developed a dictionary based on company 10-K filings, categorizing words into seven sentiment-related groups relevant to finance: “negative,” “positive,” “litigious,” “uncertainty,” “constraining,” and “superfluous.” This domain-specific approach provides a more accurate reflection of sentiment in financial disclosures.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://sraf.nd.edu/loughranmcdonald-master-dictionary/">Loughran-MacDonald Master Dictionary</a></p></li>
+</ul>
+<p>The dictionary includes:</p>
+<ul class="simple">
+<li><p>A list of positive sentiment words</p></li>
+<li><p>A list of negative sentiment words</p></li>
+<li><p>A set of stop words to ignore</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># to download from google drive, need this prefix and the source file id</span>
+<span class="n">_prefix</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?export=download&amp;id=&quot;</span> 
+<span class="n">source</span> <span class="o">=</span>  <span class="n">_prefix</span> <span class="o">+</span> <span class="s1">&#39;1ptUgGVeeUGhCbaKL14Ri3Xi5xOKkPkUD&#39;</span>
+<span class="c1"># source = &quot;Loughran-McDonald_MasterDictionary_1993-2023.csv&quot;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+<span class="c1"># sets of positive and negative sentiment words</span>
+<span class="n">words</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;positive&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Positive&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Word&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span>
+         <span class="s1">&#39;negative&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Negative&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Word&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">())}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Positive sentiment words</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Positive Words&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Positive Words</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>outperform</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>rebounded</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>efficiency</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>honored</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>leadership</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>349</th>
+      <td>improves</td>
+    </tr>
+    <tr>
+      <th>350</th>
+      <td>collaborations</td>
+    </tr>
+    <tr>
+      <th>351</th>
+      <td>innovators</td>
+    </tr>
+    <tr>
+      <th>352</th>
+      <td>advantageous</td>
+    </tr>
+    <tr>
+      <th>353</th>
+      <td>honoring</td>
+    </tr>
+  </tbody>
+</table>
+<p>354 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>Negative sentiment words</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;negative&#39;</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Negative Words&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Negative Words</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>threatening</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>immature</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>falsifications</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>uncontrolled</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>panic</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2350</th>
+      <td>objections</td>
+    </tr>
+    <tr>
+      <th>2351</th>
+      <td>coercion</td>
+    </tr>
+    <tr>
+      <th>2352</th>
+      <td>extenuating</td>
+    </tr>
+    <tr>
+      <th>2353</th>
+      <td>lying</td>
+    </tr>
+    <tr>
+      <th>2354</th>
+      <td>contradiction</td>
+    </tr>
+  </tbody>
+</table>
+<p>2355 rows × 1 columns</p>
+</div></div></div>
+</div>
+<p>List of stop words to ignore</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># stopwords</span>
+<span class="n">generic</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ME&#39;</span><span class="p">,</span> <span class="s1">&#39;MY&#39;</span><span class="p">,</span> <span class="s1">&#39;MYSELF&#39;</span><span class="p">,</span> <span class="s1">&#39;WE&#39;</span><span class="p">,</span> <span class="s1">&#39;OUR&#39;</span><span class="p">,</span> <span class="s1">&#39;OURS&#39;</span><span class="p">,</span> <span class="s1">&#39;OURSELVES&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;YOU&#39;</span><span class="p">,</span> <span class="s1">&#39;YOUR&#39;</span><span class="p">,</span> <span class="s1">&#39;YOURS&#39;</span><span class="p">,</span> <span class="s1">&#39;YOURSELF&#39;</span><span class="p">,</span> <span class="s1">&#39;YOURSELVES&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;HE&#39;</span><span class="p">,</span> <span class="s1">&#39;HIM&#39;</span><span class="p">,</span> <span class="s1">&#39;HIS&#39;</span><span class="p">,</span> <span class="s1">&#39;HIMSELF&#39;</span><span class="p">,</span> <span class="s1">&#39;SHE&#39;</span><span class="p">,</span> <span class="s1">&#39;HER&#39;</span><span class="p">,</span> <span class="s1">&#39;HERS&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;HERSELF&#39;</span><span class="p">,</span> <span class="s1">&#39;IT&#39;</span><span class="p">,</span> <span class="s1">&#39;ITS&#39;</span><span class="p">,</span> <span class="s1">&#39;ITSELF&#39;</span><span class="p">,</span> <span class="s1">&#39;THEY&#39;</span><span class="p">,</span> <span class="s1">&#39;THEM&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;THEIR&#39;</span><span class="p">,</span> <span class="s1">&#39;THEIRS&#39;</span><span class="p">,</span> <span class="s1">&#39;THEMSELVES&#39;</span><span class="p">,</span> <span class="s1">&#39;WHAT&#39;</span><span class="p">,</span> <span class="s1">&#39;WHICH&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;WHO&#39;</span><span class="p">,</span> <span class="s1">&#39;WHOM&#39;</span><span class="p">,</span> <span class="s1">&#39;THIS&#39;</span><span class="p">,</span> <span class="s1">&#39;THAT&#39;</span><span class="p">,</span> <span class="s1">&#39;THESE&#39;</span><span class="p">,</span> <span class="s1">&#39;THOSE&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;AM&#39;</span><span class="p">,</span> <span class="s1">&#39;IS&#39;</span><span class="p">,</span> <span class="s1">&#39;ARE&#39;</span><span class="p">,</span> <span class="s1">&#39;WAS&#39;</span><span class="p">,</span> <span class="s1">&#39;WERE&#39;</span><span class="p">,</span> <span class="s1">&#39;BE&#39;</span><span class="p">,</span> <span class="s1">&#39;BEEN&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;BEING&#39;</span><span class="p">,</span> <span class="s1">&#39;HAVE&#39;</span><span class="p">,</span> <span class="s1">&#39;HAS&#39;</span><span class="p">,</span> <span class="s1">&#39;HAD&#39;</span><span class="p">,</span> <span class="s1">&#39;HAVING&#39;</span><span class="p">,</span> <span class="s1">&#39;DO&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;DOES&#39;</span><span class="p">,</span> <span class="s1">&#39;DID&#39;</span><span class="p">,</span> <span class="s1">&#39;DOING&#39;</span><span class="p">,</span> <span class="s1">&#39;AN&#39;</span><span class="p">,</span> <span class="s1">&#39;THE&#39;</span><span class="p">,</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span> <span class="s1">&#39;BUT&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;IF&#39;</span><span class="p">,</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span> <span class="s1">&#39;BECAUSE&#39;</span><span class="p">,</span> <span class="s1">&#39;AS&#39;</span><span class="p">,</span> <span class="s1">&#39;UNTIL&#39;</span><span class="p">,</span> <span class="s1">&#39;WHILE&#39;</span><span class="p">,</span> <span class="s1">&#39;OF&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;AT&#39;</span><span class="p">,</span> <span class="s1">&#39;BY&#39;</span><span class="p">,</span> <span class="s1">&#39;FOR&#39;</span><span class="p">,</span> <span class="s1">&#39;WITH&#39;</span><span class="p">,</span> <span class="s1">&#39;ABOUT&#39;</span><span class="p">,</span> <span class="s1">&#39;BETWEEN&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;INTO&#39;</span><span class="p">,</span> <span class="s1">&#39;THROUGH&#39;</span><span class="p">,</span> <span class="s1">&#39;DURING&#39;</span><span class="p">,</span> <span class="s1">&#39;BEFORE&#39;</span><span class="p">,</span> <span class="s1">&#39;AFTER&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;ABOVE&#39;</span><span class="p">,</span> <span class="s1">&#39;BELOW&#39;</span><span class="p">,</span> <span class="s1">&#39;TO&#39;</span><span class="p">,</span> <span class="s1">&#39;FROM&#39;</span><span class="p">,</span> <span class="s1">&#39;UP&#39;</span><span class="p">,</span> <span class="s1">&#39;DOWN&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;OUT&#39;</span><span class="p">,</span> <span class="s1">&#39;ON&#39;</span><span class="p">,</span> <span class="s1">&#39;OFF&#39;</span><span class="p">,</span> <span class="s1">&#39;OVER&#39;</span><span class="p">,</span> <span class="s1">&#39;UNDER&#39;</span><span class="p">,</span> <span class="s1">&#39;AGAIN&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;FURTHER&#39;</span><span class="p">,</span> <span class="s1">&#39;THEN&#39;</span><span class="p">,</span> <span class="s1">&#39;ONCE&#39;</span><span class="p">,</span> <span class="s1">&#39;HERE&#39;</span><span class="p">,</span> <span class="s1">&#39;THERE&#39;</span><span class="p">,</span> <span class="s1">&#39;WHEN&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;WHERE&#39;</span><span class="p">,</span> <span class="s1">&#39;WHY&#39;</span><span class="p">,</span> <span class="s1">&#39;HOW&#39;</span><span class="p">,</span> <span class="s1">&#39;ALL&#39;</span><span class="p">,</span> <span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;BOTH&#39;</span><span class="p">,</span> <span class="s1">&#39;EACH&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;FEW&#39;</span><span class="p">,</span> <span class="s1">&#39;MORE&#39;</span><span class="p">,</span> <span class="s1">&#39;MOST&#39;</span><span class="p">,</span> <span class="s1">&#39;OTHER&#39;</span><span class="p">,</span> <span class="s1">&#39;SOME&#39;</span><span class="p">,</span> <span class="s1">&#39;SUCH&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;NO&#39;</span><span class="p">,</span> <span class="s1">&#39;NOR&#39;</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="s1">&#39;ONLY&#39;</span><span class="p">,</span> <span class="s1">&#39;OWN&#39;</span><span class="p">,</span> <span class="s1">&#39;SAME&#39;</span><span class="p">,</span> <span class="s1">&#39;SO&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;THAN&#39;</span><span class="p">,</span> <span class="s1">&#39;TOO&#39;</span><span class="p">,</span> <span class="s1">&#39;VERY&#39;</span><span class="p">,</span> <span class="s1">&#39;CAN&#39;</span><span class="p">,</span> <span class="s1">&#39;JUST&#39;</span><span class="p">,</span> <span class="s1">&#39;SHOULD&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;NOW&#39;</span><span class="p">,</span> <span class="s1">&#39;AMONG&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CountVectorizer to tokenize and code counts of inputs words</span>
+<span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">strip_accents</span><span class="o">=</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span>
+                             <span class="n">lowercase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">stop_words</span><span class="o">=</span><span class="n">generic</span><span class="p">,</span>
+                             <span class="n">token_pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\b[^\d\W][^\d\W][^\d\W]+\b&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># vectorizer to encode sentiment dictionary words </span>
+<span class="n">sentiment_vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">strip_accents</span><span class="o">=</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span>
+                                       <span class="n">lowercase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">token_pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;\b[^\d\W][^\d\W][^\d\W]+\b&quot;</span><span class="p">)</span>
+<span class="n">sentiment_vectorizer</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;negative&#39;</span><span class="p">]))])</span>
+
+<span class="c1"># create a lookup Series and a score vector for computing net sentiment</span>
+<span class="n">features</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">sentiment_vectorizer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">())</span>
+<span class="n">sentiment_points</span> <span class="o">=</span> <span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;positive&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span> 
+                    <span class="o">-</span> <span class="n">features</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="s1">&#39;negative&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="k-management-discussion-and-analysis">
+<h2>10-K Management discussion and analysis<a class="headerlink" href="#k-management-discussion-and-analysis" title="Permalink to this heading">#</a></h2>
+<p>A 10-K is a comprehensive annual report that publicly traded companies must file with the SEC. It provides an in-depth view of the company’s financial health and operational performance. Key sections include the business description, management discussion and analysis (<strong>MD&amp;A</strong>), risk factors, and financial statements.</p>
+<section id="sec-edgar-website">
+<h3>SEC Edgar website<a class="headerlink" href="#sec-edgar-website" title="Permalink to this heading">#</a></h3>
+<p>The SEC EDGAR (Electronic Data Gathering, Analysis, and Retrieval) system is an online database managed by the U.S. Securities and Exchange Commission (SEC). It provides public access to financial filings, including annual and quarterly reports (Forms 10-K and 10-Q), significant event disclosures (Form 8-K), beneficial ownership reports (Schedule 13D), insider sales reports (Form 144), proxy statements, and registration statements (S-1).</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.sec.gov/edgar/search-and-access">SEC EDGAR Search and Access</a></p></li>
+</ul>
+<p>Additionally, the SEC has recently released an EDGAR Application Programming Interface (API): <a class="reference external" href="https://www.sec.gov/search-filings/edgar-application-programming-interfaces">EDGAR API</a></p>
+<p>Loughran and MacDonald have also made SEC EDGAR data files and other textual resources available in their research repository: <a class="reference external" href="https://sraf.nd.edu/sec-edgar-data/">SEC EDGAR Data</a></p>
+</section>
+<section id="finds-edgar-module">
+<h3>FinDS <code class="docutils literal notranslate"><span class="pre">edgar</span></code> module<a class="headerlink" href="#finds-edgar-module" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">edgar</span></code> module in the FinDS package provides functions for</p>
+<ul class="simple">
+<li><p>Searching and retrieving company filings from the SEC Edgar website</p></li>
+<li><p>Storing and indexing data locally</p></li>
+<li><p>Identifying and extracting specific sections of text, such as MD&amp;A</p></li>
+</ul>
+<p>Retrieve MD&amp;A section text from 10-K’s:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># open 10-K archive of MD&amp;A text</span>
+<span class="n">ed</span> <span class="o">=</span> <span class="n">Edgar</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;10X&#39;</span><span class="p">],</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">item</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="s1">&#39;mda10K&#39;</span><span class="p">,</span> <span class="s1">&#39;10-K&#39;</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">))</span>
+<span class="n">Series</span><span class="p">((</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1993</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1994</th>
+      <td>1362</td>
+    </tr>
+    <tr>
+      <th>1995</th>
+      <td>1674</td>
+    </tr>
+    <tr>
+      <th>1996</th>
+      <td>2960</td>
+    </tr>
+    <tr>
+      <th>1997</th>
+      <td>4461</td>
+    </tr>
+    <tr>
+      <th>1998</th>
+      <td>4501</td>
+    </tr>
+    <tr>
+      <th>1999</th>
+      <td>4364</td>
+    </tr>
+    <tr>
+      <th>2000</th>
+      <td>4287</td>
+    </tr>
+    <tr>
+      <th>2001</th>
+      <td>4168</td>
+    </tr>
+    <tr>
+      <th>2002</th>
+      <td>4400</td>
+    </tr>
+    <tr>
+      <th>2003</th>
+      <td>5478</td>
+    </tr>
+    <tr>
+      <th>2004</th>
+      <td>5203</td>
+    </tr>
+    <tr>
+      <th>2005</th>
+      <td>5090</td>
+    </tr>
+    <tr>
+      <th>2006</th>
+      <td>4999</td>
+    </tr>
+    <tr>
+      <th>2007</th>
+      <td>4954</td>
+    </tr>
+    <tr>
+      <th>2008</th>
+      <td>5033</td>
+    </tr>
+    <tr>
+      <th>2009</th>
+      <td>5273</td>
+    </tr>
+    <tr>
+      <th>2010</th>
+      <td>5050</td>
+    </tr>
+    <tr>
+      <th>2011</th>
+      <td>4863</td>
+    </tr>
+    <tr>
+      <th>2012</th>
+      <td>4730</td>
+    </tr>
+    <tr>
+      <th>2013</th>
+      <td>4617</td>
+    </tr>
+    <tr>
+      <th>2014</th>
+      <td>4643</td>
+    </tr>
+    <tr>
+      <th>2015</th>
+      <td>4720</td>
+    </tr>
+    <tr>
+      <th>2016</th>
+      <td>4612</td>
+    </tr>
+    <tr>
+      <th>2017</th>
+      <td>4488</td>
+    </tr>
+    <tr>
+      <th>2018</th>
+      <td>4431</td>
+    </tr>
+    <tr>
+      <th>2019</th>
+      <td>4417</td>
+    </tr>
+    <tr>
+      <th>2020</th>
+      <td>4388</td>
+    </tr>
+    <tr>
+      <th>2021</th>
+      <td>4615</td>
+    </tr>
+    <tr>
+      <th>2022</th>
+      <td>4766</td>
+    </tr>
+    <tr>
+      <th>2023</th>
+      <td>4641</td>
+    </tr>
+    <tr>
+      <th>2024</th>
+      <td>4501</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>For all investment universe stocks between 1993 through the present, compute the average sentiment, and change in sentiment, of 10-K’s</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># retrieve usual universe at end of each year</span>
+<span class="n">univs</span> <span class="o">=</span> <span class="p">{</span><span class="n">year</span><span class="p">:</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1992</span><span class="p">,</span> <span class="n">LAST_YEAR</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)}</span>
+<span class="n">permnos</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;permnos&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">permnos</span><span class="p">),</span>
+           <span class="s1">&#39;documents&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span>
+           <span class="s1">&#39;first&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]),</span>
+           <span class="s1">&#39;last&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])},</span>
+          <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;10K-mdas&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>permnos</th>
+      <th>documents</th>
+      <th>first</th>
+      <th>last</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10K-mdas</th>
+      <td>14696</td>
+      <td>137691</td>
+      <td>19931129</td>
+      <td>20241231</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We assume up to a 3-month lag when the 10-Ks are made available. For example, filings submitted between January and March of 2024 are assigned to fiscal year 2023.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute average sentiment and change in sentiment for all companies and years</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">permnos</span><span class="p">):</span>  <span class="c1"># Loop over all permnos</span>
+    
+    <span class="c1"># retrieve all valid mda&#39;s for this permno by year</span>
+    <span class="n">mdas</span><span class="p">,</span> <span class="n">dates</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>   <span class="c1"># to collect mdas and doc dates for this permno</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">permno</span><span class="p">)]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span> <span class="o">//</span> <span class="mi">10000</span>   <span class="c1"># assign fiscal year</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">year</span> <span class="ow">in</span> <span class="n">univs</span> <span class="ow">and</span> <span class="p">(</span><span class="n">year</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mdas</span> <span class="ow">or</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">dates</span><span class="p">[</span><span class="n">year</span><span class="p">])):</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">ed</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">):</span>
+                <span class="n">mdas</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokens</span>
+                <span class="n">dates</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span>
+
+    <span class="c1"># compute sentiment as net sentiment word counts divided by doc length</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mdas</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sentiment_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mdas</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>\
+                                <span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sentiment_points</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">vectorizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mdas</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="n">sentiment</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">x</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mdas</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">X</span><span class="p">)}</span>
+    
+    <span class="c1"># derive sentiment change and similarity scores by year</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mdas</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">year</span><span class="p">,</span> <span class="s1">&#39;permno&#39;</span><span class="p">:</span> <span class="n">permno</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">dates</span><span class="p">[</span><span class="n">year</span><span class="p">]}</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mdasent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sentiment</span><span class="p">[</span><span class="n">year</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;currlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mdas</span><span class="p">[</span><span class="n">year</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">year</span><span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">mdas</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;prevlen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mdas</span><span class="p">[</span><span class="n">year</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mdachg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sentiment</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">-</span> <span class="n">sentiment</span><span class="p">[</span><span class="n">year</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">mdas</span><span class="p">[</span><span class="n">year</span><span class="p">],</span> <span class="n">mdas</span><span class="p">[</span><span class="n">year</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/14696 [00:00&lt;?, ?it/s]/home/terence/env3.11/lib/python3.11/site-packages/sklearn/feature_extraction/text.py:408: UserWarning: Your stop_words may be inconsistent with your preprocessing. Tokenizing the stop words generated tokens [&#39;about&#39;, &#39;above&#39;, &#39;after&#39;, &#39;again&#39;, &#39;all&#39;, &#39;among&#39;, &#39;and&#39;, &#39;any&#39;, &#39;are&#39;, &#39;because&#39;, &#39;been&#39;, &#39;before&#39;, &#39;being&#39;, &#39;below&#39;, &#39;between&#39;, &#39;both&#39;, &#39;but&#39;, &#39;can&#39;, &#39;did&#39;, &#39;does&#39;, &#39;doing&#39;, &#39;down&#39;, &#39;during&#39;, &#39;each&#39;, &#39;few&#39;, &#39;for&#39;, &#39;from&#39;, &#39;further&#39;, &#39;had&#39;, &#39;has&#39;, &#39;have&#39;, &#39;having&#39;, &#39;her&#39;, &#39;here&#39;, &#39;hers&#39;, &#39;herself&#39;, &#39;him&#39;, &#39;himself&#39;, &#39;his&#39;, &#39;how&#39;, &#39;into&#39;, &#39;its&#39;, &#39;itself&#39;, &#39;just&#39;, &#39;more&#39;, &#39;most&#39;, &#39;myself&#39;, &#39;nor&#39;, &#39;not&#39;, &#39;now&#39;, &#39;off&#39;, &#39;once&#39;, &#39;only&#39;, &#39;other&#39;, &#39;our&#39;, &#39;ours&#39;, &#39;ourselves&#39;, &#39;out&#39;, &#39;over&#39;, &#39;own&#39;, &#39;same&#39;, &#39;she&#39;, &#39;should&#39;, &#39;some&#39;, &#39;such&#39;, &#39;than&#39;, &#39;that&#39;, &#39;the&#39;, &#39;their&#39;, &#39;theirs&#39;, &#39;them&#39;, &#39;themselves&#39;, &#39;then&#39;, &#39;there&#39;, &#39;these&#39;, &#39;they&#39;, &#39;this&#39;, &#39;those&#39;, &#39;through&#39;, &#39;too&#39;, &#39;under&#39;, &#39;until&#39;, &#39;very&#39;, &#39;was&#39;, &#39;were&#39;, &#39;what&#39;, &#39;when&#39;, &#39;where&#39;, &#39;which&#39;, &#39;while&#39;, &#39;who&#39;, &#39;whom&#39;, &#39;why&#39;, &#39;with&#39;, &#39;you&#39;, &#39;your&#39;, &#39;yours&#39;, &#39;yourself&#39;, &#39;yourselves&#39;] not in stop_words.
+  warnings.warn(
+100%|██████████| 14696/14696 [13:49&lt;00:00, 17.71it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># save in signals database</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;rebaldate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;mdasent&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+      <span class="n">signals</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;mdachg&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>131045 107665
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># right join data with univ, to identify universe companies with missing mda</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">year</span><span class="p">]</span>\
+                  <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>\
+                  <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>\
+                  <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">univ</span><span class="p">[[</span><span class="s1">&#39;year&#39;</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>\
+                  <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                  <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">univ</span> <span class="ow">in</span> <span class="n">univs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">year</span> <span class="o">&lt;</span> <span class="n">LAST_YEAR</span><span class="p">],</span>
+                 <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># store temporary</span>
+<span class="n">store</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Exploratory analysis</strong></p>
+<p>Universe coverage by year:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stacked Bar Plot of universe coverage by year</span>
+<span class="n">y1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;mdasent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">y0</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;mdasent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span>\
+                                 <span class="o">.</span><span class="n">count</span><span class="p">()</span>\
+                                 <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">y1</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">y1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;matched 10-K MD&amp;As&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">y0</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;10-K MD&amp;As not found&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">y1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;# stocks&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Fiscal year&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Universe and matched 10-K MDA&#39;s&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/e5328f4611a8ee81bc3610b69992c67de3ce9b6f76ed89221bfc02fdeae2d9c8.png" src="_images/e5328f4611a8ee81bc3610b69992c67de3ce9b6f76ed89221bfc02fdeae2d9c8.png" />
+</div>
+</div>
+<p>When are 10-K’s filed?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stacked Bar Plot of filings date, by month and day-of-week</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([{</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">),</span>
+                             <span class="s1">&#39;day&#39;</span><span class="p">:</span> <span class="n">bd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%A&#39;</span><span class="p">),</span>
+                             <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">bd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%B&#39;</span><span class="p">)}</span>
+                            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;mdasent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="s1">&#39;date&#39;</span><span class="p">]])</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+               <span class="n">y</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)])</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">z</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Fraction&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;10-K Filings by Month and Day-of-Week&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ae59157776d2c5c8ddd6aa9acab5dc5adc7fb4d30b31d4cf60e3835e5fff522b.png" src="_images/ae59157776d2c5c8ddd6aa9acab5dc5adc7fb4d30b31d4cf60e3835e5fff522b.png" />
+</div>
+</div>
+<p>Median sentiment and change in sentiment vs total corporate profits (of all US companies), by year:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">series_id</span> <span class="o">=</span> <span class="s1">&#39;CP&#39;</span>  <span class="c1"># Corporate Profits</span>
+<span class="n">econ</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">econ</span> <span class="o">=</span> <span class="n">econ</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">econ</span><span class="o">.</span><span class="n">index</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+           
+<span class="k">for</span> <span class="n">sent</span><span class="p">,</span> <span class="n">ylab</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;mdasent&#39;</span><span class="p">:</span> <span class="s1">&#39;sentiment&#39;</span><span class="p">,</span> <span class="s1">&#39;mdachg&#39;</span><span class="p">:</span> <span class="s1">&#39;sentiment change&#39;</span><span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="n">ylab</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;currlen&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">500</span><span class="p">)]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span>
+    <span class="n">iq1</span><span class="p">,</span> <span class="n">iq2</span><span class="p">,</span> <span class="n">iq3</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="n">sent</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">.25</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.75</span><span class="p">]]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">iq2</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">iq2</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;pre&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">iq1</span><span class="p">,</span> <span class="n">iq3</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="s1">&#39;pre&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sent</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> by Fiscal Year of 10-K Filing&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Fiscal Year&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylab</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sent</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> median&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;inter-quartile range&quot;</span><span class="p">],</span>
+              <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+
+    <span class="n">bx</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+    <span class="n">econ</span><span class="p">[(</span><span class="n">econ</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">econ</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">))]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">bx</span><span class="p">)</span>
+    <span class="n">bx</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">series_id</span><span class="p">)[:</span><span class="mi">27</span><span class="p">]],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">)</span>
+    <span class="n">bx</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">series_id</span><span class="p">)[:</span><span class="mi">27</span><span class="p">])</span>
+    <span class="n">bx</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>mdasent sentiment
+mdachg sentiment change
+</pre></div>
+</div>
+<img alt="_images/88b0f99b293e66dd8e5f3db29fcc64a7aac9837514efd7fbe0da763c0af3a33c.png" src="_images/88b0f99b293e66dd8e5f3db29fcc64a7aac9837514efd7fbe0da763c0af3a33c.png" />
+<img alt="_images/d84a18d3089246947554b86f14b8f79de0998971856102e0d18262ac9329ed57.png" src="_images/d84a18d3089246947554b86f14b8f79de0998971856102e0d18262ac9329ed57.png" />
+</div>
+</div>
+</section>
+<section id="management-sentiment-and-stock-returns">
+<h3>Management sentiment and stock returns<a class="headerlink" href="#management-sentiment-and-stock-returns" title="Permalink to this heading">#</a></h3>
+<p>We analyze the relationship between sentiment in 10-K filings and subsequent stock returns by constructing cap-weighted decile-spread returns. These are calculated for two periods:</p>
+<ol class="arabic simple">
+<li><p>The same calendar year (January–December) to examine contemporaneous relationships between sentiment and stock performance.</p></li>
+<li><p>The following year (April–March) to explore an investable strategy based on sentiment changes after the release of 10-K reports for the prior fiscal year.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">ifig</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s1">&#39;mdasent&#39;</span><span class="p">,</span> <span class="s1">&#39;mdachg&#39;</span><span class="p">]):</span>
+    <span class="n">ret1</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># to collect year-ahead spread returns</span>
+    <span class="n">ret0</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># to collect current-year spread returns</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>  <span class="c1"># loop over years</span>
+        
+        <span class="c1"># compute current year average spread returns</span>
+        <span class="n">begyr</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">begyr</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">endyr</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">univ</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span>\
+                   <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>\
+                   <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crsp</span><span class="o">.</span><span class="n">get_cap</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">begyr</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crsp</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">begyr</span><span class="p">,</span> <span class="n">endyr</span><span class="p">),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">univ</span><span class="p">):</span>
+            <span class="n">sub</span> <span class="o">=</span> <span class="n">fractile_split</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">90</span><span class="p">])</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">weighted_average</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">]],</span> <span class="s1">&#39;cap&#39;</span><span class="p">)[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">weighted_average</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub</span><span class="o">==</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">]],</span> <span class="s1">&#39;cap&#39;</span><span class="p">)[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span>
+            <span class="n">ret0</span><span class="p">[</span><span class="n">endyr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ret&#39;</span><span class="p">:</span> <span class="n">pos</span><span class="o">-</span><span class="n">neg</span><span class="p">,</span> <span class="s1">&#39;npos&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sub</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;nneg&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sub</span><span class="o">==</span><span class="mi">3</span><span class="p">)}</span>
+
+        <span class="c1"># compute year ahead average spread returns</span>
+        <span class="n">beg</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">begmo</span><span class="p">(</span><span class="n">endyr</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">endyr</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+        <span class="n">univ</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">year</span><span class="p">]</span>\
+                   <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>\
+                   <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crsp</span><span class="o">.</span><span class="n">get_cap</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crsp</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">univ</span><span class="p">):</span>
+            <span class="n">sub</span> <span class="o">=</span> <span class="n">fractile_split</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">90</span><span class="p">])</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">weighted_average</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">]],</span> <span class="s1">&#39;cap&#39;</span><span class="p">)[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span>
+            <span class="n">neg</span> <span class="o">=</span> <span class="n">weighted_average</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sub</span><span class="o">==</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">]],</span> <span class="s1">&#39;cap&#39;</span><span class="p">)[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span>
+            <span class="n">ret1</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ret&#39;</span><span class="p">:</span> <span class="n">pos</span><span class="o">-</span><span class="n">neg</span><span class="p">,</span> <span class="s1">&#39;npos&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sub</span><span class="o">==</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;nneg&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sub</span><span class="o">==</span><span class="mi">3</span><span class="p">)}</span>
+
+    <span class="c1"># collect same-year and year-ahead average spread returns</span>
+    <span class="n">r0</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">ret0</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">r0</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">r0</span><span class="o">.</span><span class="n">index</span> <span class="o">//</span> <span class="mi">10000</span>
+    <span class="n">r1</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">ret1</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+    <span class="n">r1</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span class="n">r1</span><span class="o">.</span><span class="n">index</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+
+    <span class="c1"># plot same-year average spread returns</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">r0</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">.85</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">r0</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">r0</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Same Year (Jan-Dec) Returns&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;annual returns&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;Annual Spread Returns&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># plot year-ahead average spread returns</span>
+    <span class="n">r1</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mf">.85</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">r1</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">r1</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-.&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Next Year (Apr-Mar) Returns&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;annual returns&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;Annual Spread Returns&#39;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;fiscal year&#39;</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> Annual Cap-weighted Decile Spread Portfolios&quot;</span><span class="p">)</span>    
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/25 [00:00&lt;?, ?it/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 25/25 [06:21&lt;00:00, 15.26s/it]
+100%|██████████| 25/25 [00:48&lt;00:00,  1.92s/it]
+</pre></div>
+</div>
+<img alt="_images/12af3785b8abe2646b837e87e0f943003a62cb610c7f7a12256370c816786a14.png" src="_images/12af3785b8abe2646b837e87e0f943003a62cb610c7f7a12256370c816786a14.png" />
+<img alt="_images/3a04d7ea23b4c56b31e9c7323920090163d8953f9d6741037136ef8d75925683.png" src="_images/3a04d7ea23b4c56b31e9c7323920090163d8953f9d6741037136ef8d75925683.png" />
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Tim Loughran and Bill McDonald, 2011, When is a Liability not a Liability? Textual Analysis, Dictionaries, and 10-Ks, Journal of Finance, 66:1, 35-65.</p>
+<p>Cohen, Malloy and Nguyen (2020), Lazy Prices, Journal of Finance, Volume 75, Issue3, June 2020, Pages 1371-1415</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="5.1_fomc_topics.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">FOMC Topic Modeling</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="5.3_business_textual.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Business Textual Analysis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sentiment-analysis">Sentiment analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#loughran-macdonald-dictionary">Loughran-MacDonald dictionary</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#k-management-discussion-and-analysis">10-K Management discussion and analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sec-edgar-website">SEC Edgar website</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finds-edgar-module">FinDS <code class="docutils literal notranslate"><span class="pre">edgar</span></code> module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#management-sentiment-and-stock-returns">Management sentiment and stock returns</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

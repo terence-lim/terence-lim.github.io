@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.unstructured.unstructured &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.unstructured.edgar" href="finds.unstructured.edgar.html" />
+    <link rel="prev" title="finds.unstructured" href="finds.unstructured.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.unstructured.unstructured</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured"><code class="docutils literal notranslate"><span class="pre">Unstructured</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.__getitem__"><code class="docutils literal notranslate"><span class="pre">Unstructured.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.delete"><code class="docutils literal notranslate"><span class="pre">Unstructured.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.get"><code class="docutils literal notranslate"><span class="pre">Unstructured.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.insert"><code class="docutils literal notranslate"><span class="pre">Unstructured.insert()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.load_dataframe"><code class="docutils literal notranslate"><span class="pre">Unstructured.load_dataframe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.select"><code class="docutils literal notranslate"><span class="pre">Unstructured.select()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.unstructured.Unstructured.show"><code class="docutils literal notranslate"><span class="pre">Unstructured.show()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.unstructured.edgar.html">finds.unstructured.edgar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.unstructured.vocab.html">finds.unstructured.vocab</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.unstructured.html">finds.unstructured</a></li>
+      <li class="breadcrumb-item active">finds.unstructured.unstructured</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.unstructured.unstructured.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.unstructured.unstructured">
+<span id="finds-unstructured-unstructured"></span><h1>finds.unstructured.unstructured<a class="headerlink" href="#module-finds.unstructured.unstructured" title="Permalink to this heading"></a></h1>
+<p>Classes for unstructured and textual datasets</p>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.unstructured.unstructured.</span></span><span class="sig-name descname"><span class="pre">Unstructured</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mongodb</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.database.mongodb.html#finds.database.mongodb.MongoDB" title="finds.database.mongodb.MongoDB"><span class="pre">MongoDB</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">database</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for unstructured datasets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mongod</strong> – connection to MongoClient where data collection is stored</p></li>
+<li><p><strong>database</strong> – name of the database in MongoDB</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>db</strong> – pymongo.database.Database connection</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span> <span class="o">=</span> <span class="n">Unstructured</span><span class="p">(</span><span class="n">mongodb</span><span class="p">,</span> <span class="s1">&#39;fomc&#39;</span><span class="p">)</span>  <span class="c1"># connect to client named &#39;fomc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;minutes&#39;</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;minutes&#39;</span><span class="p">,</span> <span class="n">where_clause</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s1">&#39;minutes&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="p">[</span><span class="s1">&#39;minutes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">estimated_document_count</span><span class="p">()</span> <span class="c1"># count docs in collection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fomc</span><span class="p">[</span><span class="s1">&#39;minutes&#39;</span><span class="p">,</span> <span class="s1">&#39;field&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Notes:
+- sudo apt-get install -y mongodb-org  # install latest community version
+- sudo systemctl start mongod     # start and stop mongodb server
+- sudo systemctl status mongod
+- sudo systemctl restart mongod
+- sudo systemctl stop mongod</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Access a collection by name, or optionally by field</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.delete" title="Permalink to this definition"></a></dt>
+<dd><p>Delete all docs in collection satisfying where clause</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – name of collection in database to delete</p></li>
+<li><p><strong>where</strong> – where clause describing documents to delete</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>number of documents deleted, -1 if collection not in database</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>str filter (passed on directly to pymongo)</p></li>
+<li><p>dict of {keys:values}</p></li>
+<li><p>list of key names (to delete if key name $exists)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.get" title="Permalink to this definition"></a></dt>
+<dd><p>Return value of field of first doc containing key field name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – name of collection in database to retrieve from</p></li>
+<li><p><strong>field</strong> – key field name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value of key field of first document where key field name exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.insert">
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.insert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.insert" title="Permalink to this definition"></a></dt>
+<dd><p>Insert one doc; optionally remove existing duplicate document first</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – name of collection in database to insert into</p></li>
+<li><p><strong>doc</strong> – dict of {key:value} representing document</p></li>
+<li><p><strong>keys</strong> – list of field names, to delete existing docs with same values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>number of existing documents (with same key values) deleted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.load_dataframe">
+<span class="sig-name descname"><span class="pre">load_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.load_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.load_dataframe" title="Permalink to this definition"></a></dt>
+<dd><p>Insert_many records from rows of dataframe to a collection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Name of collection in database to delete</p></li>
+<li><p><strong>df</strong> – Each row of DataFrame is document, column names as key fields</p></li>
+<li><p><strong>keys</strong> – Fields names to update or replace if same values</p></li>
+<li><p><strong>update</strong> – If key fields have same value, update if True. Else replace</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.select" title="Permalink to this definition"></a></dt>
+<dd><p>Iterator to retrieve docs in collection satisfying where clause</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> – Name of collection in database to delete</p></li>
+<li><p><strong>where</strong> – Where clause describing documents to retrieve</p></li>
+<li><p><strong>include_id</strong> – If True, then include _id field in return</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Document selecting where clause in a list of dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.unstructured.Unstructured.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/unstructured.html#Unstructured.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.unstructured.Unstructured.show" title="Permalink to this definition"></a></dt>
+<dd><p>Return list of collections; or key names in all docs in collection</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.unstructured.html" class="btn btn-neutral float-left" title="finds.unstructured" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.unstructured.edgar.html" class="btn btn-neutral float-right" title="finds.unstructured.edgar" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

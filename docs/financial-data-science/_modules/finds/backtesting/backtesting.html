@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.backtesting.backtesting &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.backtesting.backtesting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.backtesting.backtesting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utilities for backtesting</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">finds.structured.stocks</span> <span class="kn">import</span> <span class="n">Stocks</span>
+<span class="kn">from</span> <span class="nn">finds.structured.signals</span> <span class="kn">import</span> <span class="n">Signals</span>
+<span class="kn">from</span> <span class="nn">finds.recipes.filters</span> <span class="kn">import</span> <span class="n">fractile_split</span>
+<span class="kn">from</span> <span class="nn">.backtest</span> <span class="kn">import</span> <span class="n">compound_ret</span>
+
+<span class="c1"># construct spread portfolio weights</span>
+<div class="viewcode-block" id="univariate_sorts"><a class="viewcode-back" href="../../../finds.backtesting.backtesting.html#finds.backtesting.backtesting.univariate_sorts">[docs]</a><span class="k">def</span> <span class="nf">univariate_sorts</span><span class="p">(</span><span class="n">stocks</span><span class="p">:</span> <span class="n">Stocks</span><span class="p">,</span>
+                     <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                     <span class="n">signals</span><span class="p">:</span> <span class="n">Signals</span><span class="p">,</span>
+                     <span class="n">rebalbeg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                     <span class="n">rebalend</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                     <span class="n">window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">months</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+                     <span class="n">pct</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">20.</span><span class="p">,</span> <span class="mf">80.</span><span class="p">),</span>
+                     <span class="n">leverage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                     <span class="n">minobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                     <span class="n">minprc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">mincap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">maxdecile</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Series</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Monthly series of cap-weighted holdings of univariate spread portfolios</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stocks: Stocks object for accessing stock returns and price data</span>
+<span class="sd">        label: Name of signal to retrieve</span>
+<span class="sd">        signals: Call to extract cross section of values for the signal</span>
+<span class="sd">        rebalbeg: First rebalance date (YYYYMMDD)</span>
+<span class="sd">        rebalend: Last holding date (YYYYMMDD)</span>
+<span class="sd">        pct: Percentile breakpoints to sort high, medium and low buckets</span>
+<span class="sd">        window: No. of months to look back for signal values; 0 is exact month</span>
+<span class="sd">        months: Months (e.g. 6=June) to retrieve univ; empty for all months</span>
+<span class="sd">        maxdecile: Include largest stocks decile from 1 through maxdecile</span>
+<span class="sd">        mincap: Minimum market cap</span>
+<span class="sd">        minobs: Minimum required sample size with non-missing signal values</span>
+<span class="sd">        leverage: Multiplier for leverage or shorting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rebaldates</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">rebalbeg</span><span class="p">,</span> <span class="n">rebalend</span><span class="p">,</span> <span class="s1">&#39;endmo&#39;</span><span class="p">)</span>
+    <span class="n">holdings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">rebaldate</span> <span class="ow">in</span> <span class="n">rebaldates</span><span class="p">:</span>
+
+        <span class="c1"># check if this is a rebalance month</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">months</span> <span class="ow">or</span> <span class="p">(</span><span class="n">rebaldate</span><span class="o">//</span><span class="mi">100</span><span class="p">)</span><span class="o">%</span><span class="mi">100</span> <span class="ow">in</span> <span class="n">months</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">holdings</span><span class="p">:</span>
+
+            <span class="c1"># rebalance: get this month&#39;s universe</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">)</span>
+
+            <span class="c1"># get signal values within lagged window</span>
+            <span class="k">if</span> <span class="n">window</span><span class="p">:</span>  <span class="c1"># lookback window to get signal values</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">months</span><span class="o">=-</span><span class="nb">abs</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>       <span class="c1"># no window, so signal value as of exact rebaldate</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">signals</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">minprc</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">mincap</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">maxdecile</span><span class="p">)]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">minobs</span><span class="p">):</span>  <span class="c1"># skip if insufficient observations</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># split signal into desired fractiles            </span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fractile_split</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
+                                            <span class="n">pct</span><span class="o">=</span><span class="n">pct</span><span class="p">,</span>
+                                            <span class="n">keys</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;nyse&#39;</span><span class="p">]])</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="s1">&#39;M&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="s1">&#39;L&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)}</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">subname</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">],</span>
+                                       <span class="p">[</span><span class="n">leverage</span><span class="p">,</span> <span class="o">-</span><span class="n">leverage</span><span class="p">]):</span>
+                <span class="n">cap</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">subs</span><span class="p">[</span><span class="n">subname</span><span class="p">],</span> <span class="s1">&#39;cap&#39;</span><span class="p">]</span>
+                <span class="n">weights</span><span class="p">[</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">cap</span> <span class="o">/</span> <span class="n">cap</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="c1">#print(&quot;(portfolio_sorts)&quot;, rebaldate, len(df))</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># if not rebalance, then adjust previous stock weights by retx</span>
+            <span class="n">retx</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">begmo</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">),</span>
+                                  <span class="n">rebaldate</span><span class="p">,</span>
+                                  <span class="n">field</span><span class="o">=</span><span class="s1">&#39;retx&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">port</span><span class="p">,</span> <span class="n">old</span> <span class="ow">in</span> <span class="n">weights</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">old</span> <span class="o">*</span> <span class="n">retx</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">weights</span><span class="p">[</span><span class="n">port</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span> <span class="o">/</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">holdings</span><span class="p">[</span><span class="n">rebaldate</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">holdings</span></div>
+
+
+    
+<div class="viewcode-block" id="bivariate_sorts"><a class="viewcode-back" href="../../../finds.backtesting.backtesting.html#finds.backtesting.backtesting.bivariate_sorts">[docs]</a><span class="k">def</span> <span class="nf">bivariate_sorts</span><span class="p">(</span><span class="n">stocks</span><span class="p">:</span> <span class="n">Stocks</span><span class="p">,</span> 
+                    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                    <span class="n">signals</span><span class="p">:</span> <span class="n">Signals</span><span class="p">,</span> 
+                    <span class="n">rebalbeg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                    <span class="n">rebalend</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                    <span class="n">window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
+                    <span class="n">pct</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="mf">70.</span><span class="p">),</span> 
+                    <span class="n">leverage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.</span><span class="p">,</span>
+                    <span class="n">months</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> 
+                    <span class="n">minobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> 
+                    <span class="n">minprc</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> 
+                    <span class="n">mincap</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> 
+                    <span class="n">maxdecile</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Generate monthly time series of holdings by two-way sort procedure</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stocks: Stocks object for accessing stock returns and price data</span>
+<span class="sd">        label: Name of signal to retrieve</span>
+<span class="sd">        signals: Call to extract cross section of values for the signal</span>
+<span class="sd">        rebalbeg: First rebalance date (YYYYMMDD)</span>
+<span class="sd">        rebalend: Last holding date (YYYYMMDD)</span>
+<span class="sd">        pct: Percentile breakpoints to sort high, medium and low buckets</span>
+<span class="sd">        window: No. of months to look back for signal values; 0 is exact month</span>
+<span class="sd">        months: Months (e.g. 6=June) to retrieve univ; empty for all months</span>
+<span class="sd">        maxdecile: Include largest stocks decile from 1 through maxdecile</span>
+<span class="sd">        mincap: Minimum market cap</span>
+<span class="sd">        minobs: Minimum required sample size with non-missing signal values</span>
+<span class="sd">        leverage: Multiplier for leverage or shorting</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">       3-tuple of spread holdings, smb holdings, and subportfolio sizes</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Independent sort by median (NYSE) mkt cap and 30/70 (NYSE) HML percentiles</span>
+<span class="sd">    - Subportfolios of the intersections are value-weighted; </span>
+<span class="sd">    - Spread portfolios are equal-weighted of subportfolios</span>
+<span class="sd">    - Portfolio are resorted every June; and other months&#39; holdings are </span>
+<span class="sd">      adjusted by monthly realized retx (i.e. dividends not reinvested)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rebaldates</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">rebalbeg</span><span class="p">,</span> <span class="n">rebalend</span><span class="p">,</span> <span class="s1">&#39;endmo&#39;</span><span class="p">)</span>
+    <span class="n">holdings</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(),</span> <span class="s1">&#39;smb&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">()}</span>  <span class="c1"># to return two sets of holdings</span>
+    <span class="c1"># sizes = {h : dict() for h in [&#39;HB&#39;,&#39;HS&#39;,&#39;MB&#39;,&#39;MS&#39;,&#39;LB&#39;,&#39;LS&#39;]}</span>
+
+    <span class="k">for</span> <span class="n">rebaldate</span> <span class="ow">in</span> <span class="n">rebaldates</span><span class="p">:</span>
+
+        <span class="c1"># check if this is a rebalance month</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">months</span> <span class="ow">or</span> <span class="p">(</span><span class="n">rebaldate</span><span class="o">//</span><span class="mi">100</span><span class="p">)</span><span class="o">%</span><span class="mi">100</span> <span class="ow">in</span> <span class="n">months</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">holdings</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
+            
+            <span class="c1"># rebalance: get this month&#39;s universe of stocks with valid data</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">)</span>
+            
+            <span class="c1"># get signal values within lagged window</span>
+            <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">months</span><span class="o">=-</span><span class="nb">abs</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">signals</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                             <span class="n">date</span><span class="o">=</span><span class="n">rebaldate</span><span class="p">,</span>
+                             <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">minprc</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">mincap</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">maxdecile</span><span class="p">)]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">minobs</span><span class="p">):</span>  <span class="c1"># skip if insufficient observations</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># split signal into desired fractiles, and assign to subportfolios</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fractile_split</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
+                                            <span class="n">pct</span><span class="o">=</span><span class="n">pct</span><span class="p">,</span>
+                                            <span class="n">keys</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;nyse&#39;</span><span class="p">]],</span>
+                                            <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;HB&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="s1">&#39;MB&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="s1">&#39;LB&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="s1">&#39;HS&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="s1">&#39;MS&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">),</span>
+                    <span class="s1">&#39;LS&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;fractile&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)}</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(),</span> <span class="s1">&#39;smb&#39;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">()}</span>
+            
+            <span class="k">for</span> <span class="n">subname</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;HB&#39;</span><span class="p">,</span><span class="s1">&#39;HS&#39;</span><span class="p">,</span><span class="s1">&#39;LB&#39;</span><span class="p">,</span><span class="s1">&#39;LS&#39;</span><span class="p">],</span>
+                                       <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]):</span>
+                <span class="n">cap</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">subs</span><span class="p">[</span><span class="n">subname</span><span class="p">],</span> <span class="s1">&#39;cap&#39;</span><span class="p">]</span>
+                <span class="n">weights</span><span class="p">[</span><span class="n">label</span><span class="p">][</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">leverage</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">cap</span> <span class="o">/</span> <span class="n">cap</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="c1"># sizes[subname][rebaldate] = sum(subs[subname])</span>
+                
+            <span class="k">for</span> <span class="n">subname</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;HB&#39;</span><span class="p">,</span><span class="s1">&#39;HS&#39;</span><span class="p">,</span><span class="s1">&#39;MB&#39;</span><span class="p">,</span><span class="s1">&#39;MS&#39;</span><span class="p">,</span><span class="s1">&#39;LB&#39;</span><span class="p">,</span><span class="s1">&#39;LS&#39;</span><span class="p">],</span>
+                                       <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]):</span>
+                <span class="n">cap</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">subs</span><span class="p">[</span><span class="n">subname</span><span class="p">],</span> <span class="s1">&#39;cap&#39;</span><span class="p">]</span>
+                <span class="n">weights</span><span class="p">[</span><span class="s1">&#39;smb&#39;</span><span class="p">][</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">leverage</span> <span class="o">*</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">cap</span> <span class="o">/</span> <span class="n">cap</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="c1"># sizes[subname][rebaldate] = sum(subs[subname])</span>
+            <span class="c1">#print(&quot;(famafrench_sorts)&quot;, rebaldate, len(df))</span>
+            
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># else not a rebalance month, so adjust holdings by retx</span>
+            <span class="n">retx</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">begmo</span><span class="p">(</span><span class="n">rebaldate</span><span class="p">),</span>
+                                      <span class="n">rebaldate</span><span class="p">,</span>
+                                      <span class="n">field</span><span class="o">=</span><span class="s1">&#39;retx&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">port</span><span class="p">,</span> <span class="n">subports</span> <span class="ow">in</span> <span class="n">weights</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">subport</span><span class="p">,</span> <span class="n">old</span> <span class="ow">in</span> <span class="n">subports</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">new</span> <span class="o">=</span> <span class="n">old</span> <span class="o">*</span> <span class="n">retx</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">weights</span><span class="p">[</span><span class="n">port</span><span class="p">][</span><span class="n">subport</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">new</span> <span class="o">/</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">new</span><span class="p">))</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">subports</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># combine this month&#39;s subportfolios</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">holdings</span><span class="p">:</span>
+            <span class="n">holdings</span><span class="p">[</span><span class="n">h</span><span class="p">][</span><span class="n">rebaldate</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">h</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">holdings</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">holdings</span><span class="p">[</span><span class="s1">&#39;smb&#39;</span><span class="p">]</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

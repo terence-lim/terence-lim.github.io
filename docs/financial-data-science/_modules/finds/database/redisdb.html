@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.database.redisdb &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.database.redisdb</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.database.redisdb</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Redis class wrapper, with convenience methods for pandas DataFrames</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">Database</span>
+
+<div class="viewcode-block" id="RedisDB"><a class="viewcode-back" href="../../../finds.database.redisdb.html#finds.database.redisdb.RedisDB">[docs]</a><span class="k">class</span> <span class="nc">RedisDB</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface to redis, with convenience functions for dataframes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      host: Hostname</span>
+<span class="sd">      port: Port number</span>
+<span class="sd">      charset: Character set</span>
+<span class="sd">      decode_responses: Set to False to zlib dataframe</span>
+<span class="sd">      prefix: string to prefix all key names</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">      redis: Redis client instance providing interface to all Redis commands</span>
+
+<span class="sd">    Redis built-in methods:</span>
+
+<span class="sd">    - rdb.redis.delete(key)      -- delete an item</span>
+<span class="sd">    - rdb.redis.get(key)         -- get an item</span>
+<span class="sd">    - rdb.redis.exists(key)      -- does item exist</span>
+<span class="sd">    - rdb.redis.set(key, value)  -- set an item</span>
+<span class="sd">    - rdb.redis.keys()           -- get keys</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">      ::</span>
+
+<span class="sd">        $ ./redis-5.0.4/src/redis-server</span>
+<span class="sd">        $ redis-cli --scan --pattern &#39;*CRSP_2020*&#39; | xargs ./redis-cli del</span>
+<span class="sd">        CLI&gt; keys *</span>
+<span class="sd">        CLI&gt; flushall</span>
+<span class="sd">        CLI&gt; info memory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">port</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">charset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+                 <span class="n">decode_responses</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open a Redis connection instance&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">charset</span><span class="o">=</span><span class="n">charset</span><span class="p">,</span>
+                                       <span class="n">decode_responses</span><span class="o">=</span><span class="n">decode_responses</span><span class="p">,</span>
+                                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span>
+        
+<div class="viewcode-block" id="RedisDB.dump"><a class="viewcode-back" href="../../../finds.database.redisdb.html#finds.database.redisdb.RedisDB.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Saves dataframe, serialized to parquet, by key name to redis</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          key: Name of key in the store</span>
+<span class="sd">          df: DataFrame to store, serialized with to_parquet</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#self.r.set(key, pa.serialize(df).to_buffer().to_pybytes())</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_object_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">)</span>  <span class="c1"># parquet fails object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="RedisDB.load"><a class="viewcode-back" href="../../../finds.database.redisdb.html#finds.database.redisdb.RedisDB.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return and deserialize dataframe given its key from redis store</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          key: Name of key in the store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>   <span class="c1"># return copy lest flag.writable is False</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+
+    <span class="c1"># Open connection</span>
+    <span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+
+    <span class="c1"># test a transaction</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;2.5&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span>
+                   <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+                   <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">])</span>
+    <span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

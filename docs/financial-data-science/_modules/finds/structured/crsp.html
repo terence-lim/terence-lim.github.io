@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.crsp &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.crsp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.crsp</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;CRSP daily and monthly stock files</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">BigInteger</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.database.redisdb</span> <span class="kn">import</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured.busday</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.structured.stocks</span> <span class="kn">import</span> <span class="n">Stocks</span><span class="p">,</span> <span class="n">StocksBuffer</span>
+<span class="kn">from</span> <span class="nn">finds.recipes.filters</span> <span class="kn">import</span> <span class="n">fractile_split</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="CRSP"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP">[docs]</a><span class="k">class</span> <span class="nc">CRSP</span><span class="p">(</span><span class="n">Stocks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements an interface to CRSP structured stocks dataset</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sql: Connection to mysql database</span>
+<span class="sd">      bd: Business dates object</span>
+<span class="sd">      rdb: Optional connection to Redis for caching selected query results</span>
+<span class="sd">      monthly: Use monthly (True) or daily file; default (None) autoselects</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Earliest CRSP prc is 19251231</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">bd</span><span class="p">:</span> <span class="n">BusDay</span><span class="p">,</span> 
+                 <span class="n">rdb</span><span class="p">:</span> <span class="n">RedisDB</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">monthly</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize connection to CRSP datasets&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;daily&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;bidlo&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;askhi&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;prc&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;vol&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;retx&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>   <span class="c1"># need retx!</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;bid&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ask&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrout&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+<span class="c1">#                Column(&#39;shrout&#39;, Float),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;openprc&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;shares&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;shares&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrout&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrsdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrenddt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;delist&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;delist&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlstdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlstcd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;nwperm&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># &#39;0&#39; - &#39;99841&#39;  (int64)</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;nwcomp&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># &#39;0&#39; - &#39;90044&#39;  (int64)</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;nextdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="c1"># &#39;String(8) &#39;19870612&#39; @0</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlamt&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>    <span class="c1"># &#39;0&#39; - &#39;2349.5&#39;  (float64)</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlretx&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>    <span class="c1"># &#39;Float&#39; &#39;-0.003648&#39; @ 3</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlprc&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>    <span class="c1"># &#39;-1315&#39; - &#39;2349.5&#39;  (float64)</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlpdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1">#&#39;String(8)&#39;&#39;19870612&#39; @0</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlret&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>    <span class="c1"># &#39;Float&#39; &#39;-0.003648&#39; @ 3</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;dist&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;distcd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;divamt&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;facpr&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;facshr&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dclrdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;exdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;rcrddt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;paydt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;acperm&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;accomp&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;names&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ncusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrcls&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">5</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;nameendt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shrcd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;exchcd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;siccd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;tsymbol&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;primexch&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;trdstat&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;secstat&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">4</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permco&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">sql</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="s1">&#39;ncusip&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;monthly&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;prc&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;retx&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlstcd&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dlret&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">)</span>                
+            <span class="p">)</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;CRSP&#39;</span><span class="p">,</span>
+                         <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monthly</span> <span class="o">=</span> <span class="n">monthly</span>
+
+<div class="viewcode-block" id="CRSP.build_lookup"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.build_lookup">[docs]</a>    <span class="k">def</span> <span class="nf">build_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                     <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Build lookup function to return target identifier from source&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                    <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                                    <span class="n">fillna</span><span class="o">=</span><span class="n">fillna</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CRSP.get_cap"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.get_cap">[docs]</a>    <span class="k">def</span> <span class="nf">get_cap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>  <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">,</span> 
+                <span class="n">use_shares</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>  <span class="n">use_permco</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute a cross-section of market capitalization values</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          date: YYYYMMDD int date of market cap</span>
+<span class="sd">          cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+<span class="sd">          use_shares: If True, use shrout from &#39;shares&#39; table, else &#39;daily&#39;</span>
+<span class="sd">          use_permco: If True, sum caps by permco, else by permno</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Series of market cap indexed by permno</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;cap</span><span class="si">{</span><span class="s1">&#39;co&#39;</span> <span class="k">if</span> <span class="n">use_permco</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rkey</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_cap load)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rkey</span><span class="p">)[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">use_shares</span><span class="p">:</span>   <span class="c1"># use shares tables</span>
+            <span class="n">permnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                                            <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">],</span>
+                                            <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                            <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;LENGTH PERMNOS =&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">permnos</span><span class="p">))</span>
+
+            <span class="n">prc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                                   <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">],</span>
+                                   <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                   <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;NULL PRC =&#39;</span><span class="p">,</span> <span class="n">prc</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+            <span class="n">shr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;shares&#39;</span><span class="p">,</span>
+                                   <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;shrout&#39;</span><span class="p">],</span>
+                                   <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;shrsdt&#39;</span><span class="p">,</span>
+                                   <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                   <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;NULL SHR =&#39;</span><span class="p">,</span> <span class="n">shr</span><span class="p">[</span><span class="s1">&#39;shrout&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">shr</span><span class="p">[</span><span class="s1">&#39;shrout&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">prc</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># where &#39;daily&#39; table contains &#39;shrout&#39;</span>
+            <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> 
+                                   <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">,</span> <span class="s1">&#39;shrout&#39;</span><span class="p">],</span>
+                                   <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                                   <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">cap</span><span class="p">[</span><span class="s1">&#39;shrout&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">cap</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">use_permco</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span>
+                                          <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;permco&#39;</span><span class="p">],</span>
+                                          <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                          <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+            <span class="n">sumcap</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;permco&#39;</span><span class="p">])[[</span><span class="s1">&#39;cap&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;permco&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sumcap</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;permco&#39;</span><span class="p">)[[</span><span class="s1">&#39;cap&#39;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;NULL CAP =&#39;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_cap dump)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rkey</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CRSP.get_universe"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.get_universe">[docs]</a>    <span class="k">def</span> <span class="nf">get_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return standard CRSP universe of US-domiciled common stocks</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          date: Rebalance date (YYYYMMDD)</span>
+<span class="sd">          cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame of screened universe, indexed by permno, with columns: </span>
+<span class="sd">          market cap &quot;decile&quot; (1..10), &quot;nyse&quot; bool, &quot;siccd&quot;, &quot;prc&quot;, &quot;cap&quot;</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - Market cap must be available on date, with non-missing prc</span>
+<span class="sd">        - shrcd in [10, 11], exchcd in [1, 2, 3]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">date</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">date</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;get_universe: </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> not valid date&quot;</span>
+        <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;universe&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rkey</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_universe load)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rkey</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                                  <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">,</span> <span class="s1">&#39;shrout&#39;</span><span class="p">],</span>
+                                  <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                  <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;shrout&#39;</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cap</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                      <span class="n">cache_mode</span><span class="o">=</span><span class="n">cache_mode</span><span class="p">,</span>
+                                      <span class="n">use_shares</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                      <span class="n">use_permco</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                         <span class="n">rsuffix</span><span class="o">=</span><span class="s1">&#39;co&#39;</span><span class="p">,</span>
+                         <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span>
+                                          <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;shrcd&#39;</span><span class="p">,</span> <span class="s1">&#39;exchcd&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;siccd&#39;</span><span class="p">,</span> <span class="s1">&#39;naics&#39;</span><span class="p">],</span>
+                                          <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                          <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                         <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;LENGTH PERMNOS&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;PRC NULL:&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+                        <span class="s1">&#39;NEG:&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;prc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;CAP NON-POSITIVE:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+            
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;capco&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;shrcd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span> <span class="o">&amp;</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;exchcd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])]</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;nyse&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;exchcd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                     <span class="c1"># nyse indicator</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fractile_split</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;capco&#39;</span><span class="p">],</span>    <span class="c1"># size deciles </span>
+                                          <span class="n">pct</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                                          <span class="n">keys</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;nyse&#39;</span><span class="p">],</span> <span class="s1">&#39;capco&#39;</span><span class="p">],</span>
+                                          <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="s1">&#39;capco&#39;</span><span class="p">,</span> <span class="s1">&#39;decile&#39;</span><span class="p">,</span> <span class="s1">&#39;nyse&#39;</span><span class="p">,</span> <span class="s1">&#39;siccd&#39;</span><span class="p">,</span> <span class="s1">&#39;prc&#39;</span><span class="p">,</span> <span class="s1">&#39;naics&#39;</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_universe dump)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rkey</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="CRSP.get_divamt"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.get_divamt">[docs]</a>    <span class="k">def</span> <span class="nf">get_divamt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Accmumulates total dollar dividends between beg and end dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: Inclusive start date (YYYYMMDD)</span>
+<span class="sd">          end: Inclusive end date (YYYYMMDD)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame with accumulated divamts = per share divamt * shrout</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{dist}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> AS </span><span class="si">{identifier}</span><span class="s2">, &quot;</span>
+             <span class="s2">&quot; SUM(</span><span class="si">{table}</span><span class="s2">.shrout * </span><span class="si">{dist}</span><span class="s2">.divamt) AS divamt &quot;</span>
+             <span class="s2">&quot;FROM </span><span class="si">{dist}</span><span class="s2"> INNER JOIN </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot; ON </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> = </span><span class="si">{dist}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> AND &quot;</span>
+             <span class="s2">&quot;    </span><span class="si">{table}</span><span class="s2">.date = </span><span class="si">{dist}</span><span class="s2">.exdt &quot;</span>
+             <span class="s2">&quot; WHERE </span><span class="si">{dist}</span><span class="s2">.divamt &gt; 0 AND </span><span class="si">{dist}</span><span class="s2">.exdt &gt;= </span><span class="si">{beg}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;   AND </span><span class="si">{dist}</span><span class="s2">.exdt &lt;= </span><span class="si">{end}</span><span class="s2"> GROUP BY </span><span class="si">{identifier}</span><span class="s2"> &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">dist</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span>
+                 <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span></div>
+
+    <span class="n">dlstcodes_</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="mi">500</span><span class="p">,</span> <span class="mi">520</span><span class="p">,</span> <span class="mi">580</span><span class="p">,</span> <span class="mi">584</span><span class="p">])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">551</span><span class="p">,</span><span class="mi">575</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="CRSP.is_dlstcode"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.is_dlstcode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_dlstcode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dlstcd</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Delisting returns if missing for these codes should be -0.3&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dlstcd</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">dlstcd</span> <span class="ow">in</span> <span class="n">CRSP</span><span class="o">.</span><span class="n">dlstcodes_</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dlstcd</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">CRSP</span><span class="o">.</span><span class="n">dlstcodes_</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CRSP.get_dlret"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.get_dlret">[docs]</a>    <span class="k">def</span> <span class="nf">get_dlret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;delist&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compounded delisting returns from beg to end dates for all permnos</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: Inclusive start date (YYYYMMDD)</span>
+<span class="sd">          end: Inclusive end date (YYYYMMDD)</span>
+<span class="sd">          dataset: either &#39;delist&#39; or &#39;monthly&#39; containing delisting returns</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Series of delisting returns</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">          Sets to -0.3 if missing and code in [500, 520, 551...574, 580, 584]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT (1+dlret) AS dlret, </span><span class="si">{identifier}</span><span class="s2">, dlstcd FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;  WHERE </span><span class="si">{dlstdt}</span><span class="s2"> &gt;= </span><span class="si">{beg}</span><span class="s2"> AND </span><span class="si">{dlstdt}</span><span class="s2"> &lt;= </span><span class="si">{end}</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;    AND dlstcd &gt; 0&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                 <span class="n">dlstdt</span><span class="o">=</span><span class="s1">&#39;dlstdt&#39;</span> <span class="k">if</span> <span class="n">dataset</span><span class="o">==</span><span class="s1">&#39;delist&#39;</span> <span class="k">else</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span>
+                 <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_dlst)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dlret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">&amp;</span>
+                    <span class="n">CRSP</span><span class="o">.</span><span class="n">is_dlstcode</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dlstcd&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;dlret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="s1">&#39;dlret&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>\
+                                               <span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+                                               <span class="o">.</span><span class="n">dropna</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dlret&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CRSP.get_ret"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.get_ret">[docs]</a>    <span class="k">def</span> <span class="nf">get_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get compounded returns, with option to include delist returns</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: starting returns date</span>
+<span class="sd">          end: ending returns date</span>
+<span class="sd">          dataset: name of returns dataset (ignore if initialized as &#39;monthly&#39;)</span>
+<span class="sd">          field: Name of returns field in dataset, in {&#39;ret&#39;, &#39;retx&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># select or autoselect monthly data set</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monthly</span> <span class="ow">or</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span>
+            <span class="n">use_monthly</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monthly</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">use_monthly</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;monthly&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables_</span> <span class="ow">and</span> 
+                           <span class="n">beg</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">begmo</span><span class="p">(</span><span class="n">beg</span><span class="p">)</span> <span class="ow">and</span>
+                           <span class="n">end</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">end</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_monthly</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">use_monthly</span><span class="p">:</span>  <span class="c1"># set beg and end to envelope calendar month dates</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;monthly&#39;</span>
+            <span class="n">beg</span> <span class="o">=</span> <span class="p">(</span><span class="n">beg</span> <span class="o">//</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">//</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">99</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># if monthly dataset, then adjust for delisting return</span>
+        <span class="k">if</span> <span class="n">use_monthly</span><span class="p">:</span>
+            <span class="n">dlst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dlret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dlst</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dlret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CRSP.cache_ret"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSP.cache_ret">[docs]</a>    <span class="k">def</span> <span class="nf">cache_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> 
+                  <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> 
+                  <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                  <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> 
+                  <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pre-generate compounded returns from daily for redis store&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s2">&quot;dataset must be daily&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">cache_ret</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                          <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span></div></div>
+    
+
+<div class="viewcode-block" id="CRSPBuffer"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSPBuffer">[docs]</a><span class="k">class</span> <span class="nc">CRSPBuffer</span><span class="p">(</span><span class="n">StocksBuffer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cache returns into memory, and provide Stocks-like interface&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">stocks</span><span class="p">:</span> <span class="n">Stocks</span><span class="p">,</span> 
+                 <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create object and load returns into its cache</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          stocks: Stocks structured data object to access stock returns data</span>
+<span class="sd">          beg: Earliest date of daily stock returns to pre-load</span>
+<span class="sd">          end: Latest date of daily stock returns to pre-load</span>
+<span class="sd">          fields: Column names of returns fields, e.g. [&#39;ret&#39;, &#39;retx&#39;, &#39;prc&#39;]</span>
+<span class="sd">          dataset: Name of dataset to extract from, e.g. &#39;daily&#39;, &#39;monthly&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span> <span class="ow">and</span> <span class="s1">&#39;dlret&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;dlret&#39;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">stocks</span><span class="o">=</span><span class="n">stocks</span><span class="p">,</span> <span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                         <span class="n">identifier</span><span class="o">=</span><span class="n">stocks</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CRSPBuffer.get_ret"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSPBuffer.get_ret">[docs]</a>    <span class="k">def</span> <span class="nf">get_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return compounded stock returns between beg and end dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: Begin date to compound returns</span>
+<span class="sd">          end: End date (inclusive) to compound returns</span>
+<span class="sd">          field: Name of returns field in dataset, in {&#39;ret&#39;, &#39;retx&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="s1">&#39;retx&#39;</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">==</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span>   <span class="c1"># CRSP partial month delisting return</span>
+            <span class="n">dlst</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;dlret&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dlst</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;dlret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CRSPBuffer.get_universe"><a class="viewcode-back" href="../../../finds.structured.crsp.html#finds.structured.crsp.CRSPBuffer.get_universe">[docs]</a>    <span class="k">def</span> <span class="nf">get_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Simply pass through original method to retrieve universe&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stocks</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">cache_mode</span><span class="o">=</span><span class="n">cache_mode</span><span class="p">)</span></div></div>
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+    <span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">CRSPBuffer</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">CRSP_DATE</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">endweek</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># weekly frequency, 3=Wed-close-to-Wed-close</span>
+    <span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">downloads</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;CRSP&#39;</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # load CRSP: TODO handle missing return codes (&lt; -1, see below)</span>
+<span class="sd">    df = crsp.load_csv(&#39;names&#39;, downloads / &#39;names.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), &#39;~&#39;, 103383)</span>
+<span class="sd">    df = crsp.load_csv(&#39;shares&#39;, downloads / &#39;shares.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), &#39;~&#39;, 2346131)</span>
+<span class="sd">    df = crsp.load_csv(&#39;dist&#39;, downloads / &#39;dist.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), &#39;~&#39;, 935880)</span>
+<span class="sd">    df = crsp.load_csv(&#39;delist&#39;, downloads / &#39;delist.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), &#39;~&#39;, 33584)</span>
+<span class="sd">    df = crsp.load_csv(&#39;monthly&#39;, downloads / &#39;monthly.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), &#39;~&#39;, 4606907)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">downloads</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;daily*.txt.gz&#39;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">load_csv</span><span class="p">(</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">csvfile</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+                           <span class="n">drop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;permno&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PERMNO&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">],</span>
+                                 <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="p">],</span>
+                                 <span class="s1">&#39;shrout&#39;</span><span class="p">:[</span><span class="s1">&#39;.&#39;</span><span class="p">]})</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;secs:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">s</span><span class="p">)</span>
+
+
+    <span class="c1"># Pre-generate weekly returns and save in Redis cache</span>
+    <span class="n">begweek</span> <span class="o">=</span> <span class="mi">19251231</span>
+    <span class="n">endweek</span> <span class="o">=</span> <span class="n">CRSP_DATE</span>
+
+    <span class="n">rebaldates</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">begweek</span><span class="p">,</span> <span class="n">endweek</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;weekly&#39;</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">date_tuples</span><span class="p">(</span><span class="n">rebaldates</span><span class="p">)</span>
+    <span class="n">batchsize</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="n">batchsize</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">batchsize</span><span class="p">)]</span>
+    <span class="n">batches</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+        <span class="n">crsp</span><span class="o">.</span><span class="n">cache_ret</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">crsp</span><span class="o">.</span><span class="n">cache_ret</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;retx&#39;</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># test CRSPBuffer</span>
+    <span class="n">stocks</span> <span class="o">=</span> <span class="n">CRSPBuffer</span><span class="p">(</span><span class="n">crsp</span><span class="p">,</span> <span class="n">beg</span><span class="o">=</span><span class="mi">20210101</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">20211231</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">],</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">)</span>
+    <span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">20210101</span><span class="p">,</span> <span class="mi">20210131</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> 
+    <span class="n">m</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">cache_mode</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # changed so now may get from monthly column or compound delist table</span>
+<span class="sd">    def get_dlstret(self, beg: int, end: int, cache_mode: str = &quot;rw&quot;) -&gt; Series:</span>
+<span class="sd">        &quot;&quot;&quot;Compounded delisting returns from beg to end dates for all permnos</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            beg: Inclusive start date (YYYYMMDD)</span>
+<span class="sd">            end: Inclusive end date (YYYYMMDD)</span>
+<span class="sd">            cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Series of compounded returns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        rkey = self.rdb.prefix &quot;_&quot;.join([&quot;dlst&quot;, str(self), str(beg), str(end)])</span>
+<span class="sd">        if &#39;r&#39; in cache_mode and self.rdb and self.rdb.redis.exists(rkey):</span>
+<span class="sd">            self._print(&quot;(get_dlstret load)&quot;, rkey, str(self))</span>
+<span class="sd">            return self.rdb.load(rkey)[&#39;ret&#39;]</span>
+
+<span class="sd">        q = (&quot;SELECT (1+dlret) AS ret, {identifier} FROM {table} &quot;</span>
+<span class="sd">             &quot;  WHERE dlstdt &gt;= {beg} AND dlstdt &lt;= {end}&quot;).format(</span>
+<span class="sd">                 table=self[&#39;delist&#39;].key,</span>
+<span class="sd">                 identifier=self.identifier,</span>
+<span class="sd">                 beg=beg,</span>
+<span class="sd">                 end=end)</span>
+<span class="sd">        self._print(&#39;(get_dlst)&#39;, q)</span>
+<span class="sd">        df = self.sql.read_dataframe(q).sort_values(self.identifier).fillna(0)</span>
+<span class="sd">        if len(df):</span>
+<span class="sd">            df = (df.groupby(self.identifier).prod(min_count=1)-1).dropna()</span>
+<span class="sd">        if &#39;w&#39; in cache_mode and self.rdb:</span>
+<span class="sd">            self._print(&quot;(get_dlstret dump)&quot;, rkey, str(self))</span>
+<span class="sd">            self.rdb.dump(rkey, df)</span>
+<span class="sd">        return df[&#39;ret&#39;]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

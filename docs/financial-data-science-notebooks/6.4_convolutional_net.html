@@ -1,0 +1,2000 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Convolutional Neural Networks &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '6.4_convolutional_net';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recurrent Neural Networks" href="6.5_recurrent_net.html" />
+    <link rel="prev" title="Deep Learning" href="6.3_deep_learning.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F6.4_convolutional_net.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/6.4_convolutional_net.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Convolutional Neural Networks</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolutions">Convolutions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-filters">Image Filters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#receptive-field-and-output-size">Receptive field and output size</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computer-vision">Computer vision</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temporal-convolutional-networks-tcn">Temporal convolutional networks (TCN)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-preparation">Data preparation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-autoregression">Vector Autoregression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lag-order">Lag order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#var-1-and-conv1d">Var(1) and Conv1d</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="convolutional-neural-networks">
+<h1>Convolutional Neural Networks<a class="headerlink" href="#convolutional-neural-networks" title="Permalink to this heading">#</a></h1>
+<p><em>Life can only be understood backwards; but it must be lived forwards.</em> - Søren Kierkegaard</p>
+<p><strong>Convolutional Neural Networks (CNNs)</strong> are particularly effective for analyzing structured data like images and sequences. By leveraging convolutional layers, CNNs extract hierarchical patterns from raw inputs for complex tasks such as image classification and time series prediction. We explore the application of <strong>Temporal Convolutional Networks (TCNs)</strong> for capturing dependencies in economic time series. The results from modeling multiple time series data such as CPI components are compared with with classical models like Vector Autoregression (VAR).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torchinfo</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.api</span> <span class="kn">import</span> <span class="n">VAR</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Alfred</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+<span class="c1"># %matplotlib qt</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="c1"># train-test split date</span>
+<span class="n">split_date</span> <span class="o">=</span> <span class="s1">&#39;2021-12-01&#39;</span>   <span class="c1"># training period up to this date</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="convolutions">
+<h2>Convolutions<a class="headerlink" href="#convolutions" title="Permalink to this heading">#</a></h2>
+<p>Convolutional layers are memory-efficient neural network components designed to process spatially structured data, such as images. Unlike fully connected (linear) layers, which require vast numbers of parameters, convolutional layers use localized, shared filters called <strong>kernels</strong> to capture patterns in input data. Mathematically, a convolution operates as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+y_{i,j,k} = \sum_{l=1}^{C_1} \sum_{m=0}^{h-1} \sum_{n=0}^{w-1} x_{l, j+m, k+n} \cdot \omega_{i,l,m,n}
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\omega\)</span> is a small kernel (e.g., 3×3) that slides over the image, performing element-wise multiplications and summing the results.</p>
+<section id="image-filters">
+<h3>Image Filters<a class="headerlink" href="#image-filters" title="Permalink to this heading">#</a></h3>
+<p>Convolutions can be interpreted as applying image processing filters, such as:</p>
+<ul class="simple">
+<li><p>Box filter (averaging):
+$<span class="math notranslate nohighlight">\(
+\frac{1}{9}
+\begin{bmatrix}
+1 &amp; 1 &amp; 1 \\\\
+1 &amp; 1 &amp; 1 \\\\
+1 &amp; 1 &amp; 1
+\end{bmatrix}
+\)</span>$</p></li>
+<li><p>Edge detection filter:
+$<span class="math notranslate nohighlight">\(
+\begin{bmatrix}
+-1 &amp; -1 &amp; -1 \\\\
+0 &amp; 0 &amp; 0 \\\\
+1 &amp; 1 &amp; 1
+\end{bmatrix}
+\)</span>$</p></li>
+</ul>
+<p>Thus, convolutional layers serve as feature extractors, enabling models to detect edges, textures, and patterns crucial for tasks like image classification and segmentation.</p>
+</section>
+<section id="receptive-field-and-output-size">
+<h3>Receptive field and output size<a class="headerlink" href="#receptive-field-and-output-size" title="Permalink to this heading">#</a></h3>
+<p>Convolutions operate on local patches of an image, but by stacking multiple layers, they can expand their <strong>receptive field</strong>, allowing the network to capture broader context. Several parameters affect the output size and receptive field:</p>
+<ul class="simple">
+<li><p>Padding: Adds extra pixels around the input to control output size and preserve borders.</p></li>
+<li><p>Stride: Controls how far the filter moves across the input, affecting downsampling.</p></li>
+<li><p>Dilation: Inserts zeros between kernel elements, expanding the receptive field without increasing parameters.</p></li>
+<li><p>Transposed convolution (up-convolution): A learnable upsampling method used to increase output size, often employed in image segmentation models like <strong>U-Net</strong>.</p></li>
+</ul>
+</section>
+<section id="computer-vision">
+<h3>Computer vision<a class="headerlink" href="#computer-vision" title="Permalink to this heading">#</a></h3>
+<p>CNNs process images based on :</p>
+<ul class="simple">
+<li><p>Recurring Patterns: They detect similar structures that appear across different images.</p></li>
+<li><p>Multi-Scale Patterns: They recognize features ranging from small edges to large object shapes.</p></li>
+<li><p>Local Invariance: They take advantage of the fact that neighboring pixels often have similar values.</p></li>
+<li><p>Semantic Grouping: They group together pixels that belong to the same object based on shared patterns.</p></li>
+</ul>
+<p>They excel at computer vision tasks that involve recognizing structured patterns at multiple levels of abstraction. These tasks include:</p>
+<ul class="simple">
+<li><p><strong>Image Classification</strong>: CNNs are highly effective at identifying what object is present in an image by detecting low-level patterns (like edges and textures) and gradually building up to high-level semantic features (like object categories).</p></li>
+<li><p><strong>Object Detection</strong>: By capturing patterns at various scales and identifying object parts, CNNs can localize and label multiple objects within an image, even if they vary in size or position.</p></li>
+<li><p><strong>Semantic Segmentation</strong>: CNNs perform well at assigning a class label to each pixel in an image by grouping together pixels that form the same object or region.</p></li>
+</ul>
+<p>AlexNet (2012) was the first deep network to outperform non-deep vision systems, winning the ImageNet challenge competition and kicking off the Deep Learning revolution. Winning the 2015 competition, ResNet introduced shortcut “residual connections” for gradients in convolutional architectures.  The U-Net (2016) model designed a symmetric hourglass-shaped architecture dsemantic segmentation, combining down-sampling to capture context with up-sampling to produce higher output resolution. More recently, Vision Transformer (ViT) models have incorporated transformer encoders by dividing images into patches, treating each patch as a token.</p>
+</section>
+</section>
+<section id="temporal-convolutional-networks-tcn">
+<h2>Temporal convolutional networks (TCN)<a class="headerlink" href="#temporal-convolutional-networks-tcn" title="Permalink to this heading">#</a></h2>
+<p><strong>Temporal Convolutional Networks (TCNs)</strong> are deep convolutional architectures designed for sequence data. They utilize causal and dilated convolutions along with residual connections to model long-range dependencies efficiently. Unlike CNNs for images, TCNs handle sequential data such as time series, text, and audio.</p>
+<ul class="simple">
+<li><p>Causal Convolutions: Ensure that each output at time <span class="math notranslate nohighlight">\(t\)</span> only depends on current and past inputs — preserving the temporal order:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+y_t = \sum_{i=0}^{k-1} w_i x_{t-i}
+\]</div>
+<ul class="simple">
+<li><p>Dilated Convolutions: Introduce gaps between filter (kernel) elements to capture long-range dependencies without expanding filter size:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+y_t = \sum_{i=0}^{k-1} w_i x_{t - d \cdot i}
+\]</div>
+<ul class="simple">
+<li><p>Residual Connections: Allow gradients to flow efficiently through deep networks, mitigating vanishing gradient issues:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+\text{Output} = x + F(x)
+\]</div>
+<p>Key hyperparameters of TCNs include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">kernel_size</span></code>: Size of convolutional filter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dropout</span></code>: Regularization to prevent overfitting.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">blocks</span></code>: Number of stacked convolutional layers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dilation</span></code>: Grows exponentially (e.g., 1, 2, 4, …).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">activation</span></code>: Non-linear activation, typically ReLU.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">CausalConv1dBlock</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Conv1d block with ReLU, skip, dropout, dilation and padding&quot;&quot;&quot;</span>
+        
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">dilation</span><span class="p">,</span>
+                     <span class="n">dropout</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+            <span class="c1"># print(&#39;kernel&#39;, kernel_size, &#39;dilation&#39;, dilation)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ConstantPad1d</span><span class="p">(((</span><span class="n">kernel_size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dilation</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span>
+                                <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ConstantPad1d</span><span class="p">(((</span><span class="n">kernel_size</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dilation</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span>
+                                <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skip</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+            <span class="k">if</span> <span class="n">in_channels</span> <span class="o">!=</span> <span class="n">out_channels</span><span class="p">:</span>   <span class="c1"># downsample for skip if necessary</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">skip</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># with skip connection</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">dropout</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;TCN model by connecting multiple convolution layers&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">in_channels</span> <span class="o">=</span> <span class="n">n_features</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dilation</span><span class="p">,</span> <span class="n">hidden</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">blocks</span><span class="p">):</span>
+            <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CausalConv1dBlock</span><span class="p">(</span><span class="n">in_channels</span><span class="o">=</span><span class="n">in_channels</span><span class="p">,</span>
+                                            <span class="n">out_channels</span><span class="o">=</span><span class="n">hidden</span><span class="p">,</span>
+                                            <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+                                            <span class="n">dilation</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="n">dilation</span><span class="p">,</span>
+                                            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">))</span>
+            <span class="n">in_channels</span> <span class="o">=</span> <span class="n">hidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">L</span><span class="p">)</span> <span class="k">if</span> <span class="n">L</span> <span class="k">else</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+        <span class="k">if</span> <span class="n">L</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ConstantPad1d</span><span class="p">((</span><span class="n">kernel_size</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span>                
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">in_channels</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;input is (B, n_features, L)), linear expects (B, * n_features)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;save model state to filename&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;load model name from filename&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="data-preparation">
+<h3>Data preparation<a class="headerlink" href="#data-preparation" title="Permalink to this heading">#</a></h3>
+<p>The dataset comprises economic time series of CPI components obtained from FRED (Federal Reserve Economic Data). The data, covering various CPI categories (e.g., food, housing, transportation), is log-transformed and differenced for stationarity and standardized using <code class="docutils literal notranslate"><span class="pre">StandardScaler</span></code> to mean 0 and variance 1.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">vspans</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">date_spans</span><span class="p">(</span><span class="s1">&#39;USREC&#39;</span><span class="p">)</span>    <span class="c1"># recession periods for plots</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CPI for U.S. City Average: Monthly, Seasonally Adjusted</span>
+<span class="c1"># https://fred.stlouisfed.org/release/tables?rid=10&amp;eid=34483</span>
+<span class="c1"># &#39;CUSR0000SEEA&#39;</span>
+<span class="n">series_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;CPIFABSL&#39;</span><span class="p">,</span> <span class="s1">&#39;CPIHOSSL&#39;</span><span class="p">,</span> <span class="s1">&#39;CPIAPPSL&#39;</span><span class="p">,</span> <span class="s1">&#39;CPITRNSL&#39;</span><span class="p">,</span> <span class="s1">&#39;CPIMEDSL&#39;</span><span class="p">,</span> <span class="s1">&#39;CPIOGSSL&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">alf</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">series_ids</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+       <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>\
+       <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;M&#39;</span>     <span class="c1"># set index to datetime type and freq = &#39;M&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1025513/4272565358.py:9: FutureWarning: &#39;M&#39; is deprecated and will be removed in a future version, please use &#39;ME&#39; instead.
+  df.index.freq = &#39;M&#39;     # set index to datetime type and freq = &#39;M&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">:</span><span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; in &#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">series_ids</span><span class="p">)]</span>
+<span class="n">names</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;Food and Beverages&#39;,
+ &#39;Housing&#39;,
+ &#39;Apparel&#39;,
+ &#39;Transportation&#39;,
+ &#39;Medical Care&#39;,
+ &#39;Other Goods and Services&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Standardize the data data</span>
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">scaled_data</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">scaled_data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Food and Beverages</th>
+      <th>Housing</th>
+      <th>Apparel</th>
+      <th>Transportation</th>
+      <th>Medical Care</th>
+      <th>Other Goods and Services</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1967-02-28</th>
+      <td>-1.520716</td>
+      <td>-1.129800</td>
+      <td>0.533990</td>
+      <td>0.266586</td>
+      <td>-0.248585</td>
+      <td>-1.017195</td>
+    </tr>
+    <tr>
+      <th>1967-03-31</th>
+      <td>-0.805655</td>
+      <td>-1.129800</td>
+      <td>0.124553</td>
+      <td>-0.267488</td>
+      <td>-0.253160</td>
+      <td>-0.284868</td>
+    </tr>
+    <tr>
+      <th>1967-04-30</th>
+      <td>-1.522780</td>
+      <td>-0.063784</td>
+      <td>0.529140</td>
+      <td>0.263339</td>
+      <td>0.988995</td>
+      <td>-1.017195</td>
+    </tr>
+    <tr>
+      <th>1967-05-31</th>
+      <td>-0.805655</td>
+      <td>-0.067262</td>
+      <td>0.122142</td>
+      <td>-0.003280</td>
+      <td>-0.266687</td>
+      <td>-0.286982</td>
+    </tr>
+    <tr>
+      <th>1967-06-30</th>
+      <td>1.339539</td>
+      <td>-1.129800</td>
+      <td>0.524347</td>
+      <td>-0.267488</td>
+      <td>0.962232</td>
+      <td>-0.289083</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2024-10-31</th>
+      <td>-0.252031</td>
+      <td>0.063171</td>
+      <td>-2.110286</td>
+      <td>-0.203592</td>
+      <td>-0.692758</td>
+      <td>-0.172972</td>
+    </tr>
+    <tr>
+      <th>2024-11-30</th>
+      <td>-0.053379</td>
+      <td>-0.037266</td>
+      <td>-0.114479</td>
+      <td>0.027062</td>
+      <td>-0.702581</td>
+      <td>0.085335</td>
+    </tr>
+    <tr>
+      <th>2024-12-31</th>
+      <td>-0.180743</td>
+      <td>-0.209529</td>
+      <td>-0.015224</td>
+      <td>0.767819</td>
+      <td>-1.058184</td>
+      <td>-1.113129</td>
+    </tr>
+    <tr>
+      <th>2025-01-31</th>
+      <td>0.090331</td>
+      <td>-0.037301</td>
+      <td>-3.137367</td>
+      <td>0.794814</td>
+      <td>-0.701262</td>
+      <td>-1.822241</td>
+    </tr>
+    <tr>
+      <th>2025-02-28</th>
+      <td>-0.350673</td>
+      <td>0.133190</td>
+      <td>0.934107</td>
+      <td>-0.605692</td>
+      <td>-0.563596</td>
+      <td>0.499572</td>
+    </tr>
+  </tbody>
+</table>
+<p>697 rows × 6 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntrain</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">split_date</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>      <span class="c1"># M is number of time series</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="training">
+<h3>Training<a class="headerlink" href="#training" title="Permalink to this heading">#</a></h3>
+<p>The TCN is trained to predict the next time step of the CPI components using past observations. Training involves splitting data into train and test sets, and using the Adam optimizer to minimize mean squared error (MSE) between predictions and actual values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model training parameters</span>
+<span class="n">seq_len</span> <span class="o">=</span> <span class="mi">8</span>         <span class="c1"># length of each input sequence for TCN</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">step_size</span> <span class="o">=</span> <span class="mi">30</span>      <span class="c1"># learning rate scheduler step size</span>
+<span class="n">lr</span> <span class="o">=</span> <span class="mf">0.01</span>           <span class="c1"># initial learning rate</span>
+<span class="n">num_lr</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">num_epochs</span> <span class="o">=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">num_lr</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>        <span class="c1"># to collect evaluate results</span>
+<span class="n">train_loss</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">test_loss</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Form input data from training set</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>    <span class="c1"># number of input planes</span>
+<span class="n">train_exs</span> <span class="o">=</span> <span class="p">[</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[(</span><span class="n">i</span> <span class="o">-</span> <span class="n">seq_len</span><span class="p">):(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">values</span>
+             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">ntrain</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># train_ex should have dimension (batch size, channels, sequence length+1)</span>
+<span class="n">train_ex</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">ntrain</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)[</span><span class="kc">None</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>First, a baseline model comprising just a single <strong>1D Conv layer</strong> is trained to predict next time step</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torchinfo</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+<span class="n">modelname</span> <span class="o">=</span> <span class="s2">&quot;1D-Convolution&quot;</span>
+<span class="n">train_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">test_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+Conv1d                                   42
+=================================================================
+Total params: 42
+Trainable params: 42
+Non-trainable params: 0
+=================================================================
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">train_ex</span><span class="p">[:,:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">train_ex</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>  <span class="c1"># calculated over all outputs</span>
+        <span class="n">total_loss</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">train_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_loss</span><span class="p">)</span>
+    
+    <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span><span class="p">)[</span><span class="kc">None</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">test_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ntrain</span><span class="p">:],</span>
+                                              <span class="n">pred</span><span class="p">[</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">results</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Train Error&#39;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">ntrain</span><span class="p">],</span>
+                                        <span class="n">pred</span><span class="p">[:</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="s1">&#39;Test Error&#39;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ntrain</span><span class="p">:],</span>
+                                        <span class="n">pred</span><span class="p">[</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Save the fitted weights to compare with classical Vector Autoregression (VAR) models.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">conv1d_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                            <span class="n">model</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Next, we train various TCN configurations, utilizing StepLR learning rate scheduler and shuffled batches, while varying:</p>
+<ul class="simple">
+<li><p>number of layers (blocks): 1, 2</p></li>
+<li><p>different kernel sizes: 1, 2</p></li>
+<li><p>dropout rates: 0, 0.5.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># [1,1,0], [1,2,0], [2,1,0], [2,2,0], [1,1,0.5], [1,2,0.5], [2,1,0.5], [2,2,0.5]</span>
+<span class="k">for</span> <span class="n">block</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">dropout</span> <span class="ow">in</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]]:</span>
+    <span class="n">modelname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;TCN(b=</span><span class="si">{</span><span class="n">block</span><span class="si">}</span><span class="s2">,k=</span><span class="si">{</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">,d=</span><span class="si">{</span><span class="n">dropout</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">train_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">test_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Set model, optimizer, loss function and learning rate scheduler</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">TCN</span><span class="p">(</span><span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> 
+                <span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">n_features</span><span class="p">]</span><span class="o">*</span><span class="n">block</span><span class="p">,</span>
+                <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+                <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;******&#39;</span><span class="p">,</span> <span class="n">modelname</span><span class="p">,</span> <span class="s1">&#39;******&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">torchinfo</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+    <span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">StepLR</span><span class="p">(</span>
+        <span class="n">optimizer</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span>
+    <span class="p">)</span>
+    <span class="n">loss_function</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
+    <span class="c1"># Run training loop over num_epochs with batch_size</span>
+    <span class="n">num_epochs</span> <span class="o">=</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">num_lr</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
+
+        <span class="c1"># shuffle indxs into batches</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_exs</span><span class="p">))</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span>
+        <span class="n">batches</span> <span class="o">=</span> <span class="p">[</span><span class="n">idxs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">),</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">)]</span>
+                   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">)]</span>
+
+        <span class="c1"># train by batch</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="c1"># input has shape (batch_size, n_features, seq_len)</span>
+            <span class="c1"># Creating a tensor from a list of numpy.ndarrays is extremely slow.</span>
+            <span class="n">nparray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">train_exs</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">seq</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+                                <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">seq_len</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+            <span class="n">train_ex</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">nparray</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">train_ex</span><span class="p">[:,:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">train_ex</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>  <span class="c1"># calculated over all outputs</span>
+            <span class="n">total_loss</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">train_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_loss</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">VERBOSE</span> <span class="ow">and</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">%</span> <span class="p">(</span><span class="n">step_size</span><span class="o">//</span><span class="mi">2</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">param_groups</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;lr&#39;</span><span class="p">],</span> <span class="n">total_loss</span><span class="p">)</span>
+
+        <span class="c1"># Compute MSE of one-period ahead forecast error in train and test sets</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">T</span><span class="p">)[</span><span class="kc">None</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,:,:]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">test_loss</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ntrain</span><span class="p">:],</span>
+                                                       <span class="n">pred</span><span class="p">[</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">results</span><span class="p">[</span><span class="n">modelname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Train Error&#39;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">ntrain</span><span class="p">],</span>
+                                            <span class="n">pred</span><span class="p">[:</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="s1">&#39;Test Error&#39;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">ntrain</span><span class="p">:],</span>
+                                            <span class="n">pred</span><span class="p">[</span><span class="n">ntrain</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">}</span>
+    <span class="c1">#print(&#39;Blocks:&#39;, block, &#39;Kernel size:&#39;, kernel_size, results[modelname])</span>
+    <span class="c1">#print(pd.concat(res, axis=1).T)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>****** TCN(b=1,k=1,d=0.0) ******
+TCN(
+  (network): Sequential(
+    (0): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(0, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(0, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+  )
+  (classifier): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+)
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+TCN                                      --
+├─Sequential: 1-1                        --
+│    └─CausalConv1dBlock: 2-1            --
+│    │    └─Sequential: 3-1              84
+├─Conv1d: 1-2                            42
+=================================================================
+Total params: 126
+Trainable params: 126
+Non-trainable params: 0
+=================================================================
+
+****** TCN(b=1,k=2,d=0.0) ******
+TCN(
+  (network): Sequential(
+    (0): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(1, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(1, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+  )
+  (classifier): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+)
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+TCN                                      --
+├─Sequential: 1-1                        --
+│    └─CausalConv1dBlock: 2-1            --
+│    │    └─Sequential: 3-1              156
+├─Conv1d: 1-2                            42
+=================================================================
+Total params: 198
+Trainable params: 198
+Non-trainable params: 0
+=================================================================
+
+****** TCN(b=2,k=1,d=0.0) ******
+TCN(
+  (network): Sequential(
+    (0): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(0, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(0, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+    (1): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(0, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(1,), stride=(1,), dilation=(2,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(0, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(1,), stride=(1,), dilation=(2,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+  )
+  (classifier): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+)
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+TCN                                      --
+├─Sequential: 1-1                        --
+│    └─CausalConv1dBlock: 2-1            --
+│    │    └─Sequential: 3-1              84
+│    └─CausalConv1dBlock: 2-2            --
+│    │    └─Sequential: 3-2              84
+├─Conv1d: 1-2                            42
+=================================================================
+Total params: 210
+Trainable params: 210
+Non-trainable params: 0
+=================================================================
+
+****** TCN(b=2,k=2,d=0.0) ******
+TCN(
+  (network): Sequential(
+    (0): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(1, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(1, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+    (1): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(2, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(2,), stride=(1,), dilation=(2,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(2, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(2,), stride=(1,), dilation=(2,))
+        (5): ReLU()
+        (6): Dropout(p=0, inplace=False)
+      )
+    )
+  )
+  (classifier): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+)
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+TCN                                      --
+├─Sequential: 1-1                        --
+│    └─CausalConv1dBlock: 2-1            --
+│    │    └─Sequential: 3-1              156
+│    └─CausalConv1dBlock: 2-2            --
+│    │    └─Sequential: 3-2              156
+├─Conv1d: 1-2                            42
+=================================================================
+Total params: 354
+Trainable params: 354
+Non-trainable params: 0
+=================================================================
+
+****** TCN(b=2,k=2,d=0.3) ******
+TCN(
+  (network): Sequential(
+    (0): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(1, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(1, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(2,), stride=(1,))
+        (5): ReLU()
+        (6): Dropout(p=0.3, inplace=False)
+      )
+    )
+    (1): CausalConv1dBlock(
+      (network): Sequential(
+        (0): ConstantPad1d(padding=(2, 0), value=0)
+        (1): Conv1d(6, 6, kernel_size=(2,), stride=(1,), dilation=(2,))
+        (2): ReLU()
+        (3): ConstantPad1d(padding=(2, 0), value=0)
+        (4): Conv1d(6, 6, kernel_size=(2,), stride=(1,), dilation=(2,))
+        (5): ReLU()
+        (6): Dropout(p=0.3, inplace=False)
+      )
+    )
+  )
+  (classifier): Conv1d(6, 6, kernel_size=(1,), stride=(1,))
+)
+=================================================================
+Layer (type:depth-idx)                   Param #
+=================================================================
+TCN                                      --
+├─Sequential: 1-1                        --
+│    └─CausalConv1dBlock: 2-1            --
+│    │    └─Sequential: 3-1              156
+│    └─CausalConv1dBlock: 2-2            --
+│    │    └─Sequential: 3-2              156
+├─Conv1d: 1-2                            42
+=================================================================
+Total params: 354
+Trainable params: 354
+Non-trainable params: 0
+=================================================================
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="evaluation">
+<h3>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this heading">#</a></h3>
+<p>Training and test errors (MSE) from one-step-ahead forecasting are collected across models. Additionally, training and testing loss curves are plotted to analyze convergence and overfitting tendencies of different configurations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TCN Models Training Loss by Epoch&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Epoch&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model Size (blocks, kernel)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/32fe6fe42d18b58caef5724fc6ac598001549baa4a2ce83cd4ea66814987fa23.png" src="_images/32fe6fe42d18b58caef5724fc6ac598001549baa4a2ce83cd4ea66814987fa23.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">test_loss</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;TCN Models Test Loss by Epoch&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Epoch&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Model Size (blocks, kernel)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/08a9bb5bd30bd4224172f3ba3672c9c4d1d546e6454dff01b4a172babe55acb9.png" src="_images/08a9bb5bd30bd4224172f3ba3672c9c4d1d546e6454dff01b4a172babe55acb9.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sorted by Test Error&#39;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Test Error&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sorted by Test Error
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Train Error</th>
+      <th>Test Error</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1D-Convolution</th>
+      <td>0.736907</td>
+      <td>0.753075</td>
+    </tr>
+    <tr>
+      <th>TCN(b=2,k=2,d=0.0)</th>
+      <td>0.786185</td>
+      <td>0.788295</td>
+    </tr>
+    <tr>
+      <th>TCN(b=2,k=1,d=0.0)</th>
+      <td>0.788457</td>
+      <td>0.792443</td>
+    </tr>
+    <tr>
+      <th>TCN(b=1,k=2,d=0.0)</th>
+      <td>0.775419</td>
+      <td>0.809113</td>
+    </tr>
+    <tr>
+      <th>TCN(b=1,k=1,d=0.0)</th>
+      <td>0.832984</td>
+      <td>0.845615</td>
+    </tr>
+    <tr>
+      <th>TCN(b=2,k=2,d=0.3)</th>
+      <td>0.790285</td>
+      <td>0.956657</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="vector-autoregression">
+<h2>Vector Autoregression<a class="headerlink" href="#vector-autoregression" title="Permalink to this heading">#</a></h2>
+<p><strong>Vector Autoregression (VAR)</strong> is a statistical time series model that captures linear interdependencies across multiple time series.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">var_model</span> <span class="o">=</span> <span class="n">VAR</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">ntrain</span><span class="p">],</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;ME&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="lag-order">
+<h3>Lag order<a class="headerlink" href="#lag-order" title="Permalink to this heading">#</a></h3>
+<p>The lagged coefficients estimated from the Vector Autoregression help predict multi-step future outcomes. The optimal lag order (p) can be selected using infomation criteria such as AIC, BIC, HQIC, or FPE.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># up to max number p of VAR(p) lags</span>
+<span class="n">maxlags</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimal number of VAR(p) lags selected by various IC&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">({</span><span class="n">ic</span><span class="p">:</span> <span class="n">var_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">maxlags</span><span class="o">=</span><span class="n">maxlags</span><span class="p">,</span> <span class="n">ic</span><span class="o">=</span><span class="n">ic</span><span class="p">)</span><span class="o">.</span><span class="n">k_ar</span>
+           <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;aic&#39;</span><span class="p">,</span> <span class="s1">&#39;fpe&#39;</span><span class="p">,</span> <span class="s1">&#39;hqic&#39;</span><span class="p">,</span> <span class="s1">&#39;bic&#39;</span><span class="p">]},</span>
+          <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;optimal p:&#39;</span><span class="p">])</span>\
+          <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;IC:&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Optimal number of VAR(p) lags selected by various IC
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>IC:</th>
+      <th>aic</th>
+      <th>fpe</th>
+      <th>hqic</th>
+      <th>bic</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>optimal p:</th>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit VAR(p) models</span>
+<span class="n">var_models</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="n">var_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxlags</span><span class="o">+</span><span class="mi">1</span><span class="p">)}</span> <span class="c1"># fit models</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show model summary for VAR(1)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">var_models</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  Summary of Regression Results   
+==================================
+Model:                         VAR
+Method:                        OLS
+Date:           Sat, 15, Mar, 2025
+Time:                     04:58:13
+--------------------------------------------------------------------
+No. of Equations:         6.00000    BIC:                   -1.67401
+Nobs:                     657.000    HQIC:                  -1.84967
+Log likelihood:          -4907.30    FPE:                   0.140733
+AIC:                     -1.96089    Det(Omega_mle):        0.132063
+--------------------------------------------------------------------
+Results for equation Food and Beverages
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                              -0.000685         0.035822           -0.019           0.985
+L1.Food and Beverages               0.309512         0.037889            8.169           0.000
+L1.Housing                          0.212849         0.043404            4.904           0.000
+L1.Apparel                         -0.002978         0.038364           -0.078           0.938
+L1.Transportation                  -0.006074         0.038082           -0.159           0.873
+L1.Medical Care                    -0.007239         0.042771           -0.169           0.866
+L1.Other Goods and Services         0.010009         0.037379            0.268           0.789
+==============================================================================================
+
+Results for equation Housing
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                              -0.016126         0.027926           -0.577           0.564
+L1.Food and Beverages               0.163358         0.029537            5.531           0.000
+L1.Housing                          0.494378         0.033836           14.611           0.000
+L1.Apparel                          0.038625         0.029907            1.291           0.197
+L1.Transportation                   0.074603         0.029687            2.513           0.012
+L1.Medical Care                     0.211794         0.033342            6.352           0.000
+L1.Other Goods and Services        -0.022649         0.029139           -0.777           0.437
+==============================================================================================
+
+Results for equation Apparel
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                              -0.004137         0.036418           -0.114           0.910
+L1.Food and Beverages               0.032202         0.038519            0.836           0.403
+L1.Housing                          0.108030         0.044125            2.448           0.014
+L1.Apparel                          0.137027         0.039002            3.513           0.000
+L1.Transportation                   0.187727         0.038715            4.849           0.000
+L1.Medical Care                     0.116103         0.043482            2.670           0.008
+L1.Other Goods and Services         0.007090         0.038000            0.187           0.852
+==============================================================================================
+
+Results for equation Transportation
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                               0.001347         0.034599            0.039           0.969
+L1.Food and Beverages               0.021051         0.036595            0.575           0.565
+L1.Housing                          0.070974         0.041921            1.693           0.090
+L1.Apparel                          0.032549         0.037054            0.878           0.380
+L1.Transportation                   0.425719         0.036782           11.574           0.000
+L1.Medical Care                     0.050082         0.041310            1.212           0.225
+L1.Other Goods and Services        -0.035207         0.036103           -0.975           0.329
+==============================================================================================
+
+Results for equation Medical Care
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                               0.033077         0.029060            1.138           0.255
+L1.Food and Beverages               0.024634         0.030737            0.801           0.423
+L1.Housing                          0.232885         0.035211            6.614           0.000
+L1.Apparel                          0.044440         0.031122            1.428           0.153
+L1.Transportation                   0.005782         0.030893            0.187           0.852
+L1.Medical Care                     0.431033         0.034697           12.423           0.000
+L1.Other Goods and Services         0.114476         0.030323            3.775           0.000
+==============================================================================================
+
+Results for equation Other Goods and Services
+==============================================================================================
+                                 coefficient       std. error           t-stat            prob
+----------------------------------------------------------------------------------------------
+const                              -0.009490         0.037496           -0.253           0.800
+L1.Food and Beverages               0.026291         0.039660            0.663           0.507
+L1.Housing                          0.076689         0.045432            1.688           0.091
+L1.Apparel                          0.094758         0.040157            2.360           0.018
+L1.Transportation                   0.018115         0.039861            0.454           0.649
+L1.Medical Care                     0.260564         0.044769            5.820           0.000
+L1.Other Goods and Services         0.009675         0.039126            0.247           0.805
+==============================================================================================
+
+Correlation matrix of residuals
+                            Food and Beverages   Housing   Apparel  Transportation  Medical Care  Other Goods and Services
+Food and Beverages                    1.000000  0.147358  0.085820       -0.000563      0.014162                 -0.010059
+Housing                               0.147358  1.000000  0.093314        0.132546      0.094535                  0.019075
+Apparel                               0.085820  0.093314  1.000000        0.126653      0.037713                  0.025531
+Transportation                       -0.000563  0.132546  0.126653        1.000000     -0.054420                 -0.012936
+Medical Care                          0.014162  0.094535  0.037713       -0.054420      1.000000                  0.153701
+Other Goods and Services             -0.010059  0.019075  0.025531       -0.012936      0.153701                  1.000000
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="var-1-and-conv1d">
+<h3>Var(1) and Conv1d<a class="headerlink" href="#var-1-and-conv1d" title="Permalink to this heading">#</a></h3>
+<p>The coefficients learned by VAR(1) models are compared to the learned weights of Conv1D layers, illustrating how classical linear models relate to convolution-based neural approaches in time series forecasting.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Coefficients of VAR(1) model&#39;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">var_models</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">intercept</span><span class="p">,</span> <span class="n">var_models</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">coefs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">]),</span>
+          <span class="n">columns</span><span class="o">=</span><span class="n">var_models</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">var_models</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">exog_names</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coefficients of VAR(1) model
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Food and Beverages</th>
+      <th>Housing</th>
+      <th>Apparel</th>
+      <th>Transportation</th>
+      <th>Medical Care</th>
+      <th>Other Goods and Services</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>const</th>
+      <td>-0.0007</td>
+      <td>-0.0161</td>
+      <td>-0.0041</td>
+      <td>0.0013</td>
+      <td>0.0331</td>
+      <td>-0.0095</td>
+    </tr>
+    <tr>
+      <th>L1.Food and Beverages</th>
+      <td>0.3095</td>
+      <td>0.1634</td>
+      <td>0.0322</td>
+      <td>0.0211</td>
+      <td>0.0246</td>
+      <td>0.0263</td>
+    </tr>
+    <tr>
+      <th>L1.Housing</th>
+      <td>0.2128</td>
+      <td>0.4944</td>
+      <td>0.1080</td>
+      <td>0.0710</td>
+      <td>0.2329</td>
+      <td>0.0767</td>
+    </tr>
+    <tr>
+      <th>L1.Apparel</th>
+      <td>-0.0030</td>
+      <td>0.0386</td>
+      <td>0.1370</td>
+      <td>0.0325</td>
+      <td>0.0444</td>
+      <td>0.0948</td>
+    </tr>
+    <tr>
+      <th>L1.Transportation</th>
+      <td>-0.0061</td>
+      <td>0.0746</td>
+      <td>0.1877</td>
+      <td>0.4257</td>
+      <td>0.0058</td>
+      <td>0.0181</td>
+    </tr>
+    <tr>
+      <th>L1.Medical Care</th>
+      <td>-0.0072</td>
+      <td>0.2118</td>
+      <td>0.1161</td>
+      <td>0.0501</td>
+      <td>0.4310</td>
+      <td>0.2606</td>
+    </tr>
+    <tr>
+      <th>L1.Other Goods and Services</th>
+      <td>0.0100</td>
+      <td>-0.0226</td>
+      <td>0.0071</td>
+      <td>-0.0352</td>
+      <td>0.1145</td>
+      <td>0.0097</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Tensor weights of Conv1D&#39;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">conv1d_weights</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bias&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">names</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tensor weights of Conv1D
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Food and Beverages</th>
+      <th>Housing</th>
+      <th>Apparel</th>
+      <th>Transportation</th>
+      <th>Medical Care</th>
+      <th>Other Goods and Services</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>bias</th>
+      <td>-0.0011</td>
+      <td>-0.0167</td>
+      <td>-0.0041</td>
+      <td>0.0014</td>
+      <td>0.0330</td>
+      <td>-0.0086</td>
+    </tr>
+    <tr>
+      <th>Food and Beverages</th>
+      <td>0.3154</td>
+      <td>0.1677</td>
+      <td>0.0322</td>
+      <td>0.0210</td>
+      <td>0.0253</td>
+      <td>0.0233</td>
+    </tr>
+    <tr>
+      <th>Housing</th>
+      <td>0.1997</td>
+      <td>0.4808</td>
+      <td>0.1080</td>
+      <td>0.0713</td>
+      <td>0.2302</td>
+      <td>0.0861</td>
+    </tr>
+    <tr>
+      <th>Apparel</th>
+      <td>-0.0014</td>
+      <td>0.0396</td>
+      <td>0.1370</td>
+      <td>0.0326</td>
+      <td>0.0447</td>
+      <td>0.0936</td>
+    </tr>
+    <tr>
+      <th>Transportation</th>
+      <td>-0.0037</td>
+      <td>0.0773</td>
+      <td>0.1877</td>
+      <td>0.4256</td>
+      <td>0.0063</td>
+      <td>0.0166</td>
+    </tr>
+    <tr>
+      <th>Medical Care</th>
+      <td>-0.0018</td>
+      <td>0.2197</td>
+      <td>0.1160</td>
+      <td>0.0493</td>
+      <td>0.4323</td>
+      <td>0.2514</td>
+    </tr>
+    <tr>
+      <th>Other Goods and Services</th>
+      <td>0.0105</td>
+      <td>-0.0227</td>
+      <td>0.0072</td>
+      <td>-0.0349</td>
+      <td>0.1146</td>
+      <td>0.0115</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="id1">
+<h3>Evaluation<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<p>The forecasting accuracy of VAR models, measured by train and test MSE, is compared across different lag orders.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate forecast errors for each observation and model</span>
+<span class="n">test_errors</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="nb">list</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxlags</span><span class="o">+</span><span class="mi">1</span><span class="p">)}</span>
+<span class="n">train_errors</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="nb">list</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxlags</span><span class="o">+</span><span class="mi">1</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxlags</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">scaled_data</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># test or train sample</span>
+    <span class="n">var_errors</span> <span class="o">=</span> <span class="n">train_errors</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ntrain</span> <span class="k">else</span> <span class="n">test_errors</span>
+    
+    <span class="c1"># error of unconditional mean forecast</span>
+    <span class="n">var_errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">ntrain</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
+
+    <span class="c1"># accumulate to error of VAR(p) model forecasts</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxlags</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">var_models</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">scaled_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">var_errors</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">pred</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Collect mean test and train set errors of all VAR(p) models</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;VAR models train and test set errors&#39;</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Train Error&#39;</span><span class="p">:</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;VAR(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+                                 <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">errors</span> <span class="ow">in</span> <span class="n">train_errors</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                 <span class="s1">&#39;Test Error&#39;</span><span class="p">:</span>  <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;VAR(</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+                                 <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">errors</span> <span class="ow">in</span> <span class="n">test_errors</span><span class="o">.</span><span class="n">items</span><span class="p">()}})</span>
+<span class="n">out</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>VAR models train and test set errors
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Train Error</th>
+      <th>Test Error</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>VAR(0)</th>
+      <td>1.009966</td>
+      <td>0.936672</td>
+    </tr>
+    <tr>
+      <th>VAR(1)</th>
+      <td>0.739496</td>
+      <td>0.757588</td>
+    </tr>
+    <tr>
+      <th>VAR(2)</th>
+      <td>0.696483</td>
+      <td>0.754189</td>
+    </tr>
+    <tr>
+      <th>VAR(3)</th>
+      <td>0.680224</td>
+      <td>0.739767</td>
+    </tr>
+    <tr>
+      <th>VAR(4)</th>
+      <td>0.671862</td>
+      <td>0.750212</td>
+    </tr>
+    <tr>
+      <th>VAR(5)</th>
+      <td>0.657304</td>
+      <td>0.739927</td>
+    </tr>
+    <tr>
+      <th>VAR(6)</th>
+      <td>0.647010</td>
+      <td>0.744329</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Error plots are generated to determine the optimal lag order for best predictive performance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot Errors</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)),</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Train Error&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)),</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Test Error&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">)</span>   <span class="c1"># dummy for legend labels</span>
+<span class="n">argmin</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;Test Error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">argmin</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">argmin</span><span class="p">][</span><span class="s1">&#39;Test Error&#39;</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Var(p) Forecast Errors&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;lag order of VAR(p)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Train Error&#39;</span><span class="p">,</span> <span class="s1">&#39;Test Error&#39;</span><span class="p">,</span>
+           <span class="sa">f</span><span class="s1">&#39;Min Test Error = </span><span class="si">{</span><span class="n">out</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">argmin</span><span class="p">][</span><span class="s2">&quot;Test Error&quot;</span><span class="p">]</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span>
+          <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/626817fb6c9b3a32d2523cf9d3bdffd4a00fdf264d688d6ca1e409bf2e5c0ac6.png" src="_images/626817fb6c9b3a32d2523cf9d3bdffd4a00fdf264d688d6ca1e409bf2e5c0ac6.png" />
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Philipp Krähenbühl, 2020-2024, “AI394T Deep Learning course materials”, retrieved from
+<a class="reference external" href="https://www.philkr.net/dl_class/material">https://www.philkr.net/dl_class/material</a> and <a class="reference external" href="https://ut.philkr.net/deeplearning/">https://ut.philkr.net/deeplearning/</a></p>
+<p>Philipp Krähenbühl, 2025, “AI395T Advances in Deep Learning course materials”, retrieved from <a class="reference external" href="https://ut.philkr.net/advances_in_deeplearning/">https://ut.philkr.net/advances_in_deeplearning/</a></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="6.3_deep_learning.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Deep Learning</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="6.5_recurrent_net.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Recurrent Neural Networks</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolutions">Convolutions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#image-filters">Image Filters</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#receptive-field-and-output-size">Receptive field and output size</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computer-vision">Computer vision</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#temporal-convolutional-networks-tcn">Temporal convolutional networks (TCN)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#data-preparation">Data preparation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training">Training</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation">Evaluation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-autoregression">Vector Autoregression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lag-order">Lag order</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#var-1-and-conv1d">Var(1) and Conv1d</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Evaluation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

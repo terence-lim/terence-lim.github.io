@@ -1,0 +1,1236 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Fama-French Portfolio Sorts &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'fama_french';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Fama-Macbeth Cross-sectional Regressions" href="fama_macbeth.html" />
+    <link rel="prev" title="Jegadeesh-Titman Rolling Portfolios" href="jegadeesh_titman.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="weekly_reversal.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="economic_releases.html">Economic Data Revisions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="econometric_forecast.html">Econometric Forecasts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bond_returns.html">Bond Returns and Risks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conditional_volatility.html">Conditional Volatility and VaR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="covariance_matrix.html">Covariance Matrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customer_ego.html">Principal Customers Graph</a></li>
+<li class="toctree-l1"><a class="reference internal" href="industry_community.html">Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bea_centrality.html">Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="link_prediction.html">Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial_regression.html">Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="business_description.html">Business Text Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classification_models.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regression_models.html">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deep_classifier.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fomc_language.html">FedSpeak Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sentiment_llm.html">LLM Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summarization_llm.html">LLM Text Summarization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finetune_llm.html">LLM Finetuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rag_agent.html">RAG, Chatbots and Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2Ffama_french.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/fama_french.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fama-French Portfolio Sorts</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-fundemntals">Stock fundemntals</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compustat">Compustat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bivariate-sorts">Bivariate sorts</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hml">HML</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#smb">SMB</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-regression">Linear regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#value-effect">Value effect</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#small-firm-effect">Small firm effect</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structural-break">Structural break</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="fama-french-portfolio-sorts">
+<h1>Fama-French Portfolio Sorts<a class="headerlink" href="#fama-french-portfolio-sorts" title="Permalink to this heading">#</a></h1>
+<p><em>The way to become rich is to put all your eggs in one basket and then watch that basket</em> - Andrew Carnegie</p>
+<p>Concepts:</p>
+<ul class="simple">
+<li><p>Fama-French research factors</p></li>
+<li><p>Bivariate portfolio sorts</p></li>
+<li><p>Linear Regression</p></li>
+<li><p>Structural Break</p></li>
+</ul>
+<p>References:</p>
+<ul class="simple">
+<li><p>Eugene F. Fama and Kenneth R. French (1992), “The Cross-Section of Expected Stock Returns”, Journal of Finance, Volume 47, Issue 2, June 1992, pages 427-465</p></li>
+<li><p>Eugene Fama and Kenneth French (2023), “Production of U.S. Rm-Rf, SMB,
+and HML in the Fama-French Data Library”, Chicago Booth Paper No. 23-22</p></li>
+<li><p>FRM Exam I Book Quantative Analysis Chapter 7-8</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">skew</span><span class="p">,</span> <span class="n">kurtosis</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span><span class="p">,</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">CRSPBuffer</span><span class="p">,</span> <span class="n">Signals</span><span class="p">,</span> <span class="n">Benchmarks</span><span class="p">,</span> <span class="n">PSTAT</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">plot_date</span>
+<span class="kn">from</span> <span class="nn">finds.backtesting</span> <span class="kn">import</span> <span class="n">bivariate_sorts</span><span class="p">,</span> <span class="n">BackTest</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">plot_date</span><span class="p">,</span> <span class="n">plot_scatter</span><span class="p">,</span> <span class="n">plot_hist</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">CRSP_DATE</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># %matplotlib qt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">pstat</span> <span class="o">=</span> <span class="n">PSTAT</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">signals</span> <span class="o">=</span> <span class="n">Signals</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bench</span> <span class="o">=</span> <span class="n">Benchmarks</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">backtest</span> <span class="o">=</span> <span class="n">BackTest</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">bench</span><span class="p">,</span> <span class="n">rf</span><span class="o">=</span><span class="s1">&#39;RF&#39;</span><span class="p">,</span> <span class="n">max_date</span><span class="o">=</span><span class="n">CRSP_DATE</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">LAST_DATE</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># last monthly rebalance date</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="stock-fundemntals">
+<h2>Stock fundemntals<a class="headerlink" href="#stock-fundemntals" title="Permalink to this heading">#</a></h2>
+<section id="compustat">
+<h3>Compustat<a class="headerlink" href="#compustat" title="Permalink to this heading">#</a></h3>
+<p>Compustat is a database of financial statements and other market information on active and inactive US and international companies, which is commonly used by academic and industry researchers.</p>
+<p>Calculate book-to-price ratios from financial statements:</p>
+<ul class="simple">
+<li><p>load items from Compustat Annual</p></li>
+<li><p>Construct HML as shareholders equity plus investment tax credits,
+less preferred stock, divided by December market cap.</p></li>
+<li><p>Require 6 month reporting lag and at least two years history in Compustat</p></li>
+<li><p>Do not add Deferred Taxes and Investment Tax Credit to BE for
+fiscal years ending in 1993 or later (FASB 109, which was issued in 1993,
+improves the accounting for deferred income taxes)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;hml&#39;</span>
+<span class="n">lag</span> <span class="o">=</span> <span class="mi">6</span>               <span class="c1"># number of months to lag fundamental data</span>
+<span class="c1"># retrieve data fields from compustat, linked by permno</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pstat</span><span class="o">.</span><span class="n">get_linked</span><span class="p">(</span><span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;annual&#39;</span><span class="p">,</span>
+                      <span class="n">date_field</span> <span class="o">=</span> <span class="s1">&#39;datadate&#39;</span><span class="p">,</span>
+                      <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;seq&#39;</span><span class="p">,</span> <span class="s1">&#39;pstk&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkrv&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkl&#39;</span><span class="p">,</span> <span class="s1">&#39;txditc&#39;</span><span class="p">],</span>
+                      <span class="n">where</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;indfmt = &#39;INDL&#39;&quot;</span>
+                               <span class="s2">&quot;  AND datafmt = &#39;STD&#39;&quot;</span>
+                               <span class="s2">&quot;  AND curcd = &#39;USD&#39; &quot;</span>
+                               <span class="s2">&quot;  AND popsrc = &#39;D&#39;&quot;</span>
+                               <span class="s2">&quot;  AND consol = &#39;C&#39;&quot;</span>
+                               <span class="s2">&quot;  AND seq &gt; 0 &quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># subtract preferred stock</span>
+<span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pstkrv&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pstkl&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pstkrv&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;pstk&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># do not add back deferred investment tax credit for fiscal years in 1993 or later</span>
+<span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;seq&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+             <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;txditc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datadate&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">10000</span> <span class="o">&lt;=</span> <span class="mi">1993</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">][[</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="s1">&#39;datadate&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># count years in Compustat        </span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span><span class="s1">&#39;datadate&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;gvkey&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span>   
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># construct b/m ratio</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;rebaldate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">datadate</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datadate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;datadate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">datadate</span><span class="p">)</span>
+    <span class="n">rebaldate</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">datadate</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lag</span><span class="p">))</span> <span class="c1"># 6 month lag</span>
+    <span class="n">capdate</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">datadate</span><span class="p">)</span>   <span class="c1"># Dec mktcap</span>
+    <span class="k">if</span> <span class="n">rebaldate</span> <span class="o">&gt;=</span> <span class="n">CRSP_DATE</span> <span class="ow">or</span> <span class="n">capdate</span> <span class="o">&gt;=</span> <span class="n">CRSP_DATE</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rebaldate</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;cap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_cap</span><span class="p">(</span><span class="n">capdate</span><span class="p">,</span> <span class="n">use_permco</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
+                           <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;permno&#39;</span><span class="p">])</span>\
+                           <span class="o">.</span><span class="n">values</span>
+<span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">/=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>  <span class="c1"># 2+ years in Compustat</span>
+<span class="n">signals</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 747/747 [00:02&lt;00:00, 290.07it/s]
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>223346
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bivariate-sorts">
+<h2>Bivariate sorts<a class="headerlink" href="#bivariate-sorts" title="Permalink to this heading">#</a></h2>
+<p>Independent bivariate sorts create portfolios sorted by the two variables: book-to-price ratio and market capitalization size. The portfolios, which are constructed at the end of each June, are the intersections of 2 portfolios formed on size (market equity, ME) and 3 portfolios formed on the ratio of book equity to market equity (BE/ME). The size breakpoint for year t is the median NYSE market equity at the end of June of year t. Stocks are market cap-weighted within each of the 6 portfolios.</p>
+<p>HML (High Minus Low) is the equal-weighted average return on the two value portfolios minus the average return on the two growth portfolios. SMB (Small Minus Big) is the equal-weighted average return on the three small portfolios minus the average return on the three big portfolios.</p>
+<p><strong>Casual Analysis</strong></p>
+<p>This sorting procedure can be motivated by the field of casual analysis, where a submodel of propensity scores is often used to reduce the influence of confounding variables by creating groups with similar probabilities of receiving a treatment. Propensity scores are typically calculated using statistical methods such as logistic regression to predict the probability of receiving the treatment. Once propensity scores are obtained, researchers can use them in different ways:</p>
+<ul class="simple">
+<li><p>Stratification: Grouping subjects into strata based on propensity scores and analyzing each stratum separately.</p></li>
+<li><p>Matching: Pairing treated and control subjects with similar propensity scores.</p></li>
+<li><p>Regression Adjustment: Including the propensity score as a covariate in regression models to adjust for imbalances in baseline characteristics.</p></li>
+</ul>
+<p>Note that the values of company size variable directly enters into the calculation of book-to-market ratio (as its denominator). Just as propensity score analysis helps to mitigate the effects of confounding variables and improve the validity of causal inference in observational studies, the matching provided by bivariate sorting can more accurately estimate the returns to the Value outcome while controlling for any Small Firm effect.</p>
+<section id="hml">
+<h3>HML<a class="headerlink" href="#hml" title="Permalink to this heading">#</a></h3>
+<p>Compute High Minus Low book-to-price monthly returns and compare to Fama-French research factor</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label</span><span class="p">,</span> <span class="n">benchname</span> <span class="o">=</span> <span class="s1">&#39;hml&#39;</span><span class="p">,</span> <span class="s1">&#39;HML(mo)&#39;</span>
+<span class="n">rebalend</span> <span class="o">=</span> <span class="n">LAST_DATE</span>
+<span class="n">rebalbeg</span> <span class="o">=</span> <span class="mi">19700101</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># preload monthly dataset into memory</span>
+<span class="n">monthly</span> <span class="o">=</span> <span class="n">CRSPBuffer</span><span class="p">(</span><span class="n">stocks</span><span class="o">=</span><span class="n">crsp</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span>
+                     <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="s1">&#39;retx&#39;</span><span class="p">,</span> <span class="s1">&#39;prc&#39;</span><span class="p">],</span>
+                     <span class="n">beg</span><span class="o">=</span><span class="mi">19251201</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">CRSP_DATE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hml</span><span class="p">,</span> <span class="n">smb</span> <span class="o">=</span> <span class="n">bivariate_sorts</span><span class="p">(</span><span class="n">stocks</span><span class="o">=</span><span class="n">monthly</span><span class="p">,</span>
+                           <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                           <span class="n">signals</span><span class="o">=</span><span class="n">signals</span><span class="p">,</span>
+                           <span class="n">rebalbeg</span><span class="o">=</span><span class="n">rebalbeg</span><span class="p">,</span>
+                           <span class="n">rebalend</span><span class="o">=</span><span class="n">rebalend</span><span class="p">,</span>
+                           <span class="n">window</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                           <span class="n">months</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Helpers to show histograms and comparisons of portfolio returns</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_ff</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to scatter plot and compare portfolio returns&quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;excess&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">})</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">plot_date</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot; vs &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plot_scatter</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">abline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;corr=</span><span class="si">{</span><span class="n">corr</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;R-squared of </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">benchname</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">corr</span><span class="o">*</span><span class="n">corr</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_summary</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to plot histogram and statistics of portfolio returns&quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+    <span class="n">kurt</span> <span class="o">=</span> <span class="n">kurtosis</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fisher</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># excess kurtosis</span>
+    <span class="n">skewness</span> <span class="o">=</span> <span class="n">skew</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Monthly rebalances (</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;skewness=</span><span class="si">{</span><span class="n">skewness</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, excess kurtosis=</span><span class="si">{</span><span class="n">kurt</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">label</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot histogram and comparison of HML returns</span>
+<span class="n">holdings</span> <span class="o">=</span> <span class="n">hml</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">backtest</span><span class="p">(</span><span class="n">monthly</span><span class="p">,</span> <span class="n">holdings</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">backtest</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">benchname</span><span class="p">],</span> <span class="n">rebalbeg</span><span class="p">,</span> <span class="n">LAST_DATE</span><span class="p">)</span>
+<span class="n">plot_ff</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+<span class="n">plot_summary</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">benchname</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;R-squared of hml vs HML(mo) (19700227 - 20231130): 0.9786
+</pre></div>
+</div>
+<img alt="_images/e4f9ddc254a25bd0b112a71e3d377675de54d60f5673170e50f759df9d5a1221.png" src="_images/e4f9ddc254a25bd0b112a71e3d377675de54d60f5673170e50f759df9d5a1221.png" />
+<img alt="_images/2756b39702a8cd278d8bc2cc344815243e2f2e2fdbd2865f7e4b9b782809fdf9.png" src="_images/2756b39702a8cd278d8bc2cc344815243e2f2e2fdbd2865f7e4b9b782809fdf9.png" />
+</div>
+</div>
+</section>
+<section id="smb">
+<h3>SMB<a class="headerlink" href="#smb" title="Permalink to this heading">#</a></h3>
+<p>Compare Small-Minus-Big monthly returns and compare to Fama-French research factor</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot histogram and comparison of SMB returns</span>
+<span class="n">label</span><span class="p">,</span> <span class="n">benchname</span> <span class="o">=</span> <span class="s1">&#39;smb&#39;</span><span class="p">,</span> <span class="s1">&#39;SMB(mo)&#39;</span>
+<span class="n">holdings</span> <span class="o">=</span> <span class="n">smb</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">backtest</span><span class="p">(</span><span class="n">monthly</span><span class="p">,</span> <span class="n">holdings</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">backtest</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">benchname</span><span class="p">],</span> <span class="n">rebalbeg</span><span class="p">,</span> <span class="n">LAST_DATE</span><span class="p">)</span>
+<span class="n">plot_ff</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+<span class="n">plot_summary</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">benchname</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;R-squared of smb vs SMB(mo) (19700227 - 20231130): 0.9652
+</pre></div>
+</div>
+<img alt="_images/9d0f7b39855ab4f0ee728794759fbc53cd6c123bbd54ab8ec37eafcb34a41e96.png" src="_images/9d0f7b39855ab4f0ee728794759fbc53cd6c123bbd54ab8ec37eafcb34a41e96.png" />
+<img alt="_images/f15880c9b789ffba4268cc751fae3bd44d4b8a21d45dcdfff0143e550b122699.png" src="_images/f15880c9b789ffba4268cc751fae3bd44d4b8a21d45dcdfff0143e550b122699.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="linear-regression">
+<h2>Linear regression<a class="headerlink" href="#linear-regression" title="Permalink to this heading">#</a></h2>
+<p><strong>Simple Linear Regression</strong></p>
+<p>The simple linear regression (SLR) model relates a continuous
+response (or dependent) variable <span class="math notranslate nohighlight">\(y_i\)</span> with one predictor (or
+explanatory or independent) variable <span class="math notranslate nohighlight">\(x_i\)</span> and an
+error term <span class="math notranslate nohighlight">\(\epsilon_i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[y_i = f(x_i) + \epsilon_i = a + b
+x_i + \epsilon_i\]</div>
+<p>Coefficent estimates of the slope <span class="math notranslate nohighlight">\(b\)</span> and intercept <span class="math notranslate nohighlight">\(a\)</span> are chosen to minimize the residual sum of squares:</p>
+<div class="math notranslate nohighlight">
+\[\hat{b} = \dfrac{\sum_{i=1}^{n} (x_i -
+    \bar{x})(y_i - \hat{y})}{\sum_{i=1}^{n} (x_i - \bar{x})^2}\]</div>
+<div class="math notranslate nohighlight">
+\[\hat{a} = \bar{y} - \hat{b} \bar{x}\]</div>
+<ul class="simple">
+<li><p>Residuals are the difference between the observed response values
+and the response values predicted by the model, <span class="math notranslate nohighlight">\(e_i = y_i -
+\hat{y}_i\)</span>.</p></li>
+<li><p>Residual sum of squares (RSS) over all observations is <span class="math notranslate nohighlight">\(RSS = e^2_1 +
+e^2_2 + ... + e^2_n\)</span> or equivalently <span class="math notranslate nohighlight">\(RSS = \sum_{i=1}^n (y_i -
+\hat{y}_i)^2\)</span>.</p></li>
+<li><p>Mean square error (MSE) is an estimate of the variance of the
+residuals <span class="math notranslate nohighlight">\(s^2 = \hat{\sigma}^2 = \frac{1}{n-2} \sum_{i=1}^n (y_i -
+\hat{y}_i)^2\)</span>.</p></li>
+<li><p>Residual standard error (RSE) or residual standard deviation is
+the estimate of the (square root of the) variance of the residuals.
+Standard error tells us the average amount that the estimate differs
+from the actual value. The residual standard error is the estimate
+of the (square root of the) variance of the residuals <span class="math notranslate nohighlight">\(\hat{s}
+\equiv RSE = \sqrt{RSS/(n - 2)}\)</span>.</p></li>
+</ul>
+<p>The estimators of the coefficients are normally distributed in large samples.Therefore, tests of a hypothesis about a regression parameter are implemented using a t-test. The standard errors associated with linear regression coefficient and mean response estimates are:</p>
+<ul class="simple">
+<li><p>Slope: <span class="math notranslate nohighlight">\(se(\hat{b}) = \sqrt{\dfrac{s^{2}}{\sum_{i=1}^{n}(x_{i} - \overline{x})^{2}}}\)</span></p></li>
+<li><p>Intercept: <span class="math notranslate nohighlight">\(se(\hat{a}) = \sqrt{s^{2}[\dfrac{1}{n} + \dfrac{\overline{x}^{2}}{\sum_{i=1}^{n}(x_{i} - \overline{x})^{2}}]}\)</span></p></li>
+<li><p>Mean response: <span class="math notranslate nohighlight">\(se(\hat{y}) = \sqrt{s^2 [\dfrac{1}{n} + \dfrac{(x -
+    \bar{x})^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2}]}\)</span></p></li>
+<li><p>Confidence intervals can be computed from standard errors. A 95% confidence interval is defined as a
+range of values such that with 95% probability, the range will
+contain the true unknown value of the parameter.  The confidence
+interval for coefficient estimates is:\ <span class="math notranslate nohighlight">\(b_j \pm t_{n - (k + 1), 1 -
+  \frac{\alpha}{2}}\ se(b_j)\)</span>, where <span class="math notranslate nohighlight">\(k\)</span>, the number of regressors,
+equals 1 for SLR.</p></li>
+<li><p>Prediction interval for a new response is
+<span class="math notranslate nohighlight">\(se(\hat{y}_{n+1}) = \sqrt{s^2 (1 + \dfrac{1}{n} + \dfrac{(x -
+    \bar{x})^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2})}\)</span></p></li>
+</ul>
+<p><strong>Multiple Linear Regression</strong></p>
+<p>With multiple regressors, the linear model <span class="math notranslate nohighlight">\(y = b_0 + b_1 x_1 + ... +
+b_k x_k + \epsilon\)</span> has coefficient estimates:
+$<span class="math notranslate nohighlight">\(\hat{b} = (X^T X)^{-1} X^T y\)</span>$</p>
+<p>The coefficient <span class="math notranslate nohighlight">\(b_{j}\)</span> quantifies the association between the
+<span class="math notranslate nohighlight">\(j\)</span> ‘th predictor and the response. It is the average effect on Y of a
+one unit increase in <span class="math notranslate nohighlight">\(X_j\)</span>, holding all other predictors fixed.</p>
+<ul class="simple">
+<li><p>Sum of squares total (SST) measures the total variance in the
+response Y, and can be thought of as the amount of variability
+inherent in the response before the regression is performed.
+<span class="math notranslate nohighlight">\(\mathrm{SST} = \sum_{i=1}^n (y_i - \overline{y})^2\)</span> measures the total
+variance in the response Y.</p></li>
+<li><p>Sum of squares regression (SSR) measures the total amount
+variance captured by the regression model:
+<span class="math notranslate nohighlight">\(\mathrm{SSR} = \sum{i=1}^n  (\hat{y}_i - \overline{y})^2\)</span></p></li>
+<li><p>Sum of squares error (SSE) measures the total variance of the
+response not explained by the regression model.  In the linear
+regression context, we may intepret total deviation to equal the
+deviation not explained by the explanatory variables plus deviation
+explained by the explanatory variables:
+<span class="math notranslate nohighlight">\((y_i - \overline{y}) = (y_i - \hat{y}_i) + (\hat{y}_i - \overline{y}_i)\)</span>.<br />
+Squaring each side
+and summing over all observations yields for the total sum of
+squared deviations <span class="math notranslate nohighlight">\(SST = \sum_{i=1}^n (y_i - \hat{y}_i)^2 +
+\sum_{i=1}^n (\hat{y}_i - \overline{y}_i)^2 = SSE + SSR\)</span>, where the
+sum of the cross-product terms turns out to be zero.</p></li>
+<li><p><span class="math notranslate nohighlight">\(R^2\)</span> statistic or coefficient of determination measures the
+proportion of variability in Y that can be explained using X. It is
+also identical to the squared correlation between X and Y. An <span class="math notranslate nohighlight">\(R^2\)</span>
+statistic that is close to 1 indicates that a large proportion of
+the variability in the response has been explained by the
+regression. A number near 0 indicates that the regression did not
+explain much of the variability in the response.  The <span class="math notranslate nohighlight">\(R^2\)</span>
+statistic provides a relative measure of the quality of a linear
+regression fit <span class="math notranslate nohighlight">\(R^2 = 1 - \frac{\mathrm{RSS}}{\mathrm{SST}}\)</span>, and
+always takes on a value between 0 and 1, and is independent of the
+scale. <span class="math notranslate nohighlight">\(R^2\)</span> is identical to the squared correlation between <span class="math notranslate nohighlight">\(X\)</span> and
+<span class="math notranslate nohighlight">\(Y\)</span>.</p></li>
+<li><p>Adjusted <span class="math notranslate nohighlight">\(R^2\)</span>: The usual <span class="math notranslate nohighlight">\(R^2\)</span> always increases (since residual
+sum of squares RSS always decreases) as more variables are
+added. The intuition behind the adjusted <span class="math notranslate nohighlight">\(R^2\)</span> is that once all of
+the correct variables have been included in the model, adding noise
+variables will lead to a decrease in the statistic. In theory, the
+model with the largest adjusted <span class="math notranslate nohighlight">\(R^2\)</span> will have only correct
+variables and no noise variables.</p></li>
+<li><p>Partial correlation coefficients, which measure the correlation between <span class="math notranslate nohighlight">\(y\)</span> and the
+<span class="math notranslate nohighlight">\(j\)</span> ‘th explanatory variable <span class="math notranslate nohighlight">\(x_j\)</span> controlling for other explanatory
+variables, can also be obtained by running only one regression:
+$<span class="math notranslate nohighlight">\(r(y, x_j |
+x_1,x_2,...,x_{j-1},x_{j+1},...,x_k) = \frac{t(b_j)}{\sqrt{t(b_j)^2
+    + n - (k+1)}}\)</span><span class="math notranslate nohighlight">\(
+where \)</span>t(b_j)<span class="math notranslate nohighlight">\( is the t-ratio for \)</span>b_j<span class="math notranslate nohighlight">\( from a
+regression of \)</span>y<span class="math notranslate nohighlight">\( on \)</span>x_1,…,x_k<span class="math notranslate nohighlight">\( (including the variable \)</span>x_j$).</p></li>
+<li><p>t-statistic or t-ratio: <span class="math notranslate nohighlight">\(t(b_j) = \dfrac{b_j}{se(b_j)}\)</span> can be
+interpreted to be the number of standard errors that <span class="math notranslate nohighlight">\(b_j\)</span> is away
+from zero. In a t-test, the null hypothesis (<span class="math notranslate nohighlight">\(H_0: \beta_j = 0\)</span>) is
+rejected in favor of the alternative if the absolute value of the
+t-ratio <span class="math notranslate nohighlight">\(|t(b_j)|\)</span> exceeds a t-value, denoted <span class="math notranslate nohighlight">\(t_{n - (k + 1), 1 -
+  \frac{\alpha}{2}}\)</span>, equal to the <span class="math notranslate nohighlight">\((1 - \frac{\alpha}{2})\)</span> ‘th
+percentile from the t-distribution using <span class="math notranslate nohighlight">\(df = n - ( k + 1)\)</span> degrees
+of freedom.</p></li>
+</ul>
+<p>The t-test is not directly applicable when testing hypotheses that involve more than one parameter, because the parameter estimators can be correlated. Instead, a common alternative called the F-test compares the fit of the model (measured using the RSS) when the null hypothesis is true relative to the fit of the model without the restriction on the parameters assumed by the null. To test whether all regression slope coefficients are zero <span class="math notranslate nohighlight">\(H_0: b_1 = 
+  ... = b_p = 0\)</span>, versus the
+alternative <span class="math notranslate nohighlight">\(H_a :\)</span> at least one <span class="math notranslate nohighlight">\(b_j\)</span> is non-zero, compute the statistic. which has a <span class="math notranslate nohighlight">\(F(p, n-p-1)\)</span> distribution:</p>
+<div class="math notranslate nohighlight">
+\[F = \dfrac{(TSS - RSS)/p}{RSS/(n - p - 1)}\]</div>
+<p>Partial F-test: Sometimes, we want to test that a particular
+subset of <span class="math notranslate nohighlight">\(q\)</span> of the coefficients are zero. In this case we fit a
+second model that uses all the variables except those last <span class="math notranslate nohighlight">\(q\)</span>, then
+compute residual sum of squares for that model and the appropriate
+F-statistic, which has a <span class="math notranslate nohighlight">\(F(p-q, n-p-1)\)</span> distribution:</p>
+<div class="math notranslate nohighlight">
+\[F = \dfrac{(RSS_q - RSS)/(p - q)}{RSS/(n - p - 1)}\]</div>
+<section id="value-effect">
+<h3>Value effect<a class="headerlink" href="#value-effect" title="Permalink to this heading">#</a></h3>
+<p>The value effect refers to the tendency of stocks with low price-to-book ratios (value stocks) to outperform stocks with high price-to-book ratios (growth stocks) over the long term.  The value investing approach, often associated with Benjamin Graham and David Dodd, emphasizes investing in stocks that are undervalued based on their intrinsic value, which is determined through fundamental analysis of a company’s financials and business prospects.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linear regression on Mkt-Rf and intercept</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;HML(mo)&quot;</span><span class="p">,</span> <span class="s2">&quot;Mkt-RF(mo)&quot;</span><span class="p">]</span>
+<span class="n">formula</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Q(&quot;</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;) ~ &#39;</span> <span class="o">+</span> <span class="s2">&quot; + &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Q(&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;)&#39;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">beg</span><span class="o">=</span><span class="mi">19620701</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">20991231</span><span class="p">)</span>
+<span class="n">lm</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;HAC&#39;</span><span class="p">,</span> <span class="n">cov_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;maxlags&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Period: 19620731-20240430
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Q(&quot;HML(mo)&quot;)   R-squared:                       0.041
+Model:                            OLS   Adj. R-squared:                  0.040
+Method:                 Least Squares   F-statistic:                     8.703
+Date:                Sat, 29 Jun 2024   Prob (F-statistic):            0.00328
+Time:                        09:53:49   Log-Likelihood:                 1570.5
+No. Observations:                 742   AIC:                            -3137.
+Df Residuals:                     740   BIC:                            -3128.
+Df Model:                           1                                         
+Covariance Type:                  HAC                                         
+===================================================================================
+                      coef    std err          z      P&gt;|z|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept           0.0038      0.001      2.657      0.008       0.001       0.007
+Q(&quot;Mkt-RF(mo)&quot;)    -0.1349      0.046     -2.950      0.003      -0.224      -0.045
+==============================================================================
+Omnibus:                       54.388   Durbin-Watson:                   1.662
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              246.485
+Skew:                          -0.044   Prob(JB):                     2.99e-54
+Kurtosis:                       5.822   Cond. No.                         22.3
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 6 lags and without small sample correction
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="small-firm-effect">
+<h3>Small firm effect<a class="headerlink" href="#small-firm-effect" title="Permalink to this heading">#</a></h3>
+<p>The small firm effect, also known as the size effect, was documented by Rolf Banz in 1981, showing that small-cap stocks tend to have higher risk-adjusted returns than large-cap stocks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Linear regression on Mkt-Rf, HML and intercept</span>
+<span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SMB(mo)&quot;</span><span class="p">,</span> <span class="s2">&quot;HML(mo)&quot;</span><span class="p">,</span> <span class="s2">&quot;Mkt-RF(mo)&quot;</span><span class="p">]</span>
+<span class="n">formula</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Q(&quot;</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;) ~ &#39;</span> <span class="o">+</span> <span class="s2">&quot; + &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Q(&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;)&#39;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">beg</span><span class="o">=</span><span class="mi">19620701</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">20991231</span><span class="p">)</span>
+<span class="n">lm</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;HAC&#39;</span><span class="p">,</span> <span class="n">cov_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;maxlags&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Period: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lm</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Period: 19620731-20240430
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Q(&quot;SMB(mo)&quot;)   R-squared:                       0.099
+Model:                            OLS   Adj. R-squared:                  0.096
+Method:                 Least Squares   F-statistic:                     28.04
+Date:                Sat, 29 Jun 2024   Prob (F-statistic):           1.83e-12
+Time:                        09:53:49   Log-Likelihood:                 1578.2
+No. Observations:                 742   AIC:                            -3150.
+Df Residuals:                     739   BIC:                            -3137.
+Df Model:                           2                                         
+Covariance Type:                  HAC                                         
+===================================================================================
+                      coef    std err          z      P&gt;|z|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept           0.0008      0.001      0.654      0.513      -0.002       0.003
+Q(&quot;HML(mo)&quot;)       -0.1046      0.088     -1.188      0.235      -0.277       0.068
+Q(&quot;Mkt-RF(mo)&quot;)     0.1874      0.029      6.533      0.000       0.131       0.244
+==============================================================================
+Omnibus:                      104.065   Durbin-Watson:                   2.036
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              717.914
+Skew:                           0.395   Prob(JB):                    1.28e-156
+Kurtosis:                       7.754   Cond. No.                         34.8
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 6 lags and without small sample correction
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="structural-break">
+<h2>Structural break<a class="headerlink" href="#structural-break" title="Permalink to this heading">#</a></h2>
+<p>The Chow F-test is normally used in the analysis of time series to
+test the presence of a structural change.  We fit separate models
+before and after a posited breakpoint – in this case that the mean
+returns to HML are different before and after its 1993 publication.
+The null hypothesis of the Chow test is that estimated
+coefficients of the two submodels are equal, which would be equal
+a single restricted model estimated from the full data sample.</p>
+<p>chow = <span class="math notranslate nohighlight">\(\dfrac{(RSS -
+(RSS_1 + RSS_2))/K}{(RSS_1 + RSS_2) / (N - 2K)}\)</span> follows a <span class="math notranslate nohighlight">\(F(K,
+N-2K)\)</span> distribution</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run restricted and unregression models</span>
+<span class="c1">#formula = f&#39;Q(&quot;HML(mo)&quot;)~ &#39;</span>
+<span class="n">bp</span> <span class="o">=</span> <span class="mi">19931231</span>  <span class="c1"># breakpoint date</span>
+<span class="n">lm1</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">&lt;=</span><span class="n">bp</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Sub Model 1 (</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">):&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lm1</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<span class="n">lm2</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">&gt;</span><span class="n">bp</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Sub Model 2 (</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">):&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lm2</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+<span class="n">lm0</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Restricted Model (coefficient is equal):&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lm0</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sub Model 1 (19620731-19931231):
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Q(&quot;SMB(mo)&quot;)   R-squared:                       0.133
+Model:                            OLS   Adj. R-squared:                  0.128
+Method:                 Least Squares   F-statistic:                     28.70
+Date:                Sat, 29 Jun 2024   Prob (F-statistic):           2.52e-12
+Time:                        09:53:49   Log-Likelihood:                 835.73
+No. Observations:                 378   AIC:                            -1665.
+Df Residuals:                     375   BIC:                            -1654.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+===================================================================================
+                      coef    std err          t      P&gt;|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept           0.0013      0.001      0.946      0.345      -0.001       0.004
+Q(&quot;HML(mo)&quot;)        0.0344      0.057      0.602      0.548      -0.078       0.147
+Q(&quot;Mkt-RF(mo)&quot;)     0.2388      0.033      7.279      0.000       0.174       0.303
+==============================================================================
+Omnibus:                        7.675   Durbin-Watson:                   1.894
+Prob(Omnibus):                  0.022   Jarque-Bera (JB):               10.554
+Skew:                           0.151   Prob(JB):                      0.00511
+Kurtosis:                       3.761   Cond. No.                         43.0
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Sub Model 2 (19931231-20240430):
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Q(&quot;SMB(mo)&quot;)   R-squared:                       0.092
+Model:                            OLS   Adj. R-squared:                  0.087
+Method:                 Least Squares   F-statistic:                     18.33
+Date:                Sat, 29 Jun 2024   Prob (F-statistic):           2.62e-08
+Time:                        09:53:49   Log-Likelihood:                 751.71
+No. Observations:                 364   AIC:                            -1497.
+Df Residuals:                     361   BIC:                            -1486.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+===================================================================================
+                      coef    std err          t      P&gt;|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept          -0.0005      0.002     -0.291      0.771      -0.004       0.003
+Q(&quot;HML(mo)&quot;)       -0.1774      0.048     -3.665      0.000      -0.273      -0.082
+Q(&quot;Mkt-RF(mo)&quot;)     0.1610      0.036      4.482      0.000       0.090       0.232
+==============================================================================
+Omnibus:                       67.123   Durbin-Watson:                   2.149
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              539.650
+Skew:                           0.479   Prob(JB):                    6.55e-118
+Kurtosis:                       8.888   Cond. No.                         30.1
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+Restricted Model (coefficient is equal):
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Q(&quot;SMB(mo)&quot;)   R-squared:                       0.099
+Model:                            OLS   Adj. R-squared:                  0.096
+Method:                 Least Squares   F-statistic:                     40.48
+Date:                Sat, 29 Jun 2024   Prob (F-statistic):           2.07e-17
+Time:                        09:53:49   Log-Likelihood:                 1578.2
+No. Observations:                 742   AIC:                            -3150.
+Df Residuals:                     739   BIC:                            -3137.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+===================================================================================
+                      coef    std err          t      P&gt;|t|      [0.025      0.975]
+-----------------------------------------------------------------------------------
+Intercept           0.0008      0.001      0.709      0.479      -0.001       0.003
+Q(&quot;HML(mo)&quot;)       -0.1046      0.036     -2.873      0.004      -0.176      -0.033
+Q(&quot;Mkt-RF(mo)&quot;)     0.1874      0.024      7.764      0.000       0.140       0.235
+==============================================================================
+Omnibus:                      104.065   Durbin-Watson:                   2.036
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              717.914
+Skew:                           0.395   Prob(JB):                    1.28e-156
+Kurtosis:                       7.754   Cond. No.                         34.8
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Test statistic with K parameters and N observations follows a <span class="math notranslate nohighlight">\(F(K, N-2K)\)</span>-distribution</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute test statistic</span>
+<span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm0</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">RSS</span> <span class="o">=</span> <span class="n">lm0</span><span class="o">.</span><span class="n">resid</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lm0</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
+<span class="n">RSS1</span> <span class="o">=</span> <span class="n">lm1</span><span class="o">.</span><span class="n">resid</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lm1</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
+<span class="n">RSS2</span> <span class="o">=</span> <span class="n">lm2</span><span class="o">.</span><span class="n">resid</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">lm2</span><span class="o">.</span><span class="n">resid</span><span class="p">)</span>
+<span class="n">chow</span> <span class="o">=</span> <span class="p">((</span><span class="n">RSS</span> <span class="o">-</span> <span class="p">(</span><span class="n">RSS1</span> <span class="o">+</span> <span class="n">RSS2</span><span class="p">))</span> <span class="o">/</span> <span class="n">K</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="n">RSS1</span> <span class="o">+</span> <span class="n">RSS2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">))</span>
+<span class="n">chow</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">K</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(3.5195180596913436, 742, 3)
+</pre></div>
+</div>
+</div>
+</div>
+<p>p-value of Chow test statitic</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">-</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">chow</span><span class="p">,</span> <span class="n">dfn</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">dfd</span><span class="o">=</span><span class="n">N</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.014824495307899976
+</pre></div>
+</div>
+</div>
+</div>
+<p>5% critical value to reject null</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">dfn</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">dfd</span><span class="o">=</span><span class="n">N</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">K</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.617002908894789
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="jegadeesh_titman.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Jegadeesh-Titman Rolling Portfolios</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="fama_macbeth.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Fama-Macbeth Cross-sectional Regressions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-fundemntals">Stock fundemntals</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compustat">Compustat</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bivariate-sorts">Bivariate sorts</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hml">HML</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#smb">SMB</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-regression">Linear regression</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#value-effect">Value effect</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#small-firm-effect">Small firm effect</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structural-break">Structural break</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

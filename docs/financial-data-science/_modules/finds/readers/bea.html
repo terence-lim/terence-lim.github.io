@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers.bea &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.readers.bea</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.readers.bea</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Wrapper over BEA web api and data source files</span>
+
+<span class="sd">- Bureau of Economic Analysis: Input-Output Use Tables</span>
+
+<span class="sd">BEA released initial results of the comprehensive update of the</span>
+<span class="sd">National Economic Accounts (NEAs), which include the National Income</span>
+<span class="sd">and Product Accounts (NIPAs) and the Industry Economic Accounts</span>
+<span class="sd">(IEAs), on September 28, 2023.</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">finds.database.redisdb</span> <span class="kn">import</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.readers.readers</span> <span class="kn">import</span> <span class="n">requests_get</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="BEA"><a class="viewcode-back" href="../../../finds.readers.bea.html#finds.readers.bea.BEA">[docs]</a><span class="k">class</span> <span class="nc">BEA</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class and methods to retrieve BEA web api and IOUse datasets</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rdb: Redis connection instance to cache data from BEA web site</span>
+<span class="sd">        userid: Register with BEA to get key for their web api</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        short_desc: Reference Series maps BEA industry to custom descriptions</span>
+<span class="sd">        params: Some common parameter sets for BEA web api</span>
+<span class="sd">        </span>
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; bea = BEA()</span>
+<span class="sd">    &gt;&gt;&gt; df = bea.get(**BEA.items[&#39;industries&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; sql.load_dataframe(&#39;gdpindustry&#39;, df, index_label=None, if_exists=&#39;replace&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; df = bea.get(**BEA.items[&#39;ioUse&#39;], year=2018)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_xls_url</span> <span class="o">=</span> <span class="s1">&#39;https://apps.bea.gov/industry/xls/io-annual/&#39;</span>    
+
+    <span class="c1"># custom short labels BEA industries</span>
+    <span class="n">short_desc</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span><span class="s1">&#39;11&#39;</span><span class="p">:</span> <span class="s1">&#39;Agriculture&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;111CA&#39;</span><span class="p">:</span> <span class="s1">&#39;Farms&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;113FF&#39;</span><span class="p">:</span> <span class="s1">&#39;Forestry,fishing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;21&#39;</span><span class="p">:</span> <span class="s1">&#39;Mining&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;211&#39;</span><span class="p">:</span> <span class="s1">&#39;Oil, gas&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;212&#39;</span><span class="p">:</span> <span class="s1">&#39;Mining&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;213&#39;</span><span class="p">:</span> <span class="s1">&#39;Support mining&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;22&#39;</span><span class="p">:</span> <span class="s1">&#39;Utilities&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;23&#39;</span><span class="p">:</span> <span class="s1">&#39;Construction&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;31G&#39;</span><span class="p">:</span> <span class="s1">&#39;Manufacturing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;33DG&#39;</span><span class="p">:</span> <span class="s1">&#39;Durable goods&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;321&#39;</span><span class="p">:</span> <span class="s1">&#39;Wood&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;327&#39;</span><span class="p">:</span> <span class="s1">&#39;Nonmetallic&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;331&#39;</span><span class="p">:</span> <span class="s1">&#39;Metals&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;332&#39;</span><span class="p">:</span> <span class="s1">&#39;Fabricated metal&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;333&#39;</span><span class="p">:</span> <span class="s1">&#39;Machinery&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;334&#39;</span><span class="p">:</span> <span class="s1">&#39;Computer&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;335&#39;</span><span class="p">:</span> <span class="s1">&#39;Electrical&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;3361MV&#39;</span><span class="p">:</span> <span class="s1">&#39;Motor vehicles&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;3364OT&#39;</span><span class="p">:</span> <span class="s1">&#39;Transport equip&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;337&#39;</span><span class="p">:</span> <span class="s1">&#39;Furniture&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;339&#39;</span><span class="p">:</span> <span class="s1">&#39;Manufacturing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;31ND&#39;</span><span class="p">:</span> <span class="s1">&#39;Nondurable goods&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;311FT&#39;</span><span class="p">:</span> <span class="s1">&#39;Food&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;313TT&#39;</span><span class="p">:</span> <span class="s1">&#39;Textile&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;315AL&#39;</span><span class="p">:</span> <span class="s1">&#39;Apparel&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;322&#39;</span><span class="p">:</span> <span class="s1">&#39;Paper&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;323&#39;</span><span class="p">:</span> <span class="s1">&#39;Printing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;324&#39;</span><span class="p">:</span> <span class="s1">&#39;Petroleum, coal&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;325&#39;</span><span class="p">:</span> <span class="s1">&#39;Chemical&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;326&#39;</span><span class="p">:</span> <span class="s1">&#39;Plastics, rubber&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;42&#39;</span><span class="p">:</span> <span class="s1">&#39;Wholesale&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;44RT&#39;</span><span class="p">:</span> <span class="s1">&#39;Retail&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;441&#39;</span><span class="p">:</span> <span class="s1">&#39;Motor dealers&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;445&#39;</span><span class="p">:</span> <span class="s1">&#39;Food stores&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;452&#39;</span><span class="p">:</span> <span class="s1">&#39;General stores&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;4A0&#39;</span><span class="p">:</span> <span class="s1">&#39;Other retail&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;48&#39;</span> <span class="p">:</span> <span class="s1">&#39;Transportation&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;48TW&#39;</span><span class="p">:</span> <span class="s1">&#39;Transport, warehouse&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;481&#39;</span><span class="p">:</span> <span class="s1">&#39;Air transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;482&#39;</span><span class="p">:</span> <span class="s1">&#39;Rail transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;483&#39;</span><span class="p">:</span> <span class="s1">&#39;Water transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;484&#39;</span><span class="p">:</span> <span class="s1">&#39;Truck transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;485&#39;</span><span class="p">:</span> <span class="s1">&#39;Transit ground&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;486&#39;</span><span class="p">:</span> <span class="s1">&#39;Pipeline transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;487OS&#39;</span><span class="p">:</span> <span class="s1">&#39;Other transport&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;493&#39;</span><span class="p">:</span> <span class="s1">&#39;Warehousing, storage&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;51&#39;</span><span class="p">:</span> <span class="s1">&#39;Information&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;511&#39;</span><span class="p">:</span> <span class="s1">&#39;Publishing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;512&#39;</span><span class="p">:</span> <span class="s1">&#39;Motion picture&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;513&#39;</span><span class="p">:</span> <span class="s1">&#39;Broadcasting&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;514&#39;</span><span class="p">:</span> <span class="s1">&#39;Data processing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;52&#39;</span><span class="p">:</span> <span class="s1">&#39;Finance,insurance&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;521CI&#39;</span><span class="p">:</span> <span class="s1">&#39;Banks&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;523&#39;</span><span class="p">:</span> <span class="s1">&#39;Securities&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;524&#39;</span><span class="p">:</span> <span class="s1">&#39;Insurance&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;525&#39;</span><span class="p">:</span> <span class="s1">&#39;Funds, trusts&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;53&#39;</span><span class="p">:</span> <span class="s1">&#39;Real estate&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;531&#39;</span><span class="p">:</span> <span class="s1">&#39;Real estate&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;HS&#39;</span><span class="p">:</span> <span class="s1">&#39;Housing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;ORE&#39;</span><span class="p">:</span> <span class="s1">&#39;Other real estate&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;532RL&#39;</span><span class="p">:</span> <span class="s1">&#39;Rental&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;54&#39;</span><span class="p">:</span> <span class="s1">&#39;Professional services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;5411&#39;</span><span class="p">:</span> <span class="s1">&#39;Legal services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;5415&#39;</span><span class="p">:</span> <span class="s1">&#39;Computer services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;5412OP&#39;</span><span class="p">:</span> <span class="s1">&#39;Misc services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;55&#39;</span><span class="p">:</span> <span class="s1">&#39;Management&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;56&#39;</span><span class="p">:</span> <span class="s1">&#39;Administrative and waste management&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;561&#39;</span><span class="p">:</span> <span class="s1">&#39;Administrative&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;562&#39;</span><span class="p">:</span> <span class="s1">&#39;Waste management&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;6&#39;</span><span class="p">:</span> <span class="s1">&#39;Educational services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;61&#39;</span><span class="p">:</span> <span class="s1">&#39;Educational&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;62&#39;</span><span class="p">:</span> <span class="s1">&#39;Healthcare&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;621&#39;</span><span class="p">:</span> <span class="s1">&#39;Ambulatory&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;622HO&#39;</span><span class="p">:</span> <span class="s1">&#39;Hospitals, nursing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;622&#39;</span><span class="p">:</span> <span class="s1">&#39;Hospitals&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;623&#39;</span><span class="p">:</span> <span class="s1">&#39;Nursing&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;624&#39;</span><span class="p">:</span> <span class="s1">&#39;Social&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;7&#39;</span><span class="p">:</span> <span class="s1">&#39;Arts, entertain, rec, accommodation, food svcs&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;71&#39;</span><span class="p">:</span> <span class="s1">&#39;Arts, entertain, rec&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;711AS&#39;</span><span class="p">:</span> <span class="s1">&#39;Performing arts&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;713&#39;</span><span class="p">:</span> <span class="s1">&#39;Recreation&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;72&#39;</span><span class="p">:</span> <span class="s1">&#39;Accommodation. food svcs&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;721&#39;</span><span class="p">:</span> <span class="s1">&#39;Accommodation&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;722&#39;</span><span class="p">:</span> <span class="s1">&#39;Food services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;81&#39;</span><span class="p">:</span> <span class="s1">&#39;Other services&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="s1">&#39;Government&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GF&#39;</span><span class="p">:</span> <span class="s1">&#39;Federal&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GFG&#39;</span><span class="p">:</span> <span class="s1">&#39;General government&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GFGD&#39;</span><span class="p">:</span> <span class="s1">&#39;Defense&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GFGN&#39;</span><span class="p">:</span> <span class="s1">&#39;Nondefense&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GFE&#39;</span><span class="p">:</span> <span class="s1">&#39;Federal enterprises&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GSL&#39;</span><span class="p">:</span> <span class="s1">&#39;State local&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GSLG&#39;</span><span class="p">:</span> <span class="s1">&#39;State local general&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;GSLE&#39;</span><span class="p">:</span> <span class="s1">&#39;State local enterprises&#39;</span><span class="p">},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;label&#39;</span><span class="p">)</span>
+    
+
+    <span class="c1"># group BEA IO-Use table coarser by vintage year    </span>
+    <span class="n">_bea_vintages</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">9999</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;531&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;HS&#39;</span><span class="p">,</span><span class="s1">&#39;ORE&#39;</span><span class="p">]},</span>   
+        <span class="mi">1963</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;48&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;481&#39;</span><span class="p">,</span><span class="s1">&#39;482&#39;</span><span class="p">,</span><span class="s1">&#39;483&#39;</span><span class="p">,</span><span class="s1">&#39;484&#39;</span><span class="p">,</span><span class="s1">&#39;485&#39;</span><span class="p">,</span><span class="s1">&#39;486&#39;</span><span class="p">,</span><span class="s1">&#39;487OS&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;51&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;511&#39;</span><span class="p">,</span><span class="s1">&#39;512&#39;</span><span class="p">,</span><span class="s1">&#39;513&#39;</span><span class="p">,</span><span class="s1">&#39;514&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;52&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;521CI&#39;</span><span class="p">,</span><span class="s1">&#39;523&#39;</span><span class="p">,</span><span class="s1">&#39;524&#39;</span><span class="p">,</span><span class="s1">&#39;525&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;54&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;5411&#39;</span><span class="p">,</span><span class="s1">&#39;5415&#39;</span><span class="p">,</span><span class="s1">&#39;5412OP&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;56&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;561&#39;</span><span class="p">,</span><span class="s1">&#39;562&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;62&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;621&#39;</span><span class="p">,</span><span class="s1">&#39;622&#39;</span><span class="p">,</span><span class="s1">&#39;623&#39;</span><span class="p">,</span><span class="s1">&#39;624&#39;</span><span class="p">,</span><span class="s1">&#39;622HO&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;71&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;711AS&#39;</span><span class="p">,</span><span class="s1">&#39;713&#39;</span><span class="p">]},</span>
+        <span class="mi">1997</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;44RT&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;441&#39;</span><span class="p">,</span> <span class="s1">&#39;445&#39;</span><span class="p">,</span> <span class="s1">&#39;452&#39;</span><span class="p">,</span> <span class="s1">&#39;4A0&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;GFG&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;GFGD&#39;</span><span class="p">,</span> <span class="s1">&#39;GFGN&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;622HO&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;622&#39;</span><span class="p">,</span><span class="s1">&#39;623&#39;</span><span class="p">]}}</span>
+    
+    <span class="c1"># parameters for favorite BEA web api    </span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gdpindustry&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;datasetname&#39;</span><span class="p">:</span> <span class="s1">&#39;GDPbyIndustry&#39;</span><span class="p">,</span> 
+                              <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;parametername&#39;</span><span class="p">:</span> <span class="s1">&#39;Industry&#39;</span><span class="p">},</span>
+              <span class="s1">&#39;ioUse&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;datasetname&#39;</span><span class="p">:</span> <span class="s1">&#39;inputoutput&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;tableid&#39;</span><span class="p">:</span> <span class="mi">259</span><span class="p">}}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rdb</span><span class="p">:</span> <span class="n">RedisDB</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">userid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open connection to BEA web api&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="o">=</span> <span class="n">rdb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">userid</span> <span class="o">=</span> <span class="n">userid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="BEA.sectoring"><a class="viewcode-back" href="../../../finds.readers.bea.html#finds.readers.bea.BEA.sectoring">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sectoring</span><span class="p">(</span><span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns BEA sector definitions, based on naics, from xls on BEA website</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            year: Year of historical BEA scheme, in {1997, 1964, 1947}</span>
+<span class="sd">            source: Source url or local file</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - https://www.bea.gov/industry/input-output-accounts-data</span>
+<span class="sd">        - https://apps.bea.gov/industry/xls/io-annual/</span>
+<span class="sd">          - IOUse_Before_Redefinitions_PRO_1947-1962_Summary.xlsx</span>
+<span class="sd">          - Use_SUT_Framework_2007_2012_DET.xlsx </span>
+<span class="sd">        - Replace &quot;HS&quot; &quot;ORE&quot; with &quot;531&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">source</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="p">{</span>   <span class="c1"># there are 3 historical schmes</span>
+                <span class="mi">1997</span><span class="p">:</span> <span class="s1">&#39;Use_SUT_Framework_2007_2012_DET.xlsx&#39;</span><span class="p">,</span>   
+                <span class="mi">1963</span><span class="p">:</span> <span class="s1">&#39;IoUse_Before_Redefinitions_PRO_1963-1996_Summary.xlsx&#39;</span><span class="p">,</span>
+                <span class="mi">1947</span><span class="p">:</span> <span class="s1">&#39;IoUse_Before_Redefinitions_PRO_1947-1962_Summary.xlsx&#39;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;bea year not in &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">BEA</span><span class="o">.</span><span class="n">_xls_url</span> <span class="o">+</span> <span class="n">filename</span><span class="p">[</span><span class="n">year</span><span class="p">]</span>
+
+        <span class="c1"># get the xls and parse the NAICS Codes sheet</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;NAICS Codes&#39;</span><span class="p">)</span>
+
+        <span class="c1"># extract main groups and labels from columns 0,1</span>
+        <span class="n">beg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">beg</span><span class="p">}</span>
+
+        <span class="c1"># Kludge: some labels missing, so fill from custom abbreviations</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">BEA</span><span class="o">.</span><span class="n">short_desc</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                       <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">})</span>
+
+        <span class="c1"># Now extract beg and end row of groups and labels from columns 1,2</span>
+        <span class="n">beg</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+                        <span class="o">|</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">&quot;HS&quot;</span><span class="p">,</span> <span class="s2">&quot;ORE&quot;</span><span class="p">]))</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beg</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+
+        <span class="c1"># for each group, parse naics code ranges from col 6, store in {results}</span>
+        <span class="c1">#   e.g. &#39;7223-4, 722514-5&#39; --&gt; [722300, 722514]</span>
+        <span class="c1"># also, parse leading digits of summary name if at least len 2 (pad 0&#39;s)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">imin</span><span class="p">,</span> <span class="n">imax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+            <span class="n">code_title</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">str</span><span class="p">(</span><span class="n">col6</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">col4</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">col6</span><span class="p">,</span> <span class="n">col4</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">imin</span><span class="p">:</span><span class="n">imax</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                                                <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">imin</span><span class="p">:</span><span class="n">imax</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+                          <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">col6</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
+            
+            <span class="c1"># &#39;491&#39; is postal industry</span>
+            <span class="n">naics_title</span> <span class="o">=</span> <span class="p">[[(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[^0-9]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">),</span> <span class="n">title</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+                           <span class="k">for</span> <span class="n">codes</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">code_title</span> <span class="k">if</span> <span class="n">codes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;491&#39;</span><span class="p">]]</span>
+
+            <span class="n">new_codes</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">),</span> <span class="n">title</span><span class="p">]</span>
+                         <span class="k">for</span> <span class="n">codes</span> <span class="ow">in</span> <span class="n">naics_title</span> <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">]</span>
+
+            <span class="c1"># include summary code by right-padding up to six 0s</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">imin</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;\d+&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">new_codes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">()</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)),</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">imin</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+
+            <span class="n">new_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">new_codes</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">])</span>\
+                              <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;code&#39;</span><span class="p">])</span>
+            <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">new_df</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">imin</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">())</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># replace earlier vintage years with coarser industries</span>
+        <span class="k">for</span> <span class="n">vintage</span><span class="p">,</span> <span class="n">codes</span> <span class="ow">in</span> <span class="n">BEA</span><span class="o">.</span><span class="n">_bea_vintages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="o">&lt;</span> <span class="n">vintage</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">codes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>
+                               <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+
+        <span class="c1"># clean-up data frame and its index for return</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;code&#39;</span><span class="p">])</span>\
+                     <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>\
+                     <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span></div>
+    
+
+<div class="viewcode-block" id="BEA.get"><a class="viewcode-back" href="../../../finds.readers.bea.html#finds.readers.bea.BEA.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasetname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">parametername</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute common BEA web api calls</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            datasetname: Name of dataset to retrieve, e.g. &#39;ioUse&#39;</span>
+<span class="sd">            parametername: Parameter to retrieve, e.g. &#39;TableID&#39;</span>
+<span class="sd">            cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+<span class="sd">            kwargs: Additional parameters, such as tableid or year</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; datasetname=&#39;ioUse&#39;</span>
+<span class="sd">        &gt;&gt;&gt; tableid=259</span>
+<span class="sd">        &gt;&gt;&gt; year = 2017</span>
+<span class="sd">        &gt;&gt;&gt; parametername = &#39;TableID&#39;</span>
+<span class="sd">        &gt;&gt;&gt; bea.get()</span>
+<span class="sd">        &gt;&gt;&gt; bea.get(datasetname)</span>
+<span class="sd">        &gt;&gt;&gt; bea.get(datasetname, parametername=parametername)</span>
+<span class="sd">        &gt;&gt;&gt; bea.get(&#39;ioUse&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; df = bea.get(datasetname=&#39;ioUse&#39;, tableid=259, year=2018)</span>
+<span class="sd">        &gt;&gt;&gt; df = bea.get(datasetname=&#39;GDPbyIndustry&#39;, parametername=&#39;Industry&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://apps.bea.gov/api/data?&amp;UserID=&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">userid</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">datasetname</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;method=GETDATASETLIST&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;datasetname=&#39;</span> <span class="o">+</span> <span class="n">datasetname</span>
+            <span class="k">if</span> <span class="n">parametername</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;method=GetParameterValues&#39;</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;parametername=&#39;</span> <span class="o">+</span> <span class="n">parametername</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;method=GetParameterList&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;&amp;method=GetData&#39;</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(BEA get rdb)&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">datasetname</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;BEAAPI&#39;</span><span class="p">][</span><span class="s1">&#39;Results&#39;</span><span class="p">][</span><span class="s1">&#39;Dataset&#39;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">parametername</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;BEAAPI&#39;</span><span class="p">][</span><span class="s1">&#39;Results&#39;</span><span class="p">][</span><span class="s1">&#39;ParamValue&#39;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;BEAAPI&#39;</span><span class="p">][</span><span class="s1">&#39;Results&#39;</span><span class="p">][</span><span class="s1">&#39;Parameter&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;BEAAPI&#39;</span><span class="p">][</span><span class="s1">&#39;Results&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Data&#39;</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;***&#39;</span><span class="p">,</span> <span class="n">datasetname</span><span class="p">,</span> <span class="n">parametername</span><span class="p">,</span> <span class="s1">&#39;***&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;index&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="BEA.read_ioUse_xls"><a class="viewcode-back" href="../../../finds.readers.bea.html#finds.readers.bea.BEA.read_ioUse_xls">[docs]</a>    <span class="k">def</span> <span class="nf">read_ioUse_xls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">,</span>
+                       <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to load a year&#39;s ioUSE table from vintage xls on website</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            year: year of IoUse to fetch</span>
+<span class="sd">            cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+<span class="sd">            source: url or filename to read from</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># early years&#39; ioUse tables</span>
+            <span class="mi">1963</span><span class="p">:</span> <span class="s1">&#39;IoUse_Before_Redefinitions_PRO_1963-1996_Summary.xlsx&#39;</span><span class="p">,</span>
+            <span class="mi">1947</span><span class="p">:</span> <span class="s1">&#39;IoUse_Before_Redefinitions_PRO_1947-1962_Summary.xlsx&#39;</span><span class="p">}</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span> <span class="ow">or</span> <span class="n">BEA</span><span class="o">.</span><span class="n">_xls_url</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">1963</span> <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1963</span> <span class="k">else</span> <span class="mi">1947</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(BEA get rdb)&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>    <span class="c1"># x.sheet_names</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>  <span class="c1"># parse the sheet for the desired year</span>
+
+        <span class="c1"># seek cells with &quot;Code&quot; in top left, and startswith &quot;T0&quot; at corners</span>
+        <span class="n">top</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Code&#39;</span><span class="p">))</span>
+        <span class="n">right</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">],:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;T0&#39;</span><span class="p">))</span>
+        <span class="n">bottom</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;T0&#39;</span><span class="p">))</span>
+
+        <span class="c1"># stack all data columns into {result}</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">right</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">bottom</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]),</span>
+                            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rowcode&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;datavalue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">bottom</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">col</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">))</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;colcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">col</span><span class="p">])</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;datavalue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">result</span><span class="p">,</span>
+                           <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                           <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>   <span class="c1"># save to redis</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="BEA.read_ioUse"><a class="viewcode-back" href="../../../finds.readers.bea.html#finds.readers.bea.BEA.read_ioUse">[docs]</a>    <span class="k">def</span> <span class="nf">read_ioUse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">vintage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load ioUse table from BEA web api (or xls if early vintage)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            year: Year of IO-Use to load</span>
+<span class="sd">            vintage: Year of sectoring; allows different eras to be compared</span>
+<span class="sd">            cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame in stacked form, flows amounts in &#39;datavalue&#39; column, and</span>
+<span class="sd">            columns &#39;rowcode&#39;, &#39;colcode&#39; label maker and user industry</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - rows, column codes that start with (&#39;T&#39;,&#39;U&#39;,&#39;V&#39;,&#39;Other&#39;) are dropped</span>
+<span class="sd">        - &#39;F&#39;: final_use, </span>
+<span class="sd">        - &#39;G&#39;: govt, </span>
+<span class="sd">        - &#39;T&#39;: total&amp;tax, </span>
+<span class="sd">        - &#39;U&#39;: used, </span>
+<span class="sd">        - &#39;V&#39;:value_added, </span>
+<span class="sd">        - &#39;O&#39;:imports</span>
+<span class="sd">        - generally, should drop = (&#39;F&#39;,&#39;T&#39;,&#39;U&#39;,&#39;V&#39;,&#39;Other&#39;)</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; bea=BEA()</span>
+<span class="sd">        &gt;&gt;&gt; data = bea.read_ioUse(1996)</span>
+<span class="sd">        &gt;&gt;&gt; sql.load_dataframe(&#39;ioUse&#39;, data, index_label=None, if_exists=&#39;replace&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; data = sql.select(&#39;ioUse&#39;, where={&#39;year&#39;: 2017, &#39;tableid&#39; : 259})</span>
+<span class="sd">        &gt;&gt;&gt; df = data.pivot(index=&#39;rowcode&#39;, columns=&#39;colcode&#39;, values=&#39;datavalue&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1997</span><span class="p">:</span> <span class="c1"># after 1997, via web apis; before, in xls spreadsheets</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;ioUse&#39;</span><span class="p">],</span> <span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">cache_mode</span><span class="o">=</span><span class="s2">&quot;rw&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;colcode&#39;</span><span class="p">,</span><span class="s1">&#39;rowcode&#39;</span><span class="p">,</span><span class="s1">&#39;datavalue&#39;</span><span class="p">]]</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;datavalue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datavalue&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datavalue&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_ioUse_xls</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="c1"># merge industries for vintage year, using historical sectoring scheme</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vintage</span><span class="p">:</span>
+            <span class="n">vintage</span> <span class="o">=</span> <span class="n">year</span>   <span class="c1"># no vintage specified, so use same year</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">codes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bea_vintages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># step thru vintages</span>
+            <span class="k">if</span> <span class="n">vintage</span> <span class="o">&lt;</span> <span class="n">key</span><span class="p">:</span>         <span class="c1"># if required vintage predates scheme year</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">codes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;&lt;--&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="n">oldRows</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rowcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;rowcode&#39;</span><span class="p">)</span>
+                    <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">oldRows</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39;datavalue&#39;</span><span class="p">]</span>
+                    <span class="n">newRows</span> <span class="o">=</span> <span class="n">oldRows</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">keep</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                    <span class="n">newRows</span><span class="p">[</span><span class="s1">&#39;rowcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newRows</span><span class="p">):</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">newRows</span><span class="p">],</span>
+                                       <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">oldCols</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;colcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;colcode&#39;</span><span class="p">)</span>
+                    <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">oldCols</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39;datavalue&#39;</span><span class="p">]</span>
+                    <span class="n">newCols</span> <span class="o">=</span> <span class="n">oldCols</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">keep</span><span class="p">,</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                    <span class="n">newCols</span><span class="p">[</span><span class="s1">&#39;colcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newCols</span><span class="p">):</span>
+                        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">newCols</span><span class="p">],</span>
+                                       <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                                       <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;colcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rowcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+        <span class="n">drop</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">,</span><span class="s1">&#39;U&#39;</span><span class="p">,</span><span class="s1">&#39;V&#39;</span><span class="p">,</span><span class="s1">&#39;Other&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;colcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rowcode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">drop</span><span class="p">)]</span>        
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">vintage</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span></div></div>
+
+    
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+    <span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+
+    <span class="n">downloads</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">]</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">])</span>
+    <span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+    <span class="n">bea</span> <span class="o">=</span> <span class="n">BEA</span><span class="p">(</span><span class="n">rdb</span><span class="p">,</span> <span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;bea&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Get sectoring table</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">BEA</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="mi">1997</span><span class="p">)</span>
+
+    
+    <span class="c1"># Read GDPbyIndustry descriptions</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">bea</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">datasetname</span><span class="o">=</span><span class="s1">&#39;GDPbyIndustry&#39;</span><span class="p">,</span> <span class="n">parametername</span><span class="o">=</span><span class="s1">&#39;Industry&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">bea</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">datasetname</span><span class="o">=</span><span class="s1">&#39;GDPbyIndustry&#39;</span><span class="p">,</span> <span class="n">parametername</span><span class="o">=</span><span class="s1">&#39;Industry&#39;</span><span class="p">,</span>
+                 <span class="n">index</span><span class="o">=</span><span class="s1">&#39;key&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    
+
+    <span class="c1"># Read ioUse table, and regroup by vintage year scheme</span>
+    <span class="c1">#</span>
+    <span class="c1"># Feb 1, 2024: Make tables, use tables, and import matrices, Annual, 2017-2022</span>
+    <span class="c1"># =&gt; tables between 1998 and 2016 inclusive are not available</span>
+    <span class="c1">#</span>
+    <span class="n">cache_mode</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>  <span class="c1"># read-only to verify in rdb</span>
+    <span class="c1"># cache_mode = &#39;w&#39;  # write-only to reload from BEA website and save to rdb</span>
+    <span class="n">years</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2022</span><span class="p">,</span> <span class="mi">1946</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">ioUses</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">vintage</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1997</span><span class="p">,</span> <span class="mi">1963</span><span class="p">,</span> <span class="mi">1947</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">years</span> <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;=</span> <span class="n">vintage</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">bea</span><span class="o">.</span><span class="n">read_ioUse</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">vintage</span><span class="o">=</span><span class="n">vintage</span><span class="p">,</span> <span class="n">cache_mode</span><span class="o">=</span><span class="n">cache_mode</span><span class="p">)</span>
+            <span class="n">ioUses</span><span class="p">[(</span><span class="n">vintage</span><span class="p">,</span> <span class="n">year</span><span class="p">)]</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vintage </span><span class="si">{</span><span class="n">vintage</span><span class="si">}</span><span class="s2">, Year </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> records&quot;</span><span class="p">)</span>
+
+    <span class="c1"># get desc: code -&gt; long description</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">bea</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">**</span><span class="n">BEA</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gdpindustry&#39;</span><span class="p">],</span> <span class="n">cache_mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)[</span><span class="s1">&#39;desc&#39;</span><span class="p">]</span>
+
+    <span class="c1"># show desc codes without short_desc</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">BEA</span><span class="o">.</span><span class="n">short_desc</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">missing</span><span class="p">)]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;Missing short desc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+    <span class="c1"># build labels: short label -&gt; long description</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">BEA</span><span class="o">.</span><span class="n">short_desc</span><span class="p">[</span><span class="n">c</span><span class="p">]:</span>
+              <span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="n">BEA</span><span class="o">.</span><span class="n">short_desc</span><span class="p">[</span><span class="n">c</span><span class="p">])</span>
+              <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">BEA</span><span class="o">.</span><span class="n">short_desc</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>   <span class="c1"># code -&gt; short label</span>
+
+    <span class="c1"># show vintage sectoring scheme</span>
+    <span class="n">BEA</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="mi">1947</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

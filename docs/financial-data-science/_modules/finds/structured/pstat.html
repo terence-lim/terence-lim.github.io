@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.pstat &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.pstat</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.pstat</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Compustat annual, quarterly and key developments</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">BigInteger</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.database.redisdb</span> <span class="kn">import</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured.busday</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.structured.structured</span> <span class="kn">import</span> <span class="n">Structured</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+                 
+<div class="viewcode-block" id="PSTAT"><a class="viewcode-back" href="../../../finds.structured.pstat.html#finds.structured.pstat.PSTAT">[docs]</a><span class="k">class</span> <span class="nc">PSTAT</span><span class="p">(</span><span class="n">Structured</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide interface to Compustat structured data sets</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sql: Connection to mysql database</span>
+<span class="sd">      bd: Custom business days object</span>
+<span class="sd">      name: Name of dataset is &quot;PSTAT&quot;</span>
+<span class="sd">      identifier: Stocks identifier field name is &quot;gvkey&quot;</span>
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Screen on (INDFMT= &#39;INDL&#39;, DATAFMT=&#39;STD&#39;, POPSRC=&#39;D&#39;, and CONSOL=&#39;C&#39;) </span>
+<span class="sd">      keeps majority of records and uniquely identifies GVKEY, DATADATE.</span>
+<span class="sd">      also include INDFMT= &#39;FS&#39;, CURRENCY=&#39;USD+CAD&#39;, STATUS=&#39;ACTIVE+INACTIVE&#39;) </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_role</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span>   <span class="c1"># Key Development role id labels</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;Target&#39;</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;Advisor&#39;</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;Buyer&#39;</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;Seller&#39;</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;Transaction&#39;</span><span class="p">,</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="s1">&#39;Transaction Consideration&#39;</span><span class="p">,</span>
+        <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;Lender&#39;</span><span class="p">,</span>
+        <span class="mi">8</span><span class="p">:</span> <span class="s1">&#39;Participant&#39;</span><span class="p">,</span>
+        <span class="mi">9</span><span class="p">:</span> <span class="s1">&#39;TradingItemId&#39;</span><span class="p">,</span>
+        <span class="mi">10</span><span class="p">:</span> <span class="s1">&#39;Auditor&#39;</span><span class="p">,</span>
+        <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;Sponsor&#39;</span><span class="p">,</span>
+        <span class="mi">14</span><span class="p">:</span> <span class="s1">&#39;Host&#39;</span><span class="p">,</span>
+    <span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;role&#39;</span><span class="p">)</span>
+
+    <span class="n">_event</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span>   <span class="c1"># Key Development event id labels</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;Seeking to Sell/Divest&#39;</span><span class="p">,</span>            <span class="c1"># may be &quot;not sell&quot;</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;Seeking Acquisitions/Investments&#39;</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="s1">&#39;Seeking Financing/Partners&#39;</span><span class="p">,</span> <span class="c1"># too general, mentions banks</span>
+        <span class="mi">7</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Other&#39;</span><span class="p">,</span>  <span class="c1"># good: includes contemplates and motions</span>
+        <span class="mi">11</span><span class="p">:</span> <span class="s1">&#39;Delayed SEC Filings&#39;</span><span class="p">,</span>   <span class="c1"># good</span>
+        <span class="mi">12</span><span class="p">:</span> <span class="s1">&#39;Delistings&#39;</span><span class="p">,</span>            <span class="c1"># good, but beware of microcap</span>
+        <span class="mi">16</span><span class="p">:</span> <span class="s1">&#39;Executive/Board Changes - Other&#39;</span><span class="p">,</span>
+        <span class="mi">21</span><span class="p">:</span> <span class="s1">&#39;Discontinued Operations/Downsizings&#39;</span><span class="p">,</span>
+        <span class="mi">22</span><span class="p">:</span> <span class="s1">&#39;Strategic Alliances&#39;</span><span class="p">,</span>
+        <span class="mi">23</span><span class="p">:</span> <span class="s1">&#39;Client Announcements&#39;</span><span class="p">,</span>
+        <span class="mi">24</span><span class="p">:</span> <span class="s1">&#39;Regulatory Agency Inquiries&#39;</span><span class="p">,</span>
+        <span class="mi">25</span><span class="p">:</span> <span class="s1">&#39;Lawsuits &amp; Legal Issues&#39;</span><span class="p">,</span>
+        <span class="mi">26</span><span class="p">:</span> <span class="s1">&#39;Corporate Guidance - Lowered&#39;</span><span class="p">,</span>
+        <span class="mi">27</span><span class="p">:</span> <span class="s1">&#39;Corporate Guidance - Raised&#39;</span><span class="p">,</span>
+        <span class="mi">28</span><span class="p">:</span> <span class="s1">&#39;Announcements of Earnings&#39;</span><span class="p">,</span>
+        <span class="mi">29</span><span class="p">:</span> <span class="s1">&#39;Corporate Guidance - New/Confirmed&#39;</span><span class="p">,</span>
+        <span class="mi">31</span><span class="p">:</span> <span class="s1">&#39;Business Expansions&#39;</span><span class="p">,</span>
+        <span class="mi">32</span><span class="p">:</span> <span class="s1">&#39;Business Reorganizations&#39;</span><span class="p">,</span>
+        <span class="mi">36</span><span class="p">:</span> <span class="s1">&#39;Buybacks&#39;</span><span class="p">,</span>
+        <span class="mi">41</span><span class="p">:</span> <span class="s1">&#39;Product-Related Announcements&#39;</span><span class="p">,</span>
+        <span class="mi">42</span><span class="p">:</span> <span class="s1">&#39;Debt Financing Related&#39;</span><span class="p">,</span>
+        <span class="mi">43</span><span class="p">:</span> <span class="s1">&#39;Restatements of Operating Results&#39;</span><span class="p">,</span>
+        <span class="mi">44</span><span class="p">:</span> <span class="s1">&#39;Labor-related Announcements&#39;</span><span class="p">,</span>
+        <span class="mi">45</span><span class="p">:</span> <span class="s1">&#39;Dividend Affirmations&#39;</span><span class="p">,</span>
+        <span class="mi">46</span><span class="p">:</span> <span class="s1">&#39;Dividend Increases&#39;</span><span class="p">,</span>
+        <span class="mi">47</span><span class="p">:</span> <span class="s1">&#39;Dividend Decreases&#39;</span><span class="p">,</span>
+        <span class="mi">48</span><span class="p">:</span> <span class="s1">&#39;Earnings Calls&#39;</span><span class="p">,</span>
+        <span class="mi">49</span><span class="p">:</span> <span class="s1">&#39;Guidance/Update Calls&#39;</span><span class="p">,</span>
+        <span class="mi">50</span><span class="p">:</span> <span class="s1">&#39;Shareholder/Analyst Calls&#39;</span><span class="p">,</span>
+        <span class="mi">51</span><span class="p">:</span> <span class="s1">&#39;Company Conference Presentations&#39;</span><span class="p">,</span>
+        <span class="mi">52</span><span class="p">:</span> <span class="s1">&#39;M&amp;A Calls&#39;</span><span class="p">,</span>
+        <span class="mi">53</span><span class="p">:</span> <span class="s1">&#39;Stock Splits &amp; Significant Stock Dividends&#39;</span><span class="p">,</span>
+        <span class="mi">54</span><span class="p">:</span> <span class="s1">&#39;Stock Dividends (&lt;5%)&#39;</span><span class="p">,</span>
+        <span class="mi">55</span><span class="p">:</span> <span class="s1">&#39;Earnings Release Date&#39;</span><span class="p">,</span>
+        <span class="mi">56</span><span class="p">:</span> <span class="s1">&#39;Name Changes&#39;</span><span class="p">,</span>
+        <span class="mi">57</span><span class="p">:</span> <span class="s1">&#39;Exchange Changes&#39;</span><span class="p">,</span>
+        <span class="mi">58</span><span class="p">:</span> <span class="s1">&#39;Ticker Changes&#39;</span><span class="p">,</span>
+        <span class="mi">59</span><span class="p">:</span> <span class="s1">&#39;Auditor Going Concern Doubts&#39;</span><span class="p">,</span>
+        <span class="mi">60</span><span class="p">:</span> <span class="s1">&#39;Address Changes&#39;</span><span class="p">,</span>
+        <span class="mi">61</span><span class="p">:</span> <span class="s1">&#39;Delayed Earnings Announcements&#39;</span><span class="p">,</span>
+        <span class="mi">62</span><span class="p">:</span> <span class="s1">&#39;Annual General Meeting&#39;</span><span class="p">,</span>
+        <span class="mi">63</span><span class="p">:</span> <span class="s1">&#39;Considering Multiple Strategic Alternatives&#39;</span><span class="p">,</span>
+        <span class="mi">64</span><span class="p">:</span> <span class="s1">&#39;Ex-Div Date (Regular)&#39;</span><span class="p">,</span>
+        <span class="mi">65</span><span class="p">:</span> <span class="s1">&#39;M&amp;A Rumors and Discussions&#39;</span><span class="p">,</span>
+        <span class="c1">#    68 : &#39;Credit Rating - S&amp;P - Upgrade&#39;,</span>
+        <span class="c1">#    69 : &#39;Credit Rating - S&amp;P - Downgrade&#39;,</span>
+        <span class="c1">#    70 : &#39;Credit Rating - S&amp;P - Not-Rated Action&#39;,</span>
+        <span class="c1">#    71 : &#39;Credit Rating - S&amp;P - New Rating&#39;,</span>
+        <span class="c1">#    72 : &#39;Credit Rating - S&amp;P - CreditWatch/Outlook Action&#39;,</span>
+        <span class="mi">73</span><span class="p">:</span> <span class="s1">&#39;Impairments/Write Offs&#39;</span><span class="p">,</span>
+        <span class="mi">74</span><span class="p">:</span> <span class="s1">&#39;Debt Defaults&#39;</span><span class="p">,</span>
+        <span class="mi">75</span><span class="p">:</span> <span class="s1">&#39;Index Constituent Drops&#39;</span><span class="p">,</span>
+        <span class="mi">76</span><span class="p">:</span> <span class="s1">&#39;Legal Structure Changes&#39;</span><span class="p">,</span>
+        <span class="mi">77</span><span class="p">:</span> <span class="s1">&#39;Changes in Company Bylaws/Rules&#39;</span><span class="p">,</span>
+        <span class="mi">78</span><span class="p">:</span> <span class="s1">&#39;Board Meeting&#39;</span><span class="p">,</span>
+        <span class="mi">79</span><span class="p">:</span> <span class="s1">&#39;Fiscal Year End Changes&#39;</span><span class="p">,</span>
+        <span class="mi">80</span><span class="p">:</span> <span class="s1">&#39;M&amp;A Transaction Announcements&#39;</span><span class="p">,</span>
+        <span class="mi">81</span><span class="p">:</span> <span class="s1">&#39;M&amp;A Transaction Closings&#39;</span><span class="p">,</span>
+        <span class="mi">82</span><span class="p">:</span> <span class="s1">&#39;M&amp;A Transaction Cancellations&#39;</span><span class="p">,</span>
+        <span class="mi">83</span><span class="p">:</span> <span class="s1">&#39;Private Placements&#39;</span><span class="p">,</span>
+        <span class="mi">85</span><span class="p">:</span> <span class="s1">&#39;IPOs&#39;</span><span class="p">,</span>
+        <span class="mi">86</span><span class="p">:</span> <span class="s1">&#39;Follow-on Equity Offerings&#39;</span><span class="p">,</span>
+        <span class="mi">87</span><span class="p">:</span> <span class="s1">&#39;Fixed Income Offerings&#39;</span><span class="p">,</span>
+        <span class="mi">88</span><span class="p">:</span> <span class="s1">&#39;Derivative/Other Instrument Offerings&#39;</span><span class="p">,</span>
+        <span class="mi">89</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Filing&#39;</span><span class="p">,</span>
+        <span class="mi">90</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Conclusion&#39;</span><span class="p">,</span>
+        <span class="mi">91</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Emergence/Exit&#39;</span><span class="p">,</span>
+        <span class="mi">92</span><span class="p">:</span> <span class="s1">&#39;End of Lock-Up Period&#39;</span><span class="p">,</span>
+        <span class="mi">93</span><span class="p">:</span> <span class="s1">&#39;Shelf Registration Filings&#39;</span><span class="p">,</span>
+        <span class="mi">94</span><span class="p">:</span> <span class="s1">&#39;Special Dividend Announced&#39;</span><span class="p">,</span>
+        <span class="mi">95</span><span class="p">:</span> <span class="s1">&#39;Index Constituent Adds&#39;</span><span class="p">,</span>
+        <span class="mi">97</span><span class="p">:</span> <span class="s1">&#39;Special/Extraordinary Shareholders Meeting&#39;</span><span class="p">,</span>
+        <span class="mi">99</span><span class="p">:</span> <span class="s1">&#39;Potential Privatization of Government Entities&#39;</span><span class="p">,</span>
+        <span class="mi">100</span><span class="p">:</span> <span class="s1">&#39;Ex-Div Date (Special)&#39;</span><span class="p">,</span>
+        <span class="mi">101</span><span class="p">:</span> <span class="s1">&#39;Executive Changes - CEO&#39;</span><span class="p">,</span>
+        <span class="mi">102</span><span class="p">:</span> <span class="s1">&#39;Executive Changes - CFO&#39;</span><span class="p">,</span>
+        <span class="c1">#    103 : &#39;LCD Institutional Loan News&#39;,</span>
+        <span class="c1">#    104 : &#39;LCD Trend News&#39;,</span>
+        <span class="c1">#    105 : &#39;LCD Fallen Angel News&#39;,</span>
+        <span class="c1">#    106 : &#39;LCD Debtor-in-possession News&#39;,</span>
+        <span class="c1">#    107 : &#39;LCD Middle Market News&#39;,</span>
+        <span class="c1">#    108 : &#39;LCD High-Yield Bond Story News&#39;,</span>
+        <span class="c1">#    109 : &#39;LCD Leveraged Buyout News&#39;,</span>
+        <span class="c1">#    110 : &#39;LCD People Story News&#39;,</span>
+        <span class="c1">#    111 : &#39;LCD Sponsored Deal News&#39;,</span>
+        <span class="c1">#    112 : &#39;LCD M&amp;A News&#39;,</span>
+        <span class="c1">#    113 : &#39;LCD Distressed News&#39;,</span>
+        <span class="c1">#    114 : &#39;LCD Break Price News&#39;,</span>
+        <span class="c1">#    115 : &#39;LCD Investment Grade Loan News&#39;,</span>
+        <span class="c1">#    116 : &#39;LCD Repricing News&#39;,</span>
+        <span class="c1">#    117 : &#39;LCD Dividend News&#39;,</span>
+        <span class="c1">#    118 : &#39;LCD Repayment News&#39;,</span>
+        <span class="c1">#    119 : &#39;LCD Mezzanine Debt News&#39;,</span>
+        <span class="c1">#    120 : &#39;LCD Second-lien News&#39;,</span>
+        <span class="c1">#    121 : &#39;LCD High-yield Europe News&#39;,</span>
+        <span class="c1">#    122 : &#39;LCD Covenant-lite News&#39;,</span>
+        <span class="c1">#    123 : &#39;LCD Cross-border Deal News&#39;,</span>
+        <span class="c1">#    124 : &#39;LCD CLO News&#39;,</span>
+        <span class="c1">#    125 : &#39;LCD Secondary Story News&#39;,</span>
+        <span class="c1">#    127 : &#39;LCD Amendment News&#39;,</span>
+        <span class="c1">#    128 : &#39;LCD Communications News&#39;,</span>
+        <span class="c1">#    129 : &#39;LCD European News&#39;,</span>
+        <span class="c1">#    130 : &#39;LCD Price-flex News&#39;,</span>
+        <span class="c1">#    131 : &#39;LCD Global News&#39;,</span>
+        <span class="c1">#    132 : &#39;LCD Ratings News&#39;,</span>
+        <span class="mi">134</span><span class="p">:</span> <span class="s1">&#39;Composite Units Offerings&#39;</span><span class="p">,</span>
+        <span class="mi">135</span><span class="p">:</span> <span class="s1">&#39;Structured Products Offerings&#39;</span><span class="p">,</span>
+        <span class="mi">136</span><span class="p">:</span> <span class="s1">&#39;Public Offering Lead Underwriter Change&#39;</span><span class="p">,</span>
+        <span class="mi">137</span><span class="p">:</span> <span class="s1">&#39;Spin-Off/Split-Off&#39;</span><span class="p">,</span>
+        <span class="mi">138</span><span class="p">:</span> <span class="s1">&#39;Announcements of Sales/Trading Statement&#39;</span><span class="p">,</span>
+        <span class="mi">139</span><span class="p">:</span> <span class="s1">&#39;Sales/Trading Statement Calls&#39;</span><span class="p">,</span>
+        <span class="mi">140</span><span class="p">:</span> <span class="s1">&#39;Sales/Trading Statement Release Date&#39;</span><span class="p">,</span>
+        <span class="c1">#    141 : &#39;LCD Bids Wanted in Competition&#39;,</span>
+        <span class="c1">#    142 : &#39;LCD Company Buys Back Outstanding Bank Debt&#39;,</span>
+        <span class="c1">#    143 : &#39;LCD Debt Exchange&#39;,</span>
+        <span class="mi">144</span><span class="p">:</span> <span class="s1">&#39;Estimated Earnings Release Date (CIQ Derived)&#39;</span><span class="p">,</span>
+        <span class="c1">#    145 : &#39;LCD Loan Credit Default Swap News&#39;,</span>
+        <span class="c1">#    146 : &#39;LCD Credit Defaults Swap News&#39;,</span>
+        <span class="c1">#    147 : &#39;LCD Default News&#39;,</span>
+        <span class="c1">#    148 : &#39;LCD Deal Launch News&#39;,</span>
+        <span class="mi">149</span><span class="p">:</span> <span class="s1">&#39;Conferences&#39;</span><span class="p">,</span>
+        <span class="mi">150</span><span class="p">:</span> <span class="s1">&#39;Auditor Changes&#39;</span><span class="p">,</span>
+        <span class="mi">151</span><span class="p">:</span> <span class="s1">&#39;Buyback Update&#39;</span><span class="p">,</span>
+        <span class="mi">152</span><span class="p">:</span> <span class="s1">&#39;Potential Buyback&#39;</span><span class="p">,</span>
+        <span class="mi">153</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Asset Sale/Liquidation&#39;</span><span class="p">,</span>
+        <span class="mi">154</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Financing&#39;</span><span class="p">,</span>
+        <span class="mi">155</span><span class="p">:</span> <span class="s1">&#39;Bankruptcy - Reorganization&#39;</span><span class="p">,</span>
+        <span class="mi">156</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Proposal Related&#39;</span><span class="p">,</span>
+        <span class="mi">157</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Activist Communication&#39;</span><span class="p">,</span>
+        <span class="mi">160</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Target Communication&#39;</span><span class="p">,</span>
+        <span class="mi">163</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Proxy/Voting Related&#39;</span><span class="p">,</span>
+        <span class="mi">164</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Agreement Related&#39;</span><span class="p">,</span>
+        <span class="mi">172</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Nomination Related&#39;</span><span class="p">,</span>
+        <span class="mi">177</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Financing Option from Activist&#39;</span><span class="p">,</span>
+        <span class="mi">187</span><span class="p">:</span> <span class="s1">&#39;Investor Activism - Supporting Statements&#39;</span><span class="p">,</span>
+        <span class="mi">192</span><span class="p">:</span> <span class="s1">&#39;Analyst/Investor Day&#39;</span><span class="p">,</span>
+        <span class="mi">194</span><span class="p">:</span> <span class="s1">&#39;Special Calls&#39;</span><span class="p">,</span>
+        <span class="mi">205</span><span class="p">:</span> <span class="s1">&#39;Regulatory Authority - Regulations&#39;</span><span class="p">,</span>
+        <span class="mi">206</span><span class="p">:</span> <span class="s1">&#39;Regulatory Authority - Compliance&#39;</span><span class="p">,</span>
+        <span class="mi">207</span><span class="p">:</span> <span class="s1">&#39;Regulatory Authority - Enforcement Actions&#39;</span><span class="p">,</span>
+        <span class="c1">#    208 : &#39;Macro: Releases&#39;,</span>
+        <span class="c1">#    209 : &#39;Macro: General&#39;,</span>
+        <span class="c1">#    210 : &#39;Macro: Auctions&#39;,</span>
+        <span class="c1">#    211 : &#39;Macro: Seminars&#39;,</span>
+        <span class="c1">#    212 : &#39;Macro: Holidays&#39;,</span>
+        <span class="mi">213</span><span class="p">:</span> <span class="s1">&#39;Dividend Cancellation&#39;</span><span class="p">,</span>
+        <span class="mi">214</span><span class="p">:</span> <span class="s1">&#39;Dividend Initiation&#39;</span><span class="p">,</span>
+        <span class="mi">215</span><span class="p">:</span> <span class="s1">&#39;Preferred Dividend&#39;</span><span class="p">,</span>
+        <span class="c1">#    216 : &#39;S&amp;P Events&#39;,</span>
+        <span class="c1">#    217 : &quot;Not a Keydev - Only for Timeline&quot;</span>
+        <span class="mi">218</span><span class="p">:</span> <span class="s2">&quot;Announcement of Interim Management Statement&quot;</span><span class="p">,</span>
+        <span class="mi">219</span><span class="p">:</span> <span class="s2">&quot;Operating Results Release Date&quot;</span><span class="p">,</span>
+        <span class="mi">220</span><span class="p">:</span> <span class="s2">&quot;Interim Management Statement Release Date&quot;</span><span class="p">,</span>
+        <span class="mi">221</span><span class="p">:</span> <span class="s2">&quot;Operating Results Calls&quot;</span><span class="p">,</span>
+        <span class="mi">222</span><span class="p">:</span> <span class="s2">&quot;Interim Management Statement Calls&quot;</span><span class="p">,</span>
+        <span class="mi">223</span><span class="p">:</span> <span class="s2">&quot;Fixed Income Calls&quot;</span><span class="p">,</span>
+        <span class="mi">224</span><span class="p">:</span> <span class="s2">&quot;Halt/Resume of Operations - Unusual Events&quot;</span><span class="p">,</span>
+        <span class="mi">225</span><span class="p">:</span> <span class="s2">&quot;Corporate Guidance - Unusual Events&quot;</span><span class="p">,</span>
+        <span class="mi">226</span><span class="p">:</span> <span class="s2">&quot;Announcement of Operating Results&quot;</span><span class="p">,</span>
+        <span class="mi">230</span><span class="p">:</span> <span class="s2">&quot;Buyback - Change in Plan Terms&quot;</span><span class="p">,</span>
+        <span class="mi">231</span><span class="p">:</span> <span class="s2">&quot;Buyback Tranche Update&quot;</span><span class="p">,</span>
+        <span class="mi">232</span><span class="p">:</span> <span class="s2">&quot;Buyback Transaction Announcements&quot;</span><span class="p">,</span>
+        <span class="mi">233</span><span class="p">:</span> <span class="s2">&quot;Buyback Transaction Cancellations&quot;</span><span class="p">,</span>
+        <span class="mi">234</span><span class="p">:</span> <span class="s2">&quot;Buyback Transaction Closings&quot;</span>
+    <span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;event&#39;</span><span class="p">)</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Maps keydev role id to description&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_role</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Maps keydev event id to description&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event</span>
+
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sql</span> <span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">bd</span> <span class="p">:</span> <span class="n">BusDay</span><span class="p">,</span> 
+                 <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;PSTAT&#39;</span><span class="p">,</span>
+                 <span class="n">identifier</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gvkey&#39;</span><span class="p">,</span>
+                 <span class="n">verbose</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Compustat tables&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;links&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;links&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;conm&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;tic&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sic&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;linkprim&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;liid&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;linktype&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">2</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;lpermco&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;linkdt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;linkenddt&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">sql</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="s1">&#39;linkdt&#39;</span><span class="p">),</span>
+                <span class="n">sql</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="s1">&#39;linkdt&#39;</span><span class="p">),</span>
+                <span class="n">sql</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> <span class="s1">&#39;linkdt&#39;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;annual&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;annual&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datadate&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;indfmt&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;consol&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;popsrc&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datafmt&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;curcd&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;costat&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;addzip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>  <span class="c1">### NEW ###</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="n">BigInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fyr&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sic&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fyear&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;prcc_f&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sich&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="o">*</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Float</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;aco&#39;</span><span class="p">,</span> <span class="s1">&#39;acox&#39;</span><span class="p">,</span> <span class="s1">&#39;act&#39;</span><span class="p">,</span> <span class="s1">&#39;ao&#39;</span><span class="p">,</span> <span class="s1">&#39;aox&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;ap&#39;</span><span class="p">,</span> <span class="s1">&#39;aqc&#39;</span><span class="p">,</span> <span class="s1">&#39;aqi&#39;</span><span class="p">,</span> <span class="s1">&#39;aqs&#39;</span><span class="p">,</span> <span class="s1">&#39;at&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;caps&#39;</span><span class="p">,</span> <span class="s1">&#39;capx&#39;</span><span class="p">,</span> <span class="s1">&#39;capxv&#39;</span><span class="p">,</span> <span class="s1">&#39;ceq&#39;</span><span class="p">,</span> <span class="s1">&#39;ceql&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;ceqt&#39;</span><span class="p">,</span> <span class="s1">&#39;ch&#39;</span><span class="p">,</span> <span class="s1">&#39;che&#39;</span><span class="p">,</span> <span class="s1">&#39;chech&#39;</span><span class="p">,</span> <span class="s1">&#39;cogs&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;cshfd&#39;</span><span class="p">,</span> <span class="s1">&#39;csho&#39;</span><span class="p">,</span> <span class="s1">&#39;cshrc&#39;</span><span class="p">,</span> <span class="s1">&#39;dc&#39;</span><span class="p">,</span> <span class="s1">&#39;dclo&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dcpstk&#39;</span><span class="p">,</span> <span class="s1">&#39;dcvsr&#39;</span><span class="p">,</span> <span class="s1">&#39;dcvsub&#39;</span><span class="p">,</span> <span class="s1">&#39;dcvt&#39;</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dd1&#39;</span><span class="p">,</span> <span class="s1">&#39;dd2&#39;</span><span class="p">,</span> <span class="s1">&#39;dd3&#39;</span><span class="p">,</span> <span class="s1">&#39;dd4&#39;</span><span class="p">,</span> <span class="s1">&#39;dd5&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dlc&#39;</span><span class="p">,</span> <span class="s1">&#39;dltis&#39;</span><span class="p">,</span> <span class="s1">&#39;dlto&#39;</span><span class="p">,</span> <span class="s1">&#39;dltp&#39;</span><span class="p">,</span> <span class="s1">&#39;dltt&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dm&#39;</span><span class="p">,</span> <span class="s1">&#39;dn&#39;</span><span class="p">,</span> <span class="s1">&#39;do&#39;</span><span class="p">,</span> <span class="s1">&#39;dp&#39;</span><span class="p">,</span> <span class="s1">&#39;dpact&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dpc&#39;</span><span class="p">,</span> <span class="s1">&#39;dpvieb&#39;</span><span class="p">,</span> <span class="s1">&#39;ds&#39;</span><span class="p">,</span> <span class="s1">&#39;dv&#39;</span><span class="p">,</span> <span class="s1">&#39;dvc&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;dvp&#39;</span><span class="p">,</span> <span class="s1">&#39;dvt&#39;</span><span class="p">,</span> <span class="s1">&#39;ebit&#39;</span><span class="p">,</span> <span class="s1">&#39;ebitda&#39;</span><span class="p">,</span> <span class="s1">&#39;emp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;epsfx&#39;</span><span class="p">,</span> <span class="s1">&#39;epspx&#39;</span><span class="p">,</span> <span class="s1">&#39;esub&#39;</span><span class="p">,</span> <span class="s1">&#39;esubc&#39;</span><span class="p">,</span> <span class="s1">&#39;fatb&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;fatl&#39;</span><span class="p">,</span> <span class="s1">&#39;fca&#39;</span><span class="p">,</span> <span class="s1">&#39;fopo&#39;</span><span class="p">,</span> <span class="s1">&#39;gdwl&#39;</span><span class="p">,</span> <span class="s1">&#39;gp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;gwo&#39;</span><span class="p">,</span> <span class="s1">&#39;ib&#39;</span><span class="p">,</span> <span class="s1">&#39;ibadj&#39;</span><span class="p">,</span> <span class="s1">&#39;ibc&#39;</span><span class="p">,</span> <span class="s1">&#39;ibcom&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;icapt&#39;</span><span class="p">,</span> <span class="s1">&#39;idit&#39;</span><span class="p">,</span> <span class="s1">&#39;intan&#39;</span><span class="p">,</span> <span class="s1">&#39;intc&#39;</span><span class="p">,</span> <span class="s1">&#39;invfg&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;invrm&#39;</span><span class="p">,</span> <span class="s1">&#39;invt&#39;</span><span class="p">,</span> <span class="s1">&#39;invwip&#39;</span><span class="p">,</span> <span class="s1">&#39;itcb&#39;</span><span class="p">,</span> <span class="s1">&#39;itci&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;ivaeq&#39;</span><span class="p">,</span> <span class="s1">&#39;ivao&#39;</span><span class="p">,</span> <span class="s1">&#39;ivch&#39;</span><span class="p">,</span> <span class="s1">&#39;ivst&#39;</span><span class="p">,</span> <span class="s1">&#39;lco&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;lcox&#39;</span><span class="p">,</span> <span class="s1">&#39;lct&#39;</span><span class="p">,</span> <span class="s1">&#39;lifr&#39;</span><span class="p">,</span> <span class="s1">&#39;lifrp&#39;</span><span class="p">,</span> <span class="s1">&#39;lo&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;lse&#39;</span><span class="p">,</span> <span class="s1">&#39;lt&#39;</span><span class="p">,</span> <span class="s1">&#39;mib&#39;</span><span class="p">,</span> <span class="s1">&#39;mibt&#39;</span><span class="p">,</span> <span class="s1">&#39;mii&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;mrc1&#39;</span><span class="p">,</span> <span class="s1">&#39;mrc2&#39;</span><span class="p">,</span> <span class="s1">&#39;mrc3&#39;</span><span class="p">,</span> <span class="s1">&#39;mrc4&#39;</span><span class="p">,</span> <span class="s1">&#39;mrc5&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;mrct&#39;</span><span class="p">,</span> <span class="s1">&#39;msa&#39;</span><span class="p">,</span> <span class="s1">&#39;ni&#39;</span><span class="p">,</span> <span class="s1">&#39;niadj&#39;</span><span class="p">,</span> <span class="s1">&#39;nopi&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;nopio&#39;</span><span class="p">,</span> <span class="s1">&#39;np&#39;</span><span class="p">,</span> <span class="s1">&#39;oancf&#39;</span><span class="p">,</span> <span class="s1">&#39;ob&#39;</span><span class="p">,</span> <span class="s1">&#39;oiadp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;oibdp&#39;</span><span class="p">,</span> <span class="s1">&#39;pi&#39;</span><span class="p">,</span> <span class="s1">&#39;ppegt&#39;</span><span class="p">,</span> <span class="s1">&#39;ppent&#39;</span><span class="p">,</span> <span class="s1">&#39;ppeveb&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;prstkc&#39;</span><span class="p">,</span> <span class="s1">&#39;pstk&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkc&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkl&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkn&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;pstkr&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkrv&#39;</span><span class="p">,</span> <span class="s1">&#39;rea&#39;</span><span class="p">,</span> <span class="s1">&#39;reajo&#39;</span><span class="p">,</span> <span class="s1">&#39;recco&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;recd&#39;</span><span class="p">,</span> <span class="s1">&#39;rect&#39;</span><span class="p">,</span> <span class="s1">&#39;recta&#39;</span><span class="p">,</span> <span class="s1">&#39;rectr&#39;</span><span class="p">,</span> <span class="s1">&#39;reuna&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;revt&#39;</span><span class="p">,</span> <span class="s1">&#39;sale&#39;</span><span class="p">,</span> <span class="s1">&#39;scstkc&#39;</span><span class="p">,</span> <span class="s1">&#39;seq&#39;</span><span class="p">,</span> <span class="s1">&#39;spi&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;sppe&#39;</span><span class="p">,</span> <span class="s1">&#39;sstk&#39;</span><span class="p">,</span> <span class="s1">&#39;tlcf&#39;</span><span class="p">,</span> <span class="s1">&#39;tstk&#39;</span><span class="p">,</span> <span class="s1">&#39;tstkc&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;tstkn&#39;</span><span class="p">,</span> <span class="s1">&#39;txc&#39;</span><span class="p">,</span> <span class="s1">&#39;txdb&#39;</span><span class="p">,</span> <span class="s1">&#39;txdi&#39;</span><span class="p">,</span> <span class="s1">&#39;txditc&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;txfed&#39;</span><span class="p">,</span> <span class="s1">&#39;txfo&#39;</span><span class="p">,</span> <span class="s1">&#39;txp&#39;</span><span class="p">,</span> <span class="s1">&#39;txr&#39;</span><span class="p">,</span> <span class="s1">&#39;txs&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="s1">&#39;txw&#39;</span><span class="p">,</span> <span class="s1">&#39;wcap&#39;</span><span class="p">,</span> <span class="s1">&#39;xacc&#39;</span><span class="p">,</span> <span class="s1">&#39;xad&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;xido&#39;</span><span class="p">,</span> <span class="s1">&#39;xidoc&#39;</span><span class="p">,</span> <span class="s1">&#39;xint&#39;</span><span class="p">,</span> <span class="s1">&#39;xlr&#39;</span><span class="p">,</span> <span class="s1">&#39;xopr&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;xpp&#39;</span><span class="p">,</span> <span class="s1">&#39;xpr&#39;</span><span class="p">,</span> <span class="s1">&#39;xrd&#39;</span><span class="p">,</span> <span class="s1">&#39;xrdp&#39;</span><span class="p">,</span> <span class="s1">&#39;xrent&#39;</span><span class="p">,</span> <span class="s1">&#39;xsga&#39;</span>
+                <span class="p">]),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;quarterly&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;quarterly&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datadate&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;indfmt&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;consol&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;popsrc&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datafmt&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;costat&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="n">BigInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sic&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datacqtr&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;datafqtr&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fqtr&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fyearq&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;rdq&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;prccq&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="o">*</span><span class="p">(</span><span class="n">Column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Float</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
+                  <span class="p">[</span><span class="s1">&#39;actq&#39;</span><span class="p">,</span> <span class="s1">&#39;atq&#39;</span><span class="p">,</span> <span class="s1">&#39;ceqq&#39;</span><span class="p">,</span> <span class="s1">&#39;cheq&#39;</span><span class="p">,</span> <span class="s1">&#39;cogsq&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;cshoq&#39;</span><span class="p">,</span> <span class="s1">&#39;dlcq&#39;</span><span class="p">,</span> <span class="s1">&#39;ibq&#39;</span><span class="p">,</span> <span class="s1">&#39;lctq&#39;</span><span class="p">,</span> <span class="s1">&#39;ltq&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;ppentq&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkq&#39;</span><span class="p">,</span> <span class="s1">&#39;pstkrq&#39;</span><span class="p">,</span> <span class="s1">&#39;revtq&#39;</span><span class="p">,</span> <span class="s1">&#39;saleq&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;seqq&#39;</span><span class="p">,</span> <span class="s1">&#39;txtq&#39;</span><span class="p">,</span> <span class="s1">&#39;xsgaq&#39;</span><span class="p">]),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;keydev&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;keydev&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;keydevid&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;companyid&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;companyname&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;keydevtoobjectroletypeid&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;announcedate&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;customer&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+                <span class="s1">&#39;customer&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>   <span class="c1"># Supplier GVKEY</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;conm&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">)),</span>                  <span class="c1"># Supplier Name</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cgvkey&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># Customer GVKEY</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cconm&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">)),</span>                 <span class="c1"># Cust Current Name</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cnms&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">100</span><span class="p">)),</span>                  <span class="c1"># Customer Name</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;srcdate&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># Source Date</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cid&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="c1">#Cust Identifier</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="c1">#Cust Segment Ident Link</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ctype&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span>  <span class="c1"># Customer Type</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;salecs&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>     <span class="c1"># Customer Sales</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;scusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span> <span class="c1"># Supplier CUSIP</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;stic&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span>   <span class="c1"># Supplier Ticker Symbol</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ccusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">9</span><span class="p">)),</span> <span class="c1"># Customer CUSIP</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ctic&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">7</span><span class="p">)),</span>   <span class="c1"># Customer Ticker Symbol</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PSTAT.build_lookup"><a class="viewcode-back" href="../../../finds.structured.pstat.html#finds.structured.pstat.PSTAT.build_lookup">[docs]</a>    <span class="k">def</span> <span class="nf">build_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;linkdt&#39;</span><span class="p">,</span> 
+                     <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;links&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Build lookup function to return target identifier from source&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                    <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                                    <span class="n">fillna</span><span class="o">=</span><span class="n">fillna</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="PSTAT.get_permnos"><a class="viewcode-back" href="../../../finds.structured.pstat.html#finds.structured.pstat.PSTAT.get_permnos">[docs]</a>    <span class="k">def</span> <span class="nf">get_permnos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">link_perm</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> 
+                    <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">permno</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of permnos mapped to gvkeys as of a date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          keys: Input list of gvkeys to lookup</span>
+<span class="sd">          date: Prevailing date of link        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permnos</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">link_perm</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> 
+                                   <span class="n">link_date</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">permno</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PSTAT.get_linked"><a class="viewcode-back" href="../../../finds.structured.pstat.html#finds.structured.pstat.PSTAT.get_linked">[docs]</a>    <span class="k">def</span> <span class="nf">get_linked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                   <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;datadate&#39;</span><span class="p">,</span> <span class="n">link_perm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> 
+                   <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;linkdt&#39;</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                   <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Query a pstat table, and return with linked crsp permno</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          dataset: pstat dataset to query</span>
+<span class="sd">          fields : Names of fields to return</span>
+<span class="sd">          date_field: Name of date field in pstat table to query</span>
+<span class="sd">          link_date: Name of link date field in &#39;links&#39; table</span>
+<span class="sd">          link_perm: Name of permno field in &#39;links&#39; table</span>
+<span class="sd">          where : Sql where clause, as sql string (optional)</span>
+<span class="sd">          limit : Maximum number of records to return (optional)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame containing result of query</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; df = pstat.get_linked(dataset=&#39;annual&#39;, date_field=&#39;datadate&#39;,</span>
+<span class="sd">                 fields=[&#39;ceq&#39;,&#39;pstkrv&#39;,&#39;pstkl&#39;,&#39;pstk&#39;],</span>
+<span class="sd">                 where=&#39;ceq &gt; 0 and datadate&gt;=19930104 and datadate&lt;=20991231&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; df = keydev.get_linked(dataset=&#39;keydev&#39;, date_field=&#39;announcedate&#39;,</span>
+<span class="sd">                 fields=[&#39;companyname&#39;, &#39;keydeveventtypeid&#39;,</span>
+<span class="sd">                 &#39;keydevtoobjectroletypeid&#39;],</span>
+<span class="sd">                 where=&#39;&#39;, limit=&#39;&#39;):</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            select keydev.companyname, keydev.keydeveventtypeid,</span>
+<span class="sd">            keydev.keydevtoobjectroletypeid,</span>
+<span class="sd">            keydev.announcedate, keydev.gvkey, lpermno as permno</span>
+<span class="sd">            from keydev left join links</span>
+<span class="sd">            on keydev.gvkey = links.gvkey and links.linkdt =</span>
+<span class="sd">                (select max(c.linkdt) as linkdt from links c</span>
+<span class="sd">                where c.gvkey = keydev.gvkey and c.linkdt &lt;= keydev.announcedate)</span>
+<span class="sd">            where lpermno is not null and keydev.gvkey &gt; 0 and links.gvkey &gt; 0</span>
+<span class="sd">            and announcedate &gt;= 20180301</span>
+<span class="sd">            limit 100;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_linked</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span> <span class="n">link_perm</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> <span class="n">link_date</span><span class="o">=</span><span class="s1">&#39;linkdt&#39;</span><span class="p">,</span> 
+                <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="n">pstat</span> <span class="o">=</span> <span class="n">PSTAT</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">)</span>
+    <span class="n">downloads</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;PSTAT&#39;</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # load links</span>
+<span class="sd">    links_df = pstat.load_csv(</span>
+<span class="sd">        &#39;links&#39;, downloads / &#39;links.txt.gz&#39;, sep=&#39;\t&#39;,    </span>
+<span class="sd">        drop={&#39;lpermno&#39;: [&#39;0&#39;, 0],</span>
+<span class="sd">              &#39;linkprim&#39;: [&#39;N&#39;, &#39;J&#39;]},</span>
+<span class="sd">        keep={&#39;linktype&#39;: [&#39;LC&#39;, &#39;LU&#39;]},  # researched and unresearched links&quot;</span>
+<span class="sd">        replace={&#39;linkdt&#39;: ([&#39;C&#39;, &#39;E&#39;, &#39;B&#39;], 0),</span>
+<span class="sd">                 &#39;linkenddt&#39;: ([&#39;C&#39;, &#39;E&#39;, &#39;B&#39;], 0)})</span>
+<span class="sd">    print(len(links_df), 33036)</span>
+<span class="sd">    lag = links_df.shift()</span>
+<span class="sd">    f = (lag.gvkey == df.gvkey) &amp; (lag.lpermno != links_df.lpermno)</span>
+<span class="sd">    print(&#39;permnos in links changed in &#39;, sum(f), &#39;of&#39;, len(links_df), 1063)</span>
+
+<span class="sd">    # load annual</span>
+<span class="sd">    annual_df = pstat.load_csv(&#39;annual&#39;, downloads / &#39;annual.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(annual_df), 464753)</span>
+<span class="sd">    print(annual_df.isna().mean().sort_values().tail(5))</span>
+
+<span class="sd">    # load quarterly</span>
+<span class="sd">    quarterly_df = pstat.load_csv(&#39;quarterly&#39;, downloads / &#39;quarterly.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(quarterly_df), 1637274)</span>
+<span class="sd">    print(quarterly_df.isna().mean().sort_values().tail(5))</span>
+
+
+<span class="sd">    # load keydevs</span>
+<span class="sd">    for filename in sorted(downloads.glob(&#39;keydev*.txt.gz&#39;)):</span>
+<span class="sd">        tic = time.time()   </span>
+<span class="sd">        keydev_df = pstat.load_csv(&#39;keydev&#39;,</span>
+<span class="sd">                                   downloads / filename,</span>
+<span class="sd">                                   sep=&#39;\t&#39;,</span>
+<span class="sd">                                   drop={&#39;gvkey&#39;: [0, &#39;0&#39;],</span>
+<span class="sd">                                         &#39;announcedate&#39;: [0, &#39;0&#39;],</span>
+<span class="sd">                                         &#39;keydevid&#39;: [0, &#39;0&#39;]})</span>
+<span class="sd">        print(len(keydev_df), filename, time.time() - tic)</span>
+<span class="sd">    print(sql.run(&#39;select count(*) from keydev&#39;), 12256909)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># load principal customers</span>
+    <span class="n">supply_df</span> <span class="o">=</span> <span class="n">pstat</span><span class="o">.</span><span class="n">load_csv</span><span class="p">(</span><span class="s1">&#39;customer&#39;</span><span class="p">,</span>
+                               <span class="n">downloads</span> <span class="o">/</span> <span class="s1">&#39;supplychain.txt&#39;</span><span class="p">,</span>
+                               <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+                               <span class="n">drop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gvkey&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">],</span>
+                                     <span class="s1">&#39;ctic&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">],</span>
+                                     <span class="s1">&#39;stic&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">]})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">supply_df</span><span class="p">),</span> <span class="mi">107114</span><span class="p">)</span>
+
+    <span class="c1"># TODO: loop over String cols and compare lens</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;conm&#39;</span><span class="p">,</span> <span class="s1">&#39;cconm&#39;</span><span class="p">,</span> <span class="s1">&#39;cnms&#39;</span><span class="p">,</span> <span class="s1">&#39;ctype&#39;</span><span class="p">,</span> <span class="s1">&#39;scusip&#39;</span><span class="p">,</span> <span class="s1">&#39;stic&#39;</span><span class="p">,</span> <span class="s1">&#39;ccusip&#39;</span><span class="p">,</span> <span class="s1">&#39;ctic&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">supply_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()),</span> <span class="nb">min</span><span class="p">(</span><span class="n">supply_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">len</span><span class="p">()))</span>
+
+<span class="sd">&#39;&#39;&#39;nanmean</span>
+<span class="sd">pstkrq    0.278155</span>
+<span class="sd">dlcq      0.283994</span>
+<span class="sd">lctq      0.368958</span>
+<span class="sd">actq      0.373740</span>
+<span class="sd">xsgaq     0.385008</span>
+
+<span class="sd">xlr       0.775819</span>
+<span class="sd">ob        0.827637</span>
+<span class="sd">cshrc     0.859283</span>
+<span class="sd">scstkc    0.974569</span>
+<span class="sd">gwo       0.977663</span>
+<span class="sd">&#39;&#39;&#39;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

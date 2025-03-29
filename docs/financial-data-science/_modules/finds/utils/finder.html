@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.utils.finder &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.utils.finder</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.utils.finder</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Finder class to lookup reference info across multiple datasets</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Finder"><a class="viewcode-back" href="../../../finds.utils.finder.html#finds.utils.finder.Finder">[docs]</a><span class="k">class</span> <span class="nc">Finder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Looks-up reference info across multiple datasets by various identifiers&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">table</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize lookup method with optional identifier type and table</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sql: SQL connection instance</span>
+<span class="sd">            identifier: Type of input identifier for this Finder instance</span>
+<span class="sd">            table: Physical name of table to query</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; find = Find(sql, identifier=&#39;comnam&#39;, table=&#39;names&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">table</span>
+
+<div class="viewcode-block" id="Finder.__call__"><a class="viewcode-back" href="../../../finds.utils.finder.html#finds.utils.finder.Finder.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                       <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                       <span class="n">table</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Lookup an identifier</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label: Input label to lookup</span>
+<span class="sd">            identifier: Identifier type of input label</span>
+<span class="sd">            table: Physical name of table to query</span>
+<span class="sd">            kwargs: Alternate method to specify identifier=label</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        Guesses identifier type and table if not specified or initialized</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; find(&#39;ALPHABET&#39;, &#39;comnam&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;ALPHABET&#39;, &#39;conm&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;ALPHABET&#39;, &#39;cname&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(18144)</span>
+<span class="sd">        &gt;&gt;&gt; find(328795, &#39;gvkey&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;0011&#39;, &#39;ticker&#39;, &#39;idsum&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;aapl&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;03783310&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;03783310&#39;,&#39;cusip&#39;, &#39;links&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;03783310&#39;,&#39;cusip&#39;, &#39;idsum&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; find(&#39;45483&#39;, &#39;permco&#39;, &#39;names&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">label</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">identifier</span><span class="p">:</span>   <span class="c1"># guess identifier if not specified</span>
+            <span class="k">if</span> <span class="mi">5</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">label</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;gvkey&#39;</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">label</span><span class="p">):</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;ncusip&#39;</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;tsymbol&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="s1">&#39;comnam&#39;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">table</span><span class="p">:</span>   <span class="c1"># guess table if not specified</span>
+            <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;ncusip&#39;</span><span class="p">,</span> <span class="s1">&#39;tsymbol&#39;</span><span class="p">,</span> <span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="s1">&#39;permco&#39;</span><span class="p">]:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="s1">&#39;names&#39;</span>
+            <span class="k">elif</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="s1">&#39;conm&#39;</span><span class="p">,</span> <span class="s1">&#39;cik&#39;</span><span class="p">]:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="s1">&#39;links&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="s1">&#39;idsum&#39;</span>
+                
+        <span class="n">like</span> <span class="o">=</span> <span class="s1">&#39;=&#39;</span>
+        <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="s1">&#39;conm&#39;</span><span class="p">,</span> <span class="s1">&#39;cname&#39;</span><span class="p">]:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="n">label</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span>
+            <span class="n">like</span> <span class="o">=</span> <span class="s1">&#39;LIKE&#39;</span>  <span class="c1"># for identifiers of str type, match with wildcard</span>
+        <span class="k">elif</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;gvkey&#39;</span><span class="p">,</span> <span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="s1">&#39;permco&#39;</span><span class="p">]:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ncusip&#39;</span><span class="p">,</span> <span class="s1">&#39;cusip&#39;</span><span class="p">]:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM </span><span class="si">{table}</span><span class="s2"> WHERE </span><span class="si">{identifier}</span><span class="s2"> </span><span class="si">{like}</span><span class="s2"> &#39;</span><span class="si">{label}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">like</span><span class="o">=</span><span class="n">like</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="o">**</span><span class="n">result</span><span class="p">)</span> <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">find</span> <span class="o">=</span> <span class="n">Finder</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;GOOG&#39;</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;META&#39;</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;tsymbol&#39;</span><span class="p">))</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="n">find</span><span class="p">(</span><span class="n">comnam</span><span class="o">=</span><span class="s1">&#39;FACEBOOK&#39;</span><span class="p">))</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

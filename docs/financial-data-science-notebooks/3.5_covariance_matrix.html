@@ -1,0 +1,2303 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Covariance Matrix &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '3.5_covariance_matrix';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Market Microstructure" href="3.6_market_microstructure.html" />
+    <link rel="prev" title="Value at Risk" href="3.4_value_at_risk.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F3.5_covariance_matrix.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/3.5_covariance_matrix.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Covariance Matrix</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-risk">Portfolio risk</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-budgetting">Risk budgetting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-parity-portfolios">Risk parity portfolios</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-matrix-estimation">Covariance matrix estimation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-components">Principal components</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ewma">EWMA</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shrinkage-methods">Shrinkage methods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#volatility-of-the-gmv-portfolio">Volatility of the GMV portfolio</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="covariance-matrix">
+<h1>Covariance Matrix<a class="headerlink" href="#covariance-matrix" title="Permalink to this heading">#</a></h1>
+<p><em>Alone, we can do so little; together, we can do so much</em> - Helen Keller</p>
+<p>The covariance matrix quantifies the relationships between asset returns, enabling investors to assess diversification benefits and manage portfolio risk.
+We begin by exploring risk budgeting, which breaks down a portfolio’s overall risk contribution by asset, and specifically risk parity portfolios, which aim to distribute risk evenly across assets.
+We then cover techniques for covariance matrix estimation, including principal component analysis (PCA), Exponentially Weighted Moving Average (EWMA), and shrinkage methods.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">import</span> <span class="nn">cvxpy</span> <span class="k">as</span> <span class="nn">cp</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mcolors</span>
+<span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="kn">import</span> <span class="n">LedoitWolf</span><span class="p">,</span> <span class="n">OAS</span><span class="p">,</span> <span class="n">EmpiricalCovariance</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">cluster</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">ColorMap</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">FFReader</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+
+<span class="c1"># %matplotlib qt</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="portfolio-risk">
+<h2>Portfolio risk<a class="headerlink" href="#portfolio-risk" title="Permalink to this heading">#</a></h2>
+<p>The covariance matrix is essential for portfolio risk analysis, helping investors evaluate diversification benefits and effectively manage overall risk. In this analysis, we use monthly returns from the 49 industry indexes compiled by Ken French.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieve industry returns from Ken French Data Library website</span>
+<span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;49_Industry_Portfolios&#39;</span>
+<span class="n">ff</span> <span class="o">=</span> <span class="n">FFReader</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+<span class="n">keep</span> <span class="o">=</span> <span class="n">ff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[(</span><span class="n">ff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">99</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">rets</span> <span class="o">=</span> <span class="p">(</span><span class="n">ff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>
+<span class="n">caps</span> <span class="o">=</span> <span class="p">(</span><span class="n">ff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">ff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="mf">10e6</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>   <span class="c1"># number of firms x avg market cap</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">caps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">caps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">rets</span> <span class="o">-</span> <span class="n">rets</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>    <span class="c1"># demean by industry</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mi">12</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>     <span class="c1"># annualized covariance matrix</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">caps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>\
+        <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;cap&#39;</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>\
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;vol&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">sigma</span><span class="p">))},</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>\
+        <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;cap&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot annualized volatility and market caps of industries</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">Y</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Cap and Volatility of FF49 Industries (</span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Log Market Cap&quot;</span><span class="p">)</span>
+<span class="n">Y</span><span class="p">[</span><span class="s1">&#39;vol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Annualized Volatility&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;monthly returns (</span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0, &#39;monthly returns (1969-07 to 2024-12)&#39;)
+</pre></div>
+</div>
+<img alt="_images/b87e81ad787d9eb0b73a35bbe11a4a8b928293e8cb2404702f61ce680c113940.png" src="_images/b87e81ad787d9eb0b73a35bbe11a4a8b928293e8cb2404702f61ce680c113940.png" />
+</div>
+</div>
+<section id="risk-budgetting">
+<h3>Risk budgetting<a class="headerlink" href="#risk-budgetting" title="Permalink to this heading">#</a></h3>
+<p>Risk budgeting breaks down a portfolio’s overall risk contribution by asset.</p>
+<ul class="simple">
+<li><p><strong>Portfolio Risk</strong>: The volatility of a market portfolio is given by:<br />
+$<span class="math notranslate nohighlight">\(\sigma_P = W^T \Sigma W\)</span><span class="math notranslate nohighlight">\(  
+where \)</span> W <span class="math notranslate nohighlight">\( represents the vector of asset weights in the portfolio, and \)</span> \Sigma $ is the covariance matrix of asset returns.</p></li>
+<li><p><strong>Covariance</strong>: The covariance of an individual security <span class="math notranslate nohighlight">\( i \)</span> with the portfolio <span class="math notranslate nohighlight">\( P \)</span> is expressed as:<br />
+$<span class="math notranslate nohighlight">\(\sigma_{iP} = \rho_{iP} \cdot \sigma_i \cdot \sigma_P\)</span><span class="math notranslate nohighlight">\(  
+where \)</span> \rho_{iP} $ is the correlation between the security and the portfolio.</p></li>
+<li><p><strong>Beta (<span class="math notranslate nohighlight">\(\beta\)</span>)</strong>: The systematic risk of a security relative to the portfolio, defined as:<br />
+$<span class="math notranslate nohighlight">\(\beta_i = \dfrac{\sigma_{iP}}{\sigma_P^2}\)</span>$<br />
+This represents the regression slope of the security’s returns against the portfolio’s returns.</p></li>
+<li><p><strong>Marginal Contribution to Risk (MCR)</strong>: Measures the sensitivity of portfolio volatility to small changes in an asset’s weight:<br />
+$<span class="math notranslate nohighlight">\(\dfrac{\partial \sigma_P}{\partial w_i} = \dfrac{\sigma_{iP}}{\sigma_P}\)</span>$</p></li>
+<li><p><strong>Percent Contribution to Risk (PCR)</strong>: Indicates the fraction of total portfolio risk attributable to a security:<br />
+$<span class="math notranslate nohighlight">\(\beta_i \cdot w_i\)</span>$<br />
+The sum of all asset contributions equals 1.</p></li>
+<li><p><strong>Contribution to Portfolio Risk</strong>: The total portfolio risk can also be expressed as:<br />
+$<span class="math notranslate nohighlight">\(\beta_i \cdot w_i \cdot \sigma_P = w_i \cdot \sigma_i \cdot \rho_{iP}\)</span>$
+This highlights how an asset’s weight, volatility, and correlation with the portfolio drive its risk contribution.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper to compute portfolio risk budget</span>
+<span class="k">def</span> <span class="nf">risk_budget</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute portfolio risk analytics&quot;&quot;&quot;</span>
+    <span class="n">sigma_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">100</span>   <span class="c1"># express as percent returns</span>
+    <span class="n">w_</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    
+    <span class="c1"># Portfolio volatility (percent)</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w_</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">sigma_</span> <span class="o">@</span> <span class="n">w_</span><span class="p">)</span>
+    
+    <span class="c1"># Covariance of each security wrt market portfolio</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">sigma_</span> <span class="o">@</span> <span class="n">w_</span>
+
+    <span class="c1"># Beta of each security wrt market portfolio</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">cov</span> <span class="o">/</span> <span class="p">(</span><span class="n">w_</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">sigma_</span> <span class="o">@</span> <span class="n">w_</span><span class="p">)</span>
+
+    <span class="c1"># Marginal Contribution to Risk of each security</span>
+    <span class="n">marginal</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">vol</span>
+    
+    <span class="c1"># Percent Contribution to Risk</span>
+    <span class="n">percent</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">w_</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="c1"># Contribution to Risk</span>
+    <span class="n">contrib</span> <span class="o">=</span> <span class="n">marginal</span> <span class="o">*</span> <span class="n">w_</span>
+
+    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">w</span><span class="p">),</span>
+                      <span class="s1">&#39;Beta&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">beta</span><span class="p">),</span>
+                      <span class="s1">&#39;MCR(%)&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">marginal</span><span class="p">),</span>
+                      <span class="s1">&#39;PCR(%)&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">percent</span><span class="p">),</span>
+                      <span class="s1">&#39;CR&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">contrib</span><span class="p">)},</span>
+                     <span class="n">index</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">sigma</span> <span class="o">@</span> <span class="n">weights</span><span class="p">)</span>  <span class="c1"># market portfolio risk</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Market Portfolio Risk Budget (vol=</span><span class="si">{</span><span class="n">vol</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="n">risk_budget</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">weights</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;CR&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Market Portfolio Risk Budget (vol=19.34%)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weight</th>
+      <th>Beta</th>
+      <th>MCR(%)</th>
+      <th>PCR(%)</th>
+      <th>CR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Softw</th>
+      <td>0.182276</td>
+      <td>1.555931</td>
+      <td>30.097357</td>
+      <td>28.360924</td>
+      <td>5.486032</td>
+    </tr>
+    <tr>
+      <th>Chips</th>
+      <td>0.161610</td>
+      <td>1.184836</td>
+      <td>22.919038</td>
+      <td>19.148127</td>
+      <td>3.703943</td>
+    </tr>
+    <tr>
+      <th>Rtail</th>
+      <td>0.085470</td>
+      <td>0.828755</td>
+      <td>16.031140</td>
+      <td>7.083394</td>
+      <td>1.370186</td>
+    </tr>
+    <tr>
+      <th>Banks</th>
+      <td>0.059413</td>
+      <td>0.843213</td>
+      <td>16.310804</td>
+      <td>5.009761</td>
+      <td>0.969070</td>
+    </tr>
+    <tr>
+      <th>Fin</th>
+      <td>0.033877</td>
+      <td>0.971510</td>
+      <td>18.792521</td>
+      <td>3.291171</td>
+      <td>0.636632</td>
+    </tr>
+    <tr>
+      <th>Drugs</th>
+      <td>0.053875</td>
+      <td>0.581038</td>
+      <td>11.239382</td>
+      <td>3.130335</td>
+      <td>0.605520</td>
+    </tr>
+    <tr>
+      <th>BusSv</th>
+      <td>0.031733</td>
+      <td>0.953210</td>
+      <td>18.438533</td>
+      <td>3.024847</td>
+      <td>0.585115</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>0.028863</td>
+      <td>0.906179</td>
+      <td>17.528786</td>
+      <td>2.615469</td>
+      <td>0.505927</td>
+    </tr>
+    <tr>
+      <th>Insur</th>
+      <td>0.034341</td>
+      <td>0.726098</td>
+      <td>14.045377</td>
+      <td>2.493480</td>
+      <td>0.482330</td>
+    </tr>
+    <tr>
+      <th>Autos</th>
+      <td>0.023701</td>
+      <td>0.997867</td>
+      <td>19.302368</td>
+      <td>2.365052</td>
+      <td>0.457487</td>
+    </tr>
+    <tr>
+      <th>Mach</th>
+      <td>0.022131</td>
+      <td>0.974029</td>
+      <td>18.841261</td>
+      <td>2.155620</td>
+      <td>0.416975</td>
+    </tr>
+    <tr>
+      <th>Trans</th>
+      <td>0.019526</td>
+      <td>0.884115</td>
+      <td>17.101985</td>
+      <td>1.726316</td>
+      <td>0.333932</td>
+    </tr>
+    <tr>
+      <th>LabEq</th>
+      <td>0.015992</td>
+      <td>1.048768</td>
+      <td>20.286986</td>
+      <td>1.677156</td>
+      <td>0.324423</td>
+    </tr>
+    <tr>
+      <th>Oil</th>
+      <td>0.028253</td>
+      <td>0.592003</td>
+      <td>11.451492</td>
+      <td>1.672590</td>
+      <td>0.323540</td>
+    </tr>
+    <tr>
+      <th>MedEq</th>
+      <td>0.019788</td>
+      <td>0.718659</td>
+      <td>13.901468</td>
+      <td>1.422059</td>
+      <td>0.275078</td>
+    </tr>
+    <tr>
+      <th>Telcm</th>
+      <td>0.020845</td>
+      <td>0.597110</td>
+      <td>11.550276</td>
+      <td>1.244649</td>
+      <td>0.240760</td>
+    </tr>
+    <tr>
+      <th>Meals</th>
+      <td>0.014186</td>
+      <td>0.862779</td>
+      <td>16.689278</td>
+      <td>1.223961</td>
+      <td>0.236759</td>
+    </tr>
+    <tr>
+      <th>Fun</th>
+      <td>0.010471</td>
+      <td>1.140790</td>
+      <td>22.067019</td>
+      <td>1.194478</td>
+      <td>0.231055</td>
+    </tr>
+    <tr>
+      <th>Util</th>
+      <td>0.027976</td>
+      <td>0.375849</td>
+      <td>7.270286</td>
+      <td>1.051464</td>
+      <td>0.203391</td>
+    </tr>
+    <tr>
+      <th>Hardw</th>
+      <td>0.010442</td>
+      <td>0.988086</td>
+      <td>19.113163</td>
+      <td>1.031731</td>
+      <td>0.199574</td>
+    </tr>
+    <tr>
+      <th>Whlsl</th>
+      <td>0.011183</td>
+      <td>0.869373</td>
+      <td>16.816831</td>
+      <td>0.972226</td>
+      <td>0.188064</td>
+    </tr>
+    <tr>
+      <th>Aero</th>
+      <td>0.009449</td>
+      <td>0.927079</td>
+      <td>17.933076</td>
+      <td>0.875994</td>
+      <td>0.169449</td>
+    </tr>
+    <tr>
+      <th>Hshld</th>
+      <td>0.012793</td>
+      <td>0.598646</td>
+      <td>11.579978</td>
+      <td>0.765832</td>
+      <td>0.148140</td>
+    </tr>
+    <tr>
+      <th>Cnstr</th>
+      <td>0.007072</td>
+      <td>1.050526</td>
+      <td>20.320993</td>
+      <td>0.742934</td>
+      <td>0.143710</td>
+    </tr>
+    <tr>
+      <th>Chems</th>
+      <td>0.008270</td>
+      <td>0.808718</td>
+      <td>15.643534</td>
+      <td>0.668792</td>
+      <td>0.129369</td>
+    </tr>
+    <tr>
+      <th>Hlth</th>
+      <td>0.005851</td>
+      <td>0.968313</td>
+      <td>18.730690</td>
+      <td>0.566569</td>
+      <td>0.109595</td>
+    </tr>
+    <tr>
+      <th>BldMt</th>
+      <td>0.005606</td>
+      <td>0.956894</td>
+      <td>18.509810</td>
+      <td>0.536398</td>
+      <td>0.103759</td>
+    </tr>
+    <tr>
+      <th>Clths</th>
+      <td>0.004255</td>
+      <td>0.938755</td>
+      <td>18.158938</td>
+      <td>0.399468</td>
+      <td>0.077272</td>
+    </tr>
+    <tr>
+      <th>Food</th>
+      <td>0.007388</td>
+      <td>0.497495</td>
+      <td>9.623355</td>
+      <td>0.367564</td>
+      <td>0.071100</td>
+    </tr>
+    <tr>
+      <th>Soda</th>
+      <td>0.006012</td>
+      <td>0.610836</td>
+      <td>11.815793</td>
+      <td>0.367218</td>
+      <td>0.071033</td>
+    </tr>
+    <tr>
+      <th>Mines</th>
+      <td>0.004196</td>
+      <td>0.870379</td>
+      <td>16.836284</td>
+      <td>0.365172</td>
+      <td>0.070638</td>
+    </tr>
+    <tr>
+      <th>Beer</th>
+      <td>0.005945</td>
+      <td>0.567434</td>
+      <td>10.976238</td>
+      <td>0.337364</td>
+      <td>0.065259</td>
+    </tr>
+    <tr>
+      <th>PerSv</th>
+      <td>0.003352</td>
+      <td>0.919656</td>
+      <td>17.789492</td>
+      <td>0.308300</td>
+      <td>0.059636</td>
+    </tr>
+    <tr>
+      <th>Smoke</th>
+      <td>0.005225</td>
+      <td>0.477864</td>
+      <td>9.243631</td>
+      <td>0.249665</td>
+      <td>0.048294</td>
+    </tr>
+    <tr>
+      <th>ElcEq</th>
+      <td>0.002505</td>
+      <td>0.982095</td>
+      <td>18.997290</td>
+      <td>0.245969</td>
+      <td>0.047579</td>
+    </tr>
+    <tr>
+      <th>Steel</th>
+      <td>0.002262</td>
+      <td>1.052579</td>
+      <td>20.360697</td>
+      <td>0.238090</td>
+      <td>0.046055</td>
+    </tr>
+    <tr>
+      <th>Guns</th>
+      <td>0.003317</td>
+      <td>0.646421</td>
+      <td>12.504129</td>
+      <td>0.214389</td>
+      <td>0.041471</td>
+    </tr>
+    <tr>
+      <th>RlEst</th>
+      <td>0.001590</td>
+      <td>1.038549</td>
+      <td>20.089312</td>
+      <td>0.165107</td>
+      <td>0.031938</td>
+    </tr>
+    <tr>
+      <th>Paper</th>
+      <td>0.001822</td>
+      <td>0.736880</td>
+      <td>14.253940</td>
+      <td>0.134245</td>
+      <td>0.025968</td>
+    </tr>
+    <tr>
+      <th>Boxes</th>
+      <td>0.001378</td>
+      <td>0.731479</td>
+      <td>14.149461</td>
+      <td>0.100793</td>
+      <td>0.019497</td>
+    </tr>
+    <tr>
+      <th>Rubbr</th>
+      <td>0.001124</td>
+      <td>0.872047</td>
+      <td>16.868545</td>
+      <td>0.098007</td>
+      <td>0.018958</td>
+    </tr>
+    <tr>
+      <th>Ships</th>
+      <td>0.000854</td>
+      <td>0.858852</td>
+      <td>16.613317</td>
+      <td>0.073364</td>
+      <td>0.014191</td>
+    </tr>
+    <tr>
+      <th>Toys</th>
+      <td>0.000644</td>
+      <td>0.991057</td>
+      <td>19.170634</td>
+      <td>0.063808</td>
+      <td>0.012343</td>
+    </tr>
+    <tr>
+      <th>Agric</th>
+      <td>0.000859</td>
+      <td>0.704508</td>
+      <td>13.627738</td>
+      <td>0.060501</td>
+      <td>0.011703</td>
+    </tr>
+    <tr>
+      <th>Books</th>
+      <td>0.000555</td>
+      <td>0.874586</td>
+      <td>16.917676</td>
+      <td>0.048503</td>
+      <td>0.009382</td>
+    </tr>
+    <tr>
+      <th>Gold</th>
+      <td>0.000960</td>
+      <td>0.429793</td>
+      <td>8.313752</td>
+      <td>0.041262</td>
+      <td>0.007982</td>
+    </tr>
+    <tr>
+      <th>Coal</th>
+      <td>0.000311</td>
+      <td>0.879600</td>
+      <td>17.014650</td>
+      <td>0.027317</td>
+      <td>0.005284</td>
+    </tr>
+    <tr>
+      <th>FabPr</th>
+      <td>0.000234</td>
+      <td>0.912134</td>
+      <td>17.643973</td>
+      <td>0.021316</td>
+      <td>0.004123</td>
+    </tr>
+    <tr>
+      <th>Txtls</th>
+      <td>0.000225</td>
+      <td>0.946333</td>
+      <td>18.305513</td>
+      <td>0.021250</td>
+      <td>0.004111</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="risk-parity-portfolios">
+<h3>Risk parity portfolios<a class="headerlink" href="#risk-parity-portfolios" title="Permalink to this heading">#</a></h3>
+<p>A <strong>risk parity portfolio (RPP)</strong> aims to equalize the risk contribution of each asset class before leveraging to reach a target volatility. The allocation can be framed as a convex optimization problem, as proposed by Spinu (2013):<br />
+$<span class="math notranslate nohighlight">\( \min_{w} \dfrac{1}{2} w^T \Sigma W - \sum_i b_i \log{w_i}\)</span><span class="math notranslate nohighlight">\(  
+subject to non-negative asset weights \)</span> w_i \geq 0 <span class="math notranslate nohighlight">\(, where \)</span> b_i = 1/N $ represents the desired risk budget for an equally weighted risk-parity portfolio.</p>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">cvxpy</span></code> convex optimization package. The risk parity portfolio has the greatest weight in the Utilities industry and lowest weight in Software.  By contrast, Software has the most weight in the market.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up variables and constraints</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">/</span><span class="n">N</span>            <span class="c1"># risk parity</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>          <span class="c1"># portfolio weights to solve for</span>
+<span class="n">constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">W</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span>      <span class="c1"># non-negative weights constraint</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solve objective</span>
+<span class="n">obj</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">cp</span><span class="o">.</span><span class="n">quad_form</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">-</span> <span class="n">cp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">W</span><span class="p">)))</span>  
+<span class="n">prob</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">Problem</span><span class="p">(</span><span class="n">cp</span><span class="o">.</span><span class="n">Minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">constraints</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.6135631335344156
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># normalize solution weights</span>
+<span class="n">rpp</span> <span class="o">=</span> <span class="p">(</span><span class="n">W</span><span class="o">/</span><span class="n">cp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">W</span><span class="p">))</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rpp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">sigma</span> <span class="o">@</span> <span class="n">rpp</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk Parity Portfolio (vol=</span><span class="si">{</span><span class="n">vol</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="n">risk_budget</span><span class="p">(</span><span class="n">rpp</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">weights</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Risk Parity Portfolio (vol=16.47%)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weight</th>
+      <th>Beta</th>
+      <th>MCR(%)</th>
+      <th>PCR(%)</th>
+      <th>CR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Util</th>
+      <td>0.038404</td>
+      <td>0.531408</td>
+      <td>8.750135</td>
+      <td>2.040813</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>Food</th>
+      <td>0.030511</td>
+      <td>0.668941</td>
+      <td>11.014738</td>
+      <td>2.040994</td>
+      <td>0.336069</td>
+    </tr>
+    <tr>
+      <th>Smoke</th>
+      <td>0.029554</td>
+      <td>0.690540</td>
+      <td>11.370397</td>
+      <td>2.040830</td>
+      <td>0.336042</td>
+    </tr>
+    <tr>
+      <th>Drugs</th>
+      <td>0.028845</td>
+      <td>0.707521</td>
+      <td>11.650005</td>
+      <td>2.040838</td>
+      <td>0.336043</td>
+    </tr>
+    <tr>
+      <th>Telcm</th>
+      <td>0.028641</td>
+      <td>0.712525</td>
+      <td>11.732403</td>
+      <td>2.040757</td>
+      <td>0.336030</td>
+    </tr>
+    <tr>
+      <th>Gold</th>
+      <td>0.028104</td>
+      <td>0.726190</td>
+      <td>11.957409</td>
+      <td>2.040872</td>
+      <td>0.336049</td>
+    </tr>
+    <tr>
+      <th>Beer</th>
+      <td>0.027832</td>
+      <td>0.733279</td>
+      <td>12.074135</td>
+      <td>2.040854</td>
+      <td>0.336046</td>
+    </tr>
+    <tr>
+      <th>Hshld</th>
+      <td>0.026951</td>
+      <td>0.757247</td>
+      <td>12.468779</td>
+      <td>2.040819</td>
+      <td>0.336040</td>
+    </tr>
+    <tr>
+      <th>Soda</th>
+      <td>0.024589</td>
+      <td>0.829944</td>
+      <td>13.665817</td>
+      <td>2.040752</td>
+      <td>0.336029</td>
+    </tr>
+    <tr>
+      <th>Oil</th>
+      <td>0.024289</td>
+      <td>0.840218</td>
+      <td>13.834978</td>
+      <td>2.040816</td>
+      <td>0.336040</td>
+    </tr>
+    <tr>
+      <th>Guns</th>
+      <td>0.023380</td>
+      <td>0.872899</td>
+      <td>14.373107</td>
+      <td>2.040875</td>
+      <td>0.336049</td>
+    </tr>
+    <tr>
+      <th>MedEq</th>
+      <td>0.023346</td>
+      <td>0.874162</td>
+      <td>14.393900</td>
+      <td>2.040858</td>
+      <td>0.336046</td>
+    </tr>
+    <tr>
+      <th>Agric</th>
+      <td>0.022982</td>
+      <td>0.888036</td>
+      <td>14.622356</td>
+      <td>2.040846</td>
+      <td>0.336045</td>
+    </tr>
+    <tr>
+      <th>Insur</th>
+      <td>0.021825</td>
+      <td>0.934992</td>
+      <td>15.395521</td>
+      <td>2.040612</td>
+      <td>0.336006</td>
+    </tr>
+    <tr>
+      <th>Rtail</th>
+      <td>0.021405</td>
+      <td>0.953405</td>
+      <td>15.698710</td>
+      <td>2.040790</td>
+      <td>0.336035</td>
+    </tr>
+    <tr>
+      <th>Boxes</th>
+      <td>0.021403</td>
+      <td>0.953503</td>
+      <td>15.700322</td>
+      <td>2.040788</td>
+      <td>0.336035</td>
+    </tr>
+    <tr>
+      <th>Paper</th>
+      <td>0.021003</td>
+      <td>0.971719</td>
+      <td>16.000274</td>
+      <td>2.040923</td>
+      <td>0.336057</td>
+    </tr>
+    <tr>
+      <th>Hardw</th>
+      <td>0.019636</td>
+      <td>1.039324</td>
+      <td>17.113457</td>
+      <td>2.040800</td>
+      <td>0.336037</td>
+    </tr>
+    <tr>
+      <th>Meals</th>
+      <td>0.019328</td>
+      <td>1.055907</td>
+      <td>17.386507</td>
+      <td>2.040808</td>
+      <td>0.336038</td>
+    </tr>
+    <tr>
+      <th>Banks</th>
+      <td>0.019318</td>
+      <td>1.056439</td>
+      <td>17.395264</td>
+      <td>2.040815</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>Whlsl</th>
+      <td>0.019181</td>
+      <td>1.063981</td>
+      <td>17.519442</td>
+      <td>2.040796</td>
+      <td>0.336036</td>
+    </tr>
+    <tr>
+      <th>Chems</th>
+      <td>0.019173</td>
+      <td>1.064438</td>
+      <td>17.526974</td>
+      <td>2.040834</td>
+      <td>0.336042</td>
+    </tr>
+    <tr>
+      <th>Books</th>
+      <td>0.018802</td>
+      <td>1.085413</td>
+      <td>17.872354</td>
+      <td>2.040809</td>
+      <td>0.336038</td>
+    </tr>
+    <tr>
+      <th>Rubbr</th>
+      <td>0.018759</td>
+      <td>1.087921</td>
+      <td>17.913644</td>
+      <td>2.040859</td>
+      <td>0.336047</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>0.018749</td>
+      <td>1.088522</td>
+      <td>17.923535</td>
+      <td>2.040857</td>
+      <td>0.336046</td>
+    </tr>
+    <tr>
+      <th>Trans</th>
+      <td>0.018642</td>
+      <td>1.094754</td>
+      <td>18.026153</td>
+      <td>2.040836</td>
+      <td>0.336043</td>
+    </tr>
+    <tr>
+      <th>BusSv</th>
+      <td>0.018231</td>
+      <td>1.119418</td>
+      <td>18.432270</td>
+      <td>2.040768</td>
+      <td>0.336032</td>
+    </tr>
+    <tr>
+      <th>PerSv</th>
+      <td>0.018229</td>
+      <td>1.119511</td>
+      <td>18.433801</td>
+      <td>2.040785</td>
+      <td>0.336035</td>
+    </tr>
+    <tr>
+      <th>Fin</th>
+      <td>0.017894</td>
+      <td>1.140526</td>
+      <td>18.779843</td>
+      <td>2.040823</td>
+      <td>0.336041</td>
+    </tr>
+    <tr>
+      <th>Clths</th>
+      <td>0.017822</td>
+      <td>1.145101</td>
+      <td>18.855166</td>
+      <td>2.040831</td>
+      <td>0.336042</td>
+    </tr>
+    <tr>
+      <th>Ships</th>
+      <td>0.017659</td>
+      <td>1.155699</td>
+      <td>19.029669</td>
+      <td>2.040855</td>
+      <td>0.336046</td>
+    </tr>
+    <tr>
+      <th>Aero</th>
+      <td>0.017440</td>
+      <td>1.170157</td>
+      <td>19.267736</td>
+      <td>2.040774</td>
+      <td>0.336033</td>
+    </tr>
+    <tr>
+      <th>Mines</th>
+      <td>0.017359</td>
+      <td>1.175643</td>
+      <td>19.358068</td>
+      <td>2.040800</td>
+      <td>0.336037</td>
+    </tr>
+    <tr>
+      <th>FabPr</th>
+      <td>0.017234</td>
+      <td>1.184134</td>
+      <td>19.497876</td>
+      <td>2.040778</td>
+      <td>0.336033</td>
+    </tr>
+    <tr>
+      <th>ElcEq</th>
+      <td>0.017124</td>
+      <td>1.191811</td>
+      <td>19.624284</td>
+      <td>2.040799</td>
+      <td>0.336037</td>
+    </tr>
+    <tr>
+      <th>LabEq</th>
+      <td>0.017067</td>
+      <td>1.195775</td>
+      <td>19.689563</td>
+      <td>2.040793</td>
+      <td>0.336036</td>
+    </tr>
+    <tr>
+      <th>Mach</th>
+      <td>0.016969</td>
+      <td>1.202645</td>
+      <td>19.802683</td>
+      <td>2.040811</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>Autos</th>
+      <td>0.016837</td>
+      <td>1.212055</td>
+      <td>19.957625</td>
+      <td>2.040782</td>
+      <td>0.336034</td>
+    </tr>
+    <tr>
+      <th>Toys</th>
+      <td>0.016776</td>
+      <td>1.216480</td>
+      <td>20.030489</td>
+      <td>2.040790</td>
+      <td>0.336035</td>
+    </tr>
+    <tr>
+      <th>Chips</th>
+      <td>0.016721</td>
+      <td>1.220482</td>
+      <td>20.096388</td>
+      <td>2.040783</td>
+      <td>0.336034</td>
+    </tr>
+    <tr>
+      <th>BldMt</th>
+      <td>0.016630</td>
+      <td>1.227147</td>
+      <td>20.206127</td>
+      <td>2.040795</td>
+      <td>0.336036</td>
+    </tr>
+    <tr>
+      <th>Hlth</th>
+      <td>0.016604</td>
+      <td>1.229089</td>
+      <td>20.238114</td>
+      <td>2.040814</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>Coal</th>
+      <td>0.016511</td>
+      <td>1.236048</td>
+      <td>20.352700</td>
+      <td>2.040804</td>
+      <td>0.336038</td>
+    </tr>
+    <tr>
+      <th>Txtls</th>
+      <td>0.016357</td>
+      <td>1.247656</td>
+      <td>20.543830</td>
+      <td>2.040811</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>RlEst</th>
+      <td>0.015599</td>
+      <td>1.308309</td>
+      <td>21.542534</td>
+      <td>2.040793</td>
+      <td>0.336036</td>
+    </tr>
+    <tr>
+      <th>Cnstr</th>
+      <td>0.015534</td>
+      <td>1.313753</td>
+      <td>21.632185</td>
+      <td>2.040810</td>
+      <td>0.336039</td>
+    </tr>
+    <tr>
+      <th>Fun</th>
+      <td>0.015339</td>
+      <td>1.330599</td>
+      <td>21.909558</td>
+      <td>2.040955</td>
+      <td>0.336062</td>
+    </tr>
+    <tr>
+      <th>Steel</th>
+      <td>0.015297</td>
+      <td>1.334155</td>
+      <td>21.968126</td>
+      <td>2.040802</td>
+      <td>0.336037</td>
+    </tr>
+    <tr>
+      <th>Softw</th>
+      <td>0.014115</td>
+      <td>1.445795</td>
+      <td>23.806377</td>
+      <td>2.040797</td>
+      <td>0.336037</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="covariance-matrix-estimation">
+<h2>Covariance matrix estimation<a class="headerlink" href="#covariance-matrix-estimation" title="Permalink to this heading">#</a></h2>
+<p>The simplest way to estimate the covariance matrix is to calculate the average product of return deviations for each pair of assets. Additionally, we examine other techniques designed to improve estimation accuracy, particularly in high-dimensional settings.</p>
+<section id="principal-components">
+<h3>Principal components<a class="headerlink" href="#principal-components" title="Permalink to this heading">#</a></h3>
+<p>By retaining only the largest principal components, the <strong>Principal Component Analysis (PCA)</strong> method provides a lower-dimensional but more stable approximation of the covariance matrix that captures most of the data’s variability.</p>
+<p>Each principal component (PC) can be interpreted as a weighted portfolio of industry assets. The projection of industry returns onto a given component effectively computes the returns of the corresponding portfolio.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit PCA</span>
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="c1"># Retrieve components, and sign flip if necessary</span>
+<span class="n">loadings</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">singular_values_</span><span class="p">)</span> <span class="o">@</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># compute loadings by column</span>
+<span class="n">components</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">components</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="c1"># Compute projections, can be interpreted as portfolio returns</span>
+<span class="n">proj</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">proj</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># flip signs if necessary</span>
+
+<span class="c1"># Equal weighted market average return</span>
+<span class="n">avg</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>From the summaries of the weights, the first principal component (PC1) resembles a broadly diversified portfolio, capturing more than half of the total variance. Higher-order principal components represent long-short spread portfolios, which explain incremental variance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">K</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Top </span><span class="si">{</span><span class="n">K</span><span class="si">}</span><span class="s2"> principal components&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;frac weights +ve&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">K</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="s1">&#39;sum weights&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">K</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="s1">&#39;sum sqr weights&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">K</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="s1">&#39;sum abs weights&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">K</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+    <span class="s1">&#39;corr avg ret&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">avg</span><span class="p">,</span> <span class="n">proj</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">)],</span>
+    <span class="s1">&#39;cumulative expl ratio&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[:</span><span class="n">K</span><span class="p">])},</span>
+          <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">)])</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Top 20 principal components
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>frac weights +ve</th>
+      <th>sum weights</th>
+      <th>sum sqr weights</th>
+      <th>sum abs weights</th>
+      <th>corr avg ret</th>
+      <th>cumulative expl ratio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>PC1</th>
+      <td>1.0000</td>
+      <td>6.8350</td>
+      <td>1.0</td>
+      <td>6.8350</td>
+      <td>0.9988</td>
+      <td>0.5590</td>
+    </tr>
+    <tr>
+      <th>PC2</th>
+      <td>0.2449</td>
+      <td>0.0942</td>
+      <td>1.0</td>
+      <td>4.1476</td>
+      <td>0.0046</td>
+      <td>0.6218</td>
+    </tr>
+    <tr>
+      <th>PC3</th>
+      <td>0.5306</td>
+      <td>0.3638</td>
+      <td>1.0</td>
+      <td>3.5694</td>
+      <td>0.0142</td>
+      <td>0.6620</td>
+    </tr>
+    <tr>
+      <th>PC4</th>
+      <td>0.6735</td>
+      <td>0.9018</td>
+      <td>1.0</td>
+      <td>5.1037</td>
+      <td>0.0341</td>
+      <td>0.6994</td>
+    </tr>
+    <tr>
+      <th>PC5</th>
+      <td>0.4694</td>
+      <td>0.5504</td>
+      <td>1.0</td>
+      <td>5.2080</td>
+      <td>0.0185</td>
+      <td>0.7290</td>
+    </tr>
+    <tr>
+      <th>PC6</th>
+      <td>0.5510</td>
+      <td>0.7125</td>
+      <td>1.0</td>
+      <td>5.5172</td>
+      <td>0.0207</td>
+      <td>0.7510</td>
+    </tr>
+    <tr>
+      <th>PC7</th>
+      <td>0.5714</td>
+      <td>0.0807</td>
+      <td>1.0</td>
+      <td>5.5623</td>
+      <td>0.0021</td>
+      <td>0.7689</td>
+    </tr>
+    <tr>
+      <th>PC8</th>
+      <td>0.5510</td>
+      <td>0.0678</td>
+      <td>1.0</td>
+      <td>4.9024</td>
+      <td>0.0016</td>
+      <td>0.7831</td>
+    </tr>
+    <tr>
+      <th>PC9</th>
+      <td>0.5102</td>
+      <td>0.1727</td>
+      <td>1.0</td>
+      <td>5.1930</td>
+      <td>0.0040</td>
+      <td>0.7971</td>
+    </tr>
+    <tr>
+      <th>PC10</th>
+      <td>0.4898</td>
+      <td>0.2090</td>
+      <td>1.0</td>
+      <td>4.8891</td>
+      <td>0.0045</td>
+      <td>0.8091</td>
+    </tr>
+    <tr>
+      <th>PC11</th>
+      <td>0.4490</td>
+      <td>0.2954</td>
+      <td>1.0</td>
+      <td>5.0131</td>
+      <td>0.0063</td>
+      <td>0.8210</td>
+    </tr>
+    <tr>
+      <th>PC12</th>
+      <td>0.5306</td>
+      <td>0.0517</td>
+      <td>1.0</td>
+      <td>5.2657</td>
+      <td>0.0011</td>
+      <td>0.8321</td>
+    </tr>
+    <tr>
+      <th>PC13</th>
+      <td>0.6531</td>
+      <td>0.1003</td>
+      <td>1.0</td>
+      <td>4.8573</td>
+      <td>0.0020</td>
+      <td>0.8423</td>
+    </tr>
+    <tr>
+      <th>PC14</th>
+      <td>0.5102</td>
+      <td>0.1026</td>
+      <td>1.0</td>
+      <td>4.8301</td>
+      <td>0.0020</td>
+      <td>0.8521</td>
+    </tr>
+    <tr>
+      <th>PC15</th>
+      <td>0.4898</td>
+      <td>0.1416</td>
+      <td>1.0</td>
+      <td>4.8642</td>
+      <td>0.0027</td>
+      <td>0.8615</td>
+    </tr>
+    <tr>
+      <th>PC16</th>
+      <td>0.5102</td>
+      <td>0.0216</td>
+      <td>1.0</td>
+      <td>5.1350</td>
+      <td>0.0004</td>
+      <td>0.8703</td>
+    </tr>
+    <tr>
+      <th>PC17</th>
+      <td>0.4898</td>
+      <td>0.0855</td>
+      <td>1.0</td>
+      <td>5.3457</td>
+      <td>0.0015</td>
+      <td>0.8788</td>
+    </tr>
+    <tr>
+      <th>PC18</th>
+      <td>0.5714</td>
+      <td>0.1669</td>
+      <td>1.0</td>
+      <td>5.1840</td>
+      <td>0.0028</td>
+      <td>0.8864</td>
+    </tr>
+    <tr>
+      <th>PC19</th>
+      <td>0.5102</td>
+      <td>0.1752</td>
+      <td>1.0</td>
+      <td>5.1187</td>
+      <td>0.0029</td>
+      <td>0.8936</td>
+    </tr>
+    <tr>
+      <th>PC20</th>
+      <td>0.4694</td>
+      <td>0.1086</td>
+      <td>1.0</td>
+      <td>5.1526</td>
+      <td>0.0018</td>
+      <td>0.9007</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>Spectral Clustering</strong></p>
+<p>Spectral clustering is a technique that groups data points based on the eigenvalues and eigenvectors of a similarity matrix. From the results, Component 1 primarily appears to capture market-wide beta risk sensitivity.
+Component 2 appears to reflect exposure to commodity-related factors (e.g. gold, coal and mining)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Spectral clustering</span>
+<span class="n">spectral</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">SpectralClustering</span><span class="p">(</span>
+    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">eigen_solver</span><span class="o">=</span><span class="s2">&quot;arpack&quot;</span><span class="p">,</span>
+    <span class="c1">#affinity=&quot;nearest_neighbors&quot;,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">spectral</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>   <span class="c1"># number of features equals the number observations dates</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">ColorMap</span><span class="p">(</span><span class="n">spectral</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;Dark2&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+           <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">spectral</span><span class="o">.</span><span class="n">labels_</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">xy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">spectral</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span>
+                    <span class="n">components</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="p">,</span> <span class="n">xytext</span><span class="o">=</span><span class="n">xy</span> <span class="o">*</span> <span class="mf">1.01</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-small&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Component 1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Component 2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spectral Clustering (</span><span class="si">{</span><span class="n">spectral</span><span class="o">.</span><span class="n">n_clusters</span><span class="si">}</span><span class="s2"> clusters)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/852d79d92c5c3f124017b9122db83fc00c1b1df7b9b228b1bc06855bcb3d5549.png" src="_images/852d79d92c5c3f124017b9122db83fc00c1b1df7b9b228b1bc06855bcb3d5549.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;cluster&#39;</span><span class="p">:</span> <span class="n">spectral</span><span class="o">.</span><span class="n">labels_</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">components</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Fun</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Toys</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Txtls</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Clths</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Rubbr</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Autos</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RlEst</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Rtail</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Meals</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Gold</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>BldMt</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>ElcEq</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Books</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Telcm</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Cnstr</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Chems</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Boxes</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Paper</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>BusSv</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Other</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Fin</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Insur</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Banks</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Trans</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>PerSv</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Mach</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Whlsl</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>Coal</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>Chips</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>LabEq</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Hardw</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Softw</th>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Steel</th>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>Mines</th>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>Smoke</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Food</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>FabPr</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Oil</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Agric</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Util</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>Aero</th>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Ships</th>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Guns</th>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>Hlth</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>Hshld</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>Drugs</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>Soda</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>Beer</th>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>MedEq</th>
+      <td>9</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="ewma">
+<h3>EWMA<a class="headerlink" href="#ewma" title="Permalink to this heading">#</a></h3>
+<p>The <strong>Exponentially-Weighted Moving Average (EWMA) method</strong> assigns greater importance to recent data when estimating the covariance matrix, which is particularly useful for tracking market risk changes.  JP Morgan RiskMetrics (1996) proposed a decay parameter <span class="math notranslate nohighlight">\( \lambda = 0.97 \)</span>, implying a monthly decay rate of 0.03.  The <strong>half-life</strong> of the weighting function represents the time required for a weight to decrease by 50%.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute half-life of risk metrics&#39; lambda for monthly data</span>
+<span class="k">def</span> <span class="nf">halflife</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span> <span class="n">half</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns halflife (t) from its definition: 0.5 = (1-decay)^t&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">half</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">decay</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">risk_metrics_lambda</span> <span class="o">=</span> <span class="mf">0.97</span>   <span class="c1"># for monthly data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Half-life: &#39;</span><span class="p">,</span> <span class="n">halflife</span><span class="p">(</span><span class="n">decay</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="n">risk_metrics_lambda</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;months&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Half-life:  22.8 months
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ewma</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">decay</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to compute EWMA covariance matrix estimate&quot;&quot;&quot;</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">decay</span><span class="p">)</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">@</span> <span class="n">X</span> <span class="o">/</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="shrinkage-methods">
+<h3>Shrinkage methods<a class="headerlink" href="#shrinkage-methods" title="Permalink to this heading">#</a></h3>
+<p>Covariance matrix estimates can be regularized using shrinkage.
+Ledoit and Wolf (1993) proposed shrinking the sample covariance matrix towards an identity matrix,
+and derived a closed-form formula to compute the asymptotically
+optimal shrinkage parameter <span class="math notranslate nohighlight">\(\beta\)</span> by minimizing a MSE criterion:</p>
+<div class="math notranslate nohighlight">
+\[ (1 - \beta) \Sigma + \beta \dfrac{tr(\Sigma)}{N}  I_n \]</div>
+<p>Chen et al. (2010) proposed the <strong>Oracle Approximating Shrinkage (OAS) Estimator</strong>
+whose convergence is significantly better under the assumption that
+the data are Gaussian.</p>
+</section>
+<section id="volatility-of-the-gmv-portfolio">
+<h3>Volatility of the GMV portfolio<a class="headerlink" href="#volatility-of-the-gmv-portfolio" title="Permalink to this heading">#</a></h3>
+<p>The out-of-sample (OOS) realized volatility of the <strong>Global Minimum Variance Portfolio (GMV)</strong> serves as a benchmark for evaluating covariance estimation accuracy.  The GMV portfolio is designed to minimize total portfolio volatility.  Since it relies on accurate covariance estimates, errors can lead to suboptimal diversification and higher realized volatility.</p>
+<p>Beginning in January 2000, we update the covariance matrix estimate monthly using a rolling 30-year data window, and track the month-ahead return of the GMV portfolio. By the end of the test period, we expect the most accurate covariance matrix estimator to achieve the lowest return volatility.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper method to compute Minimum Variance Portfolio and realized volatility</span>
+<span class="k">def</span> <span class="nf">gmv</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">ret</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute minimum variance portfolio and return&quot;&quot;&quot;</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">@</span> <span class="n">w</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rolling monthly evaluation</span>
+<span class="n">decay</span> <span class="o">=</span> <span class="mf">0.03</span>      <span class="c1"># risk metrics monthly decay rate for EWMA</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># for PCA</span>
+<span class="n">split</span> <span class="o">=</span> <span class="s1">&#39;2000-01&#39;</span> <span class="c1"># start rolling OOS prediction tests from this date</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span> <span class="p">{}</span>     <span class="c1"># collect realized returns</span>
+<span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">rets</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">rets</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">split</span><span class="p">]):</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">rets</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">rets</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">date</span><span class="p">,</span> <span class="p">:][</span><span class="o">-</span><span class="mi">30</span><span class="o">*</span><span class="mi">12</span><span class="p">:]</span>   <span class="c1"># 30 years of training data </span>
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">rets</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">rets</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="n">date</span><span class="p">,</span> <span class="p">:]</span>      <span class="c1"># predict one month ahead returns</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Empirical covariance</span>
+    <span class="n">cov</span> <span class="o">=</span> <span class="n">EmpiricalCovariance</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">covariance_</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;Covariance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">cov</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;Diagonal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">)),</span> <span class="n">X_test</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;EWMA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">ewma</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">decay</span><span class="o">=</span><span class="n">decay</span><span class="p">),</span> <span class="n">X_test</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;PCA-</span><span class="si">{</span><span class="n">n_components</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">get_covariance</span><span class="p">(),</span> <span class="n">X_test</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;Identity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cov</span><span class="p">)),</span> <span class="n">X_test</span><span class="p">)</span>    
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">LedoitWolf</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">covariance_</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+    <span class="n">r</span><span class="p">[</span><span class="n">date</span><span class="p">][</span><span class="s1">&#39;OAS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmv</span><span class="p">(</span><span class="n">OAS</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">covariance_</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 300/300 [01:01&lt;00:00,  4.86it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ts</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="n">vol</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;realized volatility&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Realized volatility of minimum variance portfolio&#39;</span><span class="p">)</span>
+<span class="n">vol</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Realized volatility of minimum variance portfolio
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Covariance</th>
+      <th>Diagonal</th>
+      <th>EWMA</th>
+      <th>PCA-10</th>
+      <th>Identity</th>
+      <th>LW</th>
+      <th>OAS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>realized volatility</th>
+      <td>0.035531</td>
+      <td>0.045541</td>
+      <td>0.040645</td>
+      <td>0.036339</td>
+      <td>0.048569</td>
+      <td>0.034681</td>
+      <td>0.035041</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Plot evaluation period realized volatility of minimum variance portfolios</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">vol</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">vol</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">mcolors</span><span class="o">.</span><span class="n">TABLEAU_COLORS</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Realized Test Volatility of Global MVPs </span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">rets</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/6fc6c2436076b7ea658c769f3031996303bb260e21e0bbbb478999023e4bec36.png" src="_images/6fc6c2436076b7ea658c769f3031996303bb260e21e0bbbb478999023e4bec36.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="3.4_value_at_risk.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Value at Risk</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="3.6_market_microstructure.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Market Microstructure</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#portfolio-risk">Portfolio risk</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-budgetting">Risk budgetting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-parity-portfolios">Risk parity portfolios</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-matrix-estimation">Covariance matrix estimation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-components">Principal components</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ewma">EWMA</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shrinkage-methods">Shrinkage methods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#volatility-of-the-gmv-portfolio">Volatility of the GMV portfolio</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

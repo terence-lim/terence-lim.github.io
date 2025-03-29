@@ -1,0 +1,1311 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Reinforcement Learning &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '6.6_reinforcement_learning';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Language Modeling" href="6.7_language_modeling.html" />
+    <link rel="prev" title="Recurrent Neural Networks" href="6.5_recurrent_net.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F6.6_reinforcement_learning.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/6.6_reinforcement_learning.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Reinforcement Learning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retirement-spending-policy">Retirement spending policy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sbbi-data">SBBI data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scenario-generator">Scenario generator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#historical-simulations">Historical simulations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-of-spending-shortfall">Risk of spending shortfall</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-reinforcement-learning">Deep reinforcement learning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gymnasium-environment">Gymnasium environment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#state-space">State space</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#actions">Actions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-function">Reward function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-q-network-dqn">Deep Q-Network (DQN)</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="reinforcement-learning">
+<h1>Reinforcement Learning<a class="headerlink" href="#reinforcement-learning" title="Permalink to this heading">#</a></h1>
+<p><em>I have not failed. I’ve just found 10,000 ways that won’t work</em> - Thomas A. Edison</p>
+<p>We combine financial modeling with reinforcement learning (RL) to evaluate static and adaptive retirement spending strategies. Traditional approaches, such as the <strong>4% rule</strong>, assume fixed withdrawal rates and asset allocations, that may not adapt well to changing market conditions. Leveraging historical economic data, simulations, and deep learning techniques, we apply RL to learn dynamic strategies which adjust asset allocations based on financial conditions, minimizing the risk of retirees outliving their savings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">from</span> <span class="nn">gymnasium</span> <span class="kn">import</span> <span class="n">spaces</span>
+<span class="kn">from</span> <span class="nn">stable_baselines3</span> <span class="kn">import</span> <span class="n">DQN</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">subplots</span><span class="p">,</span> <span class="n">set_xticks</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+<span class="n">store</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">])</span>
+<span class="c1">#pd.set_option(&#39;display.max_rows&#39;, None)</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">gym</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">min_level</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">ERROR</span>  <span class="c1"># Suppress warnings</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># open connections</span>
+<span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;RL&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="retirement-spending-policy">
+<h2>Retirement spending policy<a class="headerlink" href="#retirement-spending-policy" title="Permalink to this heading">#</a></h2>
+<p>A <strong>retirement spending policy</strong> guides how retirees withdraw funds from their savings to sustain their lifestyle while minimizing the risk of depleting assets. The key elements include the <strong>withdrawal strategy</strong>, which defines the initial withdrawal rate (e.g., the 4% rule) and its adjustments over time (e.g., inflation-linked or dynamic withdrawals); <strong>asset allocation</strong>, which balances stocks, bonds, and other investments to optimize growth and risk; <strong>time horizon</strong>, representing the expected duration of withdrawals, typically spanning 20-30 years or more; and <strong>market conditions</strong>, including interest rates, inflation, and asset returns, which influence portfolio sustainability. Effective policies seek to balance spending needs, longevity risk, and market fluctuations to minimize the risk of outliving their assets.</p>
+<p>Benz, Ptak and Rekenthaler (2022) found that “For retirees who seek a fixed real withdrawal from their portfolio in retirement, a starting withdrawal rate of 3.8% is safe in Morningstar’s model over a 30-year time horizon, assuming a 90% success rate (defined here as a 90% likelihood of not running out of funds) and a balanced portfolio.”</p>
+<section id="sbbi-data">
+<h3>SBBI data<a class="headerlink" href="#sbbi-data" title="Permalink to this heading">#</a></h3>
+<p>The <strong>Stocks, Bonds, Bills, and Inflation (SBBI)</strong> dataset provides historical monthly, quarterly, and yearly total returns and yields for major U.S. asset classes, including large-cap stocks, small-cap stocks, corporate bonds, government bonds, and inflation. This data, which dates back to 1926, is commonly used for retirement portfolio simulations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read sbbi data</span>
+<span class="n">sbbi_file</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;SBBI/stocks-bonds-bills-and-inflation-data.xlsx&#39;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">sbbi_file</span><span class="p">,</span>
+                   <span class="n">sheet_name</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">skiprows</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+                   <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                   <span class="n">usecols</span><span class="o">=</span><span class="s1">&#39;A,B,G,P&#39;</span><span class="p">,</span>
+                   <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">columns_official</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;stocks&#39;</span><span class="p">,</span> <span class="s1">&#39;bonds&#39;</span><span class="p">,</span> <span class="s1">&#39;inflation&#39;</span><span class="p">]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>stocks</th>
+      <th>bonds</th>
+      <th>inflation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19260131</th>
+      <td>0.000000</td>
+      <td>0.013756</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>19260228</th>
+      <td>-0.038462</td>
+      <td>0.006313</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>19260331</th>
+      <td>-0.057471</td>
+      <td>0.004129</td>
+      <td>-0.005587</td>
+    </tr>
+    <tr>
+      <th>19260430</th>
+      <td>0.025305</td>
+      <td>0.007589</td>
+      <td>0.005618</td>
+    </tr>
+    <tr>
+      <th>19260531</th>
+      <td>0.017918</td>
+      <td>0.001412</td>
+      <td>-0.005587</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20240831</th>
+      <td>0.024257</td>
+      <td>NaN</td>
+      <td>0.000814</td>
+    </tr>
+    <tr>
+      <th>20240930</th>
+      <td>0.021357</td>
+      <td>0.100107</td>
+      <td>0.001604</td>
+    </tr>
+    <tr>
+      <th>20241031</th>
+      <td>-0.009069</td>
+      <td>-0.046509</td>
+      <td>0.001151</td>
+    </tr>
+    <tr>
+      <th>20241130</th>
+      <td>0.058701</td>
+      <td>0.068325</td>
+      <td>-0.000542</td>
+    </tr>
+    <tr>
+      <th>20241231</th>
+      <td>-0.023838</td>
+      <td>-0.044901</td>
+      <td>0.000355</td>
+    </tr>
+  </tbody>
+</table>
+<p>1188 rows × 3 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="scenario-generator">
+<h3>Scenario generator<a class="headerlink" href="#scenario-generator" title="Permalink to this heading">#</a></h3>
+<p>To create realistic economic simulations, we extract different 30-year retirement periods from the 100-year span of historical data. These scenarios help model how varying economic conditions impact retirement outcomes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Scenario generator: episode, backtest a sample path</span>
+<span class="k">class</span> <span class="nc">Episodes</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_loops</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">*</span><span class="mf">.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">*</span><span class="mf">.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">T</span>              <span class="c1"># number of years per episode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">12</span>   <span class="c1"># number of monthly observations per episode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_loops</span> <span class="o">=</span> <span class="n">num_loops</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_loops</span>
+        
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_loops</span><span class="p">):</span>
+            <span class="n">rows</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">t</span><span class="p">:(</span><span class="n">t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">),</span> <span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">//</span> <span class="mi">12</span><span class="p">)</span>\
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
+                    <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">11</span><span class="p">):(</span><span class="n">t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">):</span><span class="mi">12</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Summary statistics of all 30-year episodes:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">means</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+<span class="n">episodes</span> <span class="o">=</span> <span class="n">Episodes</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">episodes</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">means</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">episode</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;30-year sample periods:&#39;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">({</span><span class="n">s</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">means</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="o">|</span> <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">episodes</span><span class="p">)},</span>
+          <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;annualized mean&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>30-year sample periods:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>stocks</th>
+      <th>bonds</th>
+      <th>inflation</th>
+      <th>N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>annualized mean</th>
+      <td>0.105185</td>
+      <td>0.05502</td>
+      <td>0.03604</td>
+      <td>817</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We assess the effectiveness of a fixed annual withdrawal strategy by analyzing its performance under different conditions. Key inputs for such strategies include: ortfolio asset allocation (e.g., stock/bond mix); market environment (e.g., past returns and inflation rates); and expected duration of withdrawals.</p>
+<p>For example, a typical rule of a fixed 4% withdrawal rate (adjusted for inflation) for a 50% stock / 50% bond portfolio can be evaluated across rolling 30-year periods to estimate the likelihood that a retiree’s savings will last the full duration.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Base</span></code> model is a simple <strong>buy-and-hold</strong> strategy where funds are invested in a fixed allocation at the start of retirement and are not rebalanced, even if allocation weights drift over time. Withdrawals remain fixed as a percentage of initial wealth, adjusted for inflation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Buy-and-hold allocation model where assets weights drift from initial&quot;&quot;&quot;</span>
+    
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Buy-and-Hold&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">W</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+        <span class="k">assert</span> <span class="n">W</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>         <span class="c1"># spend must be positive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="p">),</span> <span class="n">W</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>
+        
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">market_changes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s2">&quot;W&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">market_changes</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">market_changes</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">action</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="c1"># rebalance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">market_changes</span><span class="p">))</span>           <span class="c1"># price changes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">wealth</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># remaining wealth</span>
+        <span class="k">if</span> <span class="n">wealth</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">truncated</span> <span class="o">=</span> <span class="kc">True</span>          <span class="c1"># is not enough for spend  </span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>            
+        <span class="k">else</span><span class="p">:</span>                 
+            <span class="n">truncated</span> <span class="o">=</span> <span class="kc">False</span>         <span class="c1"># is sufficient for spend</span>
+            <span class="n">spend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">wealth</span>  <span class="c1"># allocate and deduct spending</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">spend</span>
+        <span class="n">terminated</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="ow">or</span> <span class="n">truncated</span>
+        <span class="k">return</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Allow initial asset allocation to drift&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Fixed</span></code> model adds annual rebalancing, ensuring that the portfolio maintains a constant stock/bond allocation throughout retirement.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FixedModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Allocation model where assets are rebalanced to fixed weights&quot;&quot;&quot;</span>
+    
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Annual-Rebalance&#39;</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Action to rebalance asset allocation to fixed initial weight&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To assess the risk of retirees running out of money, we simulate rolling 30-year periods and track shortfalls. Our starting scenarios assume a 50/50 stock-bond allocation and a 4% inflation-adjusted withdrawal rule. The probability of shortfall measures the fraction of simulations where assets were depleted before reaching 30 years.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alloc</span> <span class="o">=</span> <span class="mi">50</span>   <span class="c1"># 50-50 stocks/bonds initial allocation</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="mf">4.0</span>   <span class="c1"># 4 percent spending policy</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">BaseModel</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="p">[</span><span class="n">alloc</span><span class="p">,</span> <span class="mi">100</span><span class="o">-</span><span class="n">alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">episodes</span><span class="p">)):</span>
+    <span class="n">obs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">episode</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">episode</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">episode</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+        <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">truncated</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="n">result</span><span class="p">[</span><span class="n">episode</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">T</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of 30-year scenerios:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">episodes</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Probability of shortfall:   &#39;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of 30-year scenerios: 817
+Probability of shortfall:    0.0747
+</pre></div>
+</div>
+</div>
+</div>
+<p>The graph illustrates the years in which retirees ran out of money, with bar heights representing the number of years their assets fell short of the goal. Additionally, plots of compounded asset returns and inflation highlight how periods of lower investment returns and higher inflation increased the risk of shortfall.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fails</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;shortfall_years&#39;</span><span class="p">)</span>
+<span class="n">market</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">fails</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+<span class="n">fails</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">fails</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">market</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">fails</span><span class="o">.</span><span class="n">index</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">market</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retirement Shortfalls: </span><span class="si">{</span><span class="n">alloc</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="mi">100</span><span class="o">-</span><span class="n">alloc</span><span class="si">}</span><span class="s2"> allocation, </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">% spend&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;cumulative returns of asset classes and CPI&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Year of retirement&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="c1">##</span>
+<span class="n">bx</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">fails</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C4&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">bx</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of shortfall years&#39;</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;shortfall years&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">)</span>
+<span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">nskip</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/35e74e4bccf0658ef6beee494201d31d1aa5033cff49cd7d96c9f429dd1fedf6.png" src="_images/35e74e4bccf0658ef6beee494201d31d1aa5033cff49cd7d96c9f429dd1fedf6.png" />
+</div>
+</div>
+</section>
+<section id="historical-simulations">
+<h3>Historical simulations<a class="headerlink" href="#historical-simulations" title="Permalink to this heading">#</a></h3>
+<p>Next, we expanded the analysis to include a broader range of asset allocations (0% to 100% in stocks) and withdrawal rates (3% to 5%) to evaluate their impact on portfolio longevity.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># range of spending policy rules</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">5.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># simulate fixed and initial equity allocations from 0 to 100%</span>
+<span class="n">allocs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TAIL</span> <span class="o">=</span> <span class="mf">0.95</span>
+<span class="n">tail</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">TAIL</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">compute_shortfall</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute average number of years of shortfall given tail probability level, q&quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>   <span class="c1"># each simulation&#39;s results (years of shortfall)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">q</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">q</span><span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">Model</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">FixedModel</span><span class="p">]):</span>
+    <span class="n">fail</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">allocs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">shortfall</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">allocs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">quantile</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rules</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">allocs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">alloc</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">allocs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">rules</span><span class="p">:</span>
+
+            <span class="c1"># Evaluate for this allocation strategy and spending policy</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="p">[</span><span class="n">alloc</span><span class="p">,</span> <span class="mi">100</span><span class="o">-</span><span class="n">alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">])</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">episodes</span><span class="p">)):</span> <span class="c1"># for every 30-year sample</span>
+                <span class="n">obs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">episode</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">episode</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                    <span class="n">obs</span> <span class="o">=</span> <span class="n">episode</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+                    <span class="n">action</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+                    <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">obs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">truncated</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">fail</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">quantile</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">],</span> <span class="n">shortfall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_shortfall</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">TAIL</span><span class="p">)</span>
+    <span class="n">store</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">,</span> <span class="n">shortfall</span><span class="o">=</span><span class="n">shortfall</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 21/21 [07:33&lt;00:00, 21.57s/it]
+100%|██████████| 21/21 [07:32&lt;00:00, 21.57s/it]
+</pre></div>
+</div>
+</div>
+</div>
+<p>We compare the proportion of scenarios where the <code class="docutils literal notranslate"><span class="pre">Base</span></code> buy-and-hold strategy performed better or worse than the <code class="docutils literal notranslate"><span class="pre">Fixed</span></code> strategy with annual rebalancing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#for model in [BaseModel, FixedModel]:</span>
+<span class="c1">#    fail = store[model.name][&#39;fail&#39;]</span>
+<span class="c1">#    print(f&quot;Probability of Shortfall: with {model.name} allocation&quot;)</span>
+<span class="c1">#    print(fail.iloc[::-1, :].round(2).to_string())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Buy-and-hold outperformed Annual-Rebalance:&#39;</span><span class="p">,</span> 
+      <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">FixedModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">store</span><span class="p">[</span><span class="n">BaseModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Annual-Rebalance outperformed Buy-and-Hold:&#39;</span><span class="p">,</span> 
+      <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">FixedModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">store</span><span class="p">[</span><span class="n">BaseModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Buy-and-hold outperformed Annual-Rebalance: 0.374
+Annual-Rebalance outperformed Buy-and-Hold: 0.297
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="risk-of-spending-shortfall">
+<h3>Risk of spending shortfall<a class="headerlink" href="#risk-of-spending-shortfall" title="Permalink to this heading">#</a></h3>
+<p>To measure the likelihood and severity of depleting funds before the end of retirement, we use two key metrics:</p>
+<ul class="simple">
+<li><p><strong>Probability of shortfall:</strong> The percentage of simulations where retirees outlived their assets.</p></li>
+<li><p><strong>Expected shortfall period:</strong> This metric quantifies the severity of shortfalls by estimating how many years retirees would be without funds in the worst-case scenarios (e.g., the worst 5% of simulations).</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">FixedModel</span><span class="p">]:</span>
+    <span class="n">fail</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">fail</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">annot_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-small&#39;</span><span class="p">),</span>
+                <span class="n">xticklabels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">fail</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">fail</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="c1"># Labels and title</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Spending Rule&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Allocation to Stocks&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Probability of Shortfall: with </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> strategy&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0154e90e4b93daf92e6150950d16505cc3cbef93e6b81d367617a4a98f50ff77.png" src="_images/0154e90e4b93daf92e6150950d16505cc3cbef93e6b81d367617a4a98f50ff77.png" />
+<img alt="_images/91408338cfcd2a4d95568016510b8d358ce31c731423f0c4a48beea00a7d81f5.png" src="_images/91408338cfcd2a4d95568016510b8d358ce31c731423f0c4a48beea00a7d81f5.png" />
+</div>
+</div>
+<p><strong>Probability of shortfall:</strong></p>
+<p>Contour lines in the probability of shortfall graph show the combinations of asset allocation and withdrawal rates that result in the same likelihood of running out of money.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">levels</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to plot contour lines at given levels&quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">allocs</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">cp</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;cool&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> strategy&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;spending policy (%)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">allocs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> equity allocation (%)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">FixedModel</span><span class="p">]:</span>    
+    <span class="n">fail</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fail&#39;</span><span class="p">]</span>
+    <span class="n">plot_contour</span><span class="p">(</span><span class="n">fail</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">.01</span><span class="p">,</span><span class="mf">.05</span><span class="p">,</span><span class="mf">.1</span><span class="p">,</span><span class="mf">.15</span><span class="p">],</span>
+                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Probability of Shortfall&quot;</span><span class="p">,</span> 
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;countour levels: probability of shortfall&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/d06a0f38432c316699443d04af5f493074cd65bf6d4e3f69fd29f606e9132440.png" src="_images/d06a0f38432c316699443d04af5f493074cd65bf6d4e3f69fd29f606e9132440.png" />
+<img alt="_images/c66c319d9dac9c3bc4e2fc606ddcf7f1bf1d74477a0e4269efa9586e082eb5a4.png" src="_images/c66c319d9dac9c3bc4e2fc606ddcf7f1bf1d74477a0e4269efa9586e082eb5a4.png" />
+</div>
+</div>
+<p><strong>Expected shortfall period:</strong></p>
+<p>This metric estimates the potential duration of financial shortfalls, which helps retirees plan for worst-case scenarios.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#for model in [BaseModel, FixedModel]:    </span>
+<span class="c1">#    shortfall = store[model.name][&#39;shortfall&#39;]</span>
+<span class="c1">#    print(f&quot;Expected Years of Shortfall in {tail}% tail: (model.name) allocation&quot;)</span>
+<span class="c1">#    print(shortfall.iloc[::-1, :].round(1).to_string())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Buy-and-hold outperformed Annual-Rebalance:&#39;</span><span class="p">,</span> 
+      <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">FixedModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;shortfall&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">store</span><span class="p">[</span><span class="n">BaseModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;shortfall&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Annual-Rebalance outperformed Buy-and-Hold:&#39;</span><span class="p">,</span> 
+      <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="n">FixedModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;shortfall&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">store</span><span class="p">[</span><span class="n">BaseModel</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;shortfall&#39;</span><span class="p">]),</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Buy-and-hold outperformed Annual-Rebalance: 0.059
+Annual-Rebalance outperformed Buy-and-Hold: 0.61
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="n">BaseModel</span><span class="p">,</span> <span class="n">FixedModel</span><span class="p">]:</span>    
+    <span class="n">shortfall</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;shortfall&#39;</span><span class="p">]</span>
+    <span class="n">plot_contour</span><span class="p">(</span><span class="n">shortfall</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> 
+                 <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Expected Years of Shortfall in </span><span class="si">{</span><span class="n">tail</span><span class="si">}</span><span class="s2">% tail&quot;</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;contour levels: number of years&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/d9d919db489496e89a4bfbf9b70bc5a7a9e9eea3d7dc746cdff627ce0a43476f.png" src="_images/d9d919db489496e89a4bfbf9b70bc5a7a9e9eea3d7dc746cdff627ce0a43476f.png" />
+<img alt="_images/02d68c23c4872ef8fb45678cbb122274e9d25d6295fd5d6d2fb60c0085fd2b3e.png" src="_images/02d68c23c4872ef8fb45678cbb122274e9d25d6295fd5d6d2fb60c0085fd2b3e.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="deep-reinforcement-learning">
+<h2>Deep reinforcement learning<a class="headerlink" href="#deep-reinforcement-learning" title="Permalink to this heading">#</a></h2>
+<p>Unlike static asset allocation models, <strong>reinforcement learning (RL)</strong> can learn optimal strategies that adapt to market conditions and remaining wealth.</p>
+<section id="gymnasium-environment">
+<h3>Gymnasium environment<a class="headerlink" href="#gymnasium-environment" title="Permalink to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Gymnasium</span></code> (formerly OpenAI Gym) library provides a Pythonic interface for reinforcement learning problems. <code class="docutils literal notranslate"><span class="pre">Stable</span> <span class="pre">Baselines3</span></code> (SB3) implements a set of RL algorithms in PyTorchf OpenAI’s Gym library.</p>
+<p><a class="reference external" href="https://gymnasium.farama.org/index.html">https://gymnasium.farama.org/index.html</a></p>
+<p><a class="github reference external" href="https://github.com/DLR-RM/stable-baselines3">DLR-RM/stable-baselines3</a></p>
+</section>
+<section id="state-space">
+<h3>State space<a class="headerlink" href="#state-space" title="Permalink to this heading">#</a></h3>
+<p>During training, the RL model learns to predict optimal spending actions based on the current financial state. The <strong>state space</strong> includes:</p>
+<ul class="simple">
+<li><p>current wealth and allocation,</p></li>
+<li><p>recent market (equity and bonds) and inflation changes</p></li>
+<li><p>spending amount</p></li>
+<li><p>years since retirement</p></li>
+</ul>
+</section>
+<section id="actions">
+<h3>Actions<a class="headerlink" href="#actions" title="Permalink to this heading">#</a></h3>
+<p><strong>Exploitation</strong>: Selects the action with the highest expected value, based on past training data (e.g., Q-learning, SARSA).</p>
+<p><strong>Exploration</strong>: Tries alternative strategies to discover better long-term policies.</p>
+</section>
+<section id="reward-function">
+<h3>Reward function<a class="headerlink" href="#reward-function" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>If assets are depleted, the model applies a severe penalty of <span class="math notranslate nohighlight">\(-100\)</span> times the square of remaining years: <span class="math notranslate nohighlight">\(-(100 T^2)\)</span></p></li>
+<li><p>If wealth is positive, the reward is proportional to the wealth-to-spending coverage ratio: <span class="math notranslate nohighlight">\(\sqrt{\frac{W}{S(T+1)}}\)</span></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">FAIL</span> <span class="o">=</span> <span class="mi">100</span>    <span class="c1"># failure reward factor</span>
+<span class="k">class</span> <span class="nc">CustomEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Custom gymnasium environment, using Episodes scenario generator&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">episodes</span><span class="p">:</span> <span class="n">Episodes</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>            <span class="c1"># for stepping through a 30-year episode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">episodes</span> <span class="o">=</span> <span class="n">episodes</span>      <span class="c1"># for generating a sample 30-year episode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episodes</span><span class="p">)</span>  <span class="c1"># iterator to reset a 30-year sample</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">initial</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span>
+        <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">episodes</span><span class="o">.</span><span class="n">low</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">T</span><span class="p">]</span> <span class="o">+</span> <span class="n">episodes</span><span class="o">.</span><span class="n">high</span> <span class="o">+</span> <span class="p">[</span><span class="n">T</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">spaces</span><span class="o">.</span><span class="n">Discrete</span><span class="p">(</span><span class="mi">21</span><span class="p">)</span>
+        <span class="c1">#self.action_space = spaces.Box(low=0.0, high=1.0)</span>
+        
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># generate a fresh 30-year episode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">episode</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episodes</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">episode</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># return initial observations</span>
+        <span class="n">deltas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episode</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">])</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">T</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obs</span><span class="p">,</span> <span class="p">{}</span>
+
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">W</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>            <span class="c1"># amount to spend at t-1</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">W</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>   <span class="c1"># wealth at t-1</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">T</span>                <span class="c1"># year remaining till termination</span>
+
+        <span class="c1"># Convert action to asset allocation weights</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">action</span> <span class="o">*</span> <span class="mf">0.05</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">action</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="n">action</span><span class="p">])</span>
+        
+        <span class="c1"># Grab next market move at time t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">deltas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="c1"># Apply rebalance wealth and market move (t=1)</span>
+        <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
+
+        <span class="c1"># Calculate reward (t=1)</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">T</span><span class="o">*</span><span class="n">FAIL</span><span class="p">)</span> <span class="k">if</span> <span class="n">truncated</span> <span class="k">else</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">W</span> <span class="o">/</span> <span class="p">(</span><span class="n">S</span><span class="o">*</span><span class="n">T</span><span class="p">))</span>
+
+        <span class="c1"># Return as next observation</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="p">[</span><span class="n">T</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obs</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Helpers to evaluate trained model</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">episodes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return success likelihood, shortfalls and asset allocation actions&quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">episodes</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)}</span>  <span class="c1"># to store predicted actions</span>
+    <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">episodes</span><span class="p">)):</span>
+        <span class="n">obs</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="n">terminated</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">terminated</span><span class="p">:</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">_states</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obs</span><span class="p">))</span>
+            <span class="n">actions</span><span class="p">[</span><span class="n">env</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">T</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
+            <span class="n">obs</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">terminated</span><span class="p">,</span> <span class="n">truncated</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">T</span> <span class="k">if</span> <span class="n">truncated</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1">#print(n, truncated, action, rewards, env.model.W)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">),</span> <span class="o">*</span><span class="n">compute_shortfall</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">TAIL</span><span class="p">),</span> <span class="n">actions</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="deep-q-network-dqn">
+<h3>Deep Q-Network (DQN)<a class="headerlink" href="#deep-q-network-dqn" title="Permalink to this heading">#</a></h3>
+<p>We use <strong>Deep Q-Networks (DQN)</strong> from <code class="docutils literal notranslate"><span class="pre">Stable</span> <span class="pre">Baselines3</span></code>, which is designed for discrete action spaces. This approach employs <strong>deep reinforcement learning</strong> to maximize wealth longevity while adapting asset allocation strategies dynamically.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TIMESTEPS</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">5e5</span><span class="p">)</span>
+<span class="n">initial_alloc</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">fail</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">shortfall</span><span class="p">,</span> <span class="n">quantile</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">rules</span><span class="p">):</span>  <span class="c1"># train a model for each spending rule</span>
+
+    <span class="c1"># define and train model for this spending rule</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">rule</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="p">[</span><span class="n">initial_alloc</span><span class="p">,</span> <span class="mi">100</span><span class="o">-</span><span class="n">initial_alloc</span><span class="p">,</span> <span class="n">rule</span><span class="p">]</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">CustomEnv</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">BaseModel</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="n">T</span><span class="p">,</span> <span class="n">W</span><span class="o">=</span><span class="n">W</span><span class="p">),</span> <span class="n">episodes</span><span class="o">=</span><span class="n">episodes</span><span class="p">)</span>
+    <span class="n">clf</span> <span class="o">=</span> <span class="n">DQN</span><span class="p">(</span><span class="s1">&#39;MlpPolicy&#39;</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">clf</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">total_timesteps</span><span class="o">=</span><span class="n">TIMESTEPS</span><span class="p">)</span>
+    <span class="n">clf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># evaluate model</span>
+    <span class="n">test_clf</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">outdir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">fail</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">quantile</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">shortfall</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">actions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span>\
+        <span class="n">evaluate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">test_clf</span><span class="p">,</span> <span class="n">episodes</span><span class="p">)</span>
+
+    <span class="n">store</span><span class="p">[</span><span class="s1">&#39;dqn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">,</span> <span class="n">shortfall</span><span class="o">=</span><span class="n">shortfall</span><span class="p">,</span>
+                        <span class="n">quantile</span><span class="o">=</span><span class="n">quantile</span><span class="p">,</span> <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 21/21 [2:00:19&lt;00:00, 343.79s/it]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fail</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Deep RL&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>         3.0  3.1  3.2  3.3   3.4  3.5  3.6   3.7   3.8   3.9   4.0   4.1   4.2   4.3  4.4   4.5   4.6   4.7   4.8   4.9   5.0
+Deep RL  0.0  0.0  0.0  0.0  0.01  0.0  0.0  0.01  0.02  0.02  0.03  0.06  0.06  0.08  0.1  0.11  0.14  0.12  0.16  0.21  0.19
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot average allocations over time</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Deep RL average equity allocations, by year after retirement&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;3.5&quot;</span><span class="p">,</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span> <span class="s2">&quot;4.5&quot;</span><span class="p">,</span> <span class="s2">&quot;5.0&quot;</span><span class="p">]):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[[</span><span class="n">a</span><span class="o">*</span><span class="mi">5</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">[</span><span class="n">rule</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span>
+    <span class="n">median</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">y</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spending policy: </span><span class="si">{</span><span class="n">rule</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;years after retirement&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;equity allocation (%)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/69932e5e34a9cb7c4529d3b77b5e8adfb9a5ad9d2429d1469b721f41f9841ba8.png" src="_images/69932e5e34a9cb7c4529d3b77b5e8adfb9a5ad9d2429d1469b721f41f9841ba8.png" />
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Richard S. Sutton and Andrew G. Barto, 2018, “Reinforcement Learning: An Introduction”, MIT Press.</p>
+<p>Christine Benz, Jeffrey Ptak John Rekenthaler, Dec. 12, 2022, “The State of Retirement Income: 2022. A look at how higher bond yields, lower equity valuations, and inflation affect starting safe withdrawal rates”, Morningstar Portfolio and Planning Research.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="6.5_recurrent_net.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Recurrent Neural Networks</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="6.7_language_modeling.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Language Modeling</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retirement-spending-policy">Retirement spending policy</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sbbi-data">SBBI data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scenario-generator">Scenario generator</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#historical-simulations">Historical simulations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-of-spending-shortfall">Risk of spending shortfall</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-reinforcement-learning">Deep reinforcement learning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gymnasium-environment">Gymnasium environment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#state-space">State space</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#actions">Actions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reward-function">Reward function</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deep-q-network-dqn">Deep Q-Network (DQN)</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

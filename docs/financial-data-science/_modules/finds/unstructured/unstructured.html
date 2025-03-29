@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.unstructured.unstructured &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.unstructured.unstructured</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.unstructured.unstructured</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Classes for unstructured and textual datasets</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">finds.database.mongodb</span> <span class="kn">import</span> <span class="n">MongoDB</span><span class="p">,</span> <span class="n">parse_where</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Unstructured"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured">[docs]</a><span class="k">class</span> <span class="nc">Unstructured</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for unstructured datasets</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mongod: connection to MongoClient where data collection is stored</span>
+<span class="sd">        database: name of the database in MongoDB</span>
+
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        db : pymongo.database.Database connection</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; fomc = Unstructured(mongodb, &#39;fomc&#39;)  # connect to client named &#39;fomc&#39;</span>
+<span class="sd">    &gt;&gt;&gt; fomc.show()</span>
+<span class="sd">    &gt;&gt;&gt; fomc.select(&#39;minutes&#39;, where_clause)</span>
+<span class="sd">    &gt;&gt;&gt; fomc.delete(&#39;minutes&#39;, where_clause)</span>
+<span class="sd">    &gt;&gt;&gt; fomc.insert(&#39;minutes&#39;, doc)</span>
+<span class="sd">    &gt;&gt;&gt; fomc[&#39;minutes&#39;].estimated_document_count() # count docs in collection</span>
+<span class="sd">    &gt;&gt;&gt; fomc[&#39;minutes&#39;, &#39;field&#39;]</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    - sudo apt-get install -y mongodb-org  # install latest community version</span>
+<span class="sd">    - sudo systemctl start mongod     # start and stop mongodb server</span>
+<span class="sd">    - sudo systemctl status mongod</span>
+<span class="sd">    - sudo systemctl restart mongod</span>
+<span class="sd">    - sudo systemctl stop mongod</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mongodb</span><span class="p">:</span> <span class="n">MongoDB</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongodb</span> <span class="o">=</span> <span class="n">mongodb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">database</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">mongodb</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="n">database</span><span class="p">]</span>  <span class="c1"># make Database operations available</span>
+        <span class="c1">#self._c = self.c</span>
+        <span class="c1">#self.collections = self._c</span>
+
+<div class="viewcode-block" id="Unstructured.__getitem__"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">|</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Access a collection by name, or optionally by field&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="p">[</span><span class="n">args</span><span class="p">]</span></div>
+    
+<div class="viewcode-block" id="Unstructured.delete"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">|</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Delete all docs in collection satisfying where clause</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection: name of collection in database to delete</span>
+<span class="sd">            where: where clause describing documents to delete</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            number of documents deleted, -1 if collection not in database</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - str filter (passed on directly to pymongo)</span>
+<span class="sd">        - dict of {keys:values}</span>
+<span class="sd">        - list of key names (to delete if key name $exists)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">collection</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">list_collection_names</span><span class="p">():</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">delete_many</span><span class="p">(</span><span class="n">parse_where</span><span class="p">(</span><span class="n">where</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">deleted_count</span></div>
+
+<div class="viewcode-block" id="Unstructured.insert"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.insert">[docs]</a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Insert one doc; optionally remove existing duplicate document first</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection: name of collection in database to insert into</span>
+<span class="sd">            doc: dict of {key:value} representing document</span>
+<span class="sd">            keys: list of field names, to delete existing docs with same values</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            number of existing documents (with same key values) deleted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deleted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span> <span class="k">if</span> <span class="p">[]</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">insert_one</span><span class="p">({</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;_id&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">deleted</span></div>
+
+<div class="viewcode-block" id="Unstructured.get"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return value of field of first doc containing key field name</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection: name of collection in database to retrieve from</span>
+<span class="sd">            field: key field name</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value of key field of first document where key field name exists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="n">field</span> <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$exists&#39;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">}})[</span><span class="n">field</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Unstructured.select"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span> <span class="o">|</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">[],</span>
+               <span class="n">include_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Iterator to retrieve docs in collection satisfying where clause</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection: Name of collection in database to delete</span>
+<span class="sd">            where: Where clause describing documents to retrieve</span>
+<span class="sd">            include_id: If True, then include _id field in return</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Document selecting where clause in a list of dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">include_id</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">include_id</span> <span class="k">else</span> <span class="p">{</span><span class="s1">&#39;projection&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;_id&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">parse_where</span><span class="p">(</span><span class="n">where</span><span class="p">),</span> <span class="o">**</span><span class="n">include_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Unstructured.show"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of collections; or key names in all docs in collection&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">collection</span><span class="p">:</span>
+            <span class="c1">#: self[c].index_information()</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">list_collection_names</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">all_keys</span><span class="p">,</span> <span class="n">rec_keys</span><span class="p">:</span> <span class="n">all_keys</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">rec_keys</span><span class="p">),</span>
+                          <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">()),</span>
+                          <span class="nb">set</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Unstructured.load_dataframe"><a class="viewcode-back" href="../../../finds.unstructured.unstructured.html#finds.unstructured.unstructured.Unstructured.load_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+                       <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">update</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert_many records from rows of dataframe to a collection</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            collection: Name of collection in database to delete</span>
+<span class="sd">            df: Each row of DataFrame is document, column names as key fields</span>
+<span class="sd">            keys: Fields names to update or replace if same values</span>
+<span class="sd">            update: If key fields have same value, update if True. Else replace</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">insert_many</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">update_one</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">},</span>
+                                                <span class="n">doc</span><span class="p">,</span>
+                                                <span class="n">upsert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">replace_one</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">},</span>
+                                                 <span class="n">doc</span><span class="p">,</span>
+                                                 <span class="n">upsert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  
+    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="kn">import</span> <span class="nn">csv</span>
+    <span class="kn">import</span> <span class="nn">io</span>
+    <span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">MongoDB</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+
+    <span class="k">def</span> <span class="nf">update_situations</span><span class="p">(</span><span class="n">csvfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to parse situations text from key developments file</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            csvfile: name of delimited text file, may be .gz</span>
+<span class="sd">            sep: delimiter used in input file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame with overflowing &#39;situation&#39; text corrected, </span>
+<span class="sd">            and unique &#39;keydevid&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">open_</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span> <span class="k">if</span> <span class="n">csvfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gz&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">open</span>
+        <span class="k">with</span> <span class="n">open_</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;rt&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;latin-1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>                <span class="c1"># &quot;ISO-8859-1&quot; &quot;latin-1&quot;)</span>
+            <span class="n">nsep</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span>           <span class="c1"># infer number of delimiters</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>     <span class="c1"># merge overflow text from end</span>
+            <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">sep</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nsep</span><span class="p">:</span>
+                <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x1a</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;secs&#39;</span><span class="p">,</span>
+              <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">),</span> <span class="nb">min</span><span class="p">([</span><span class="n">line</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]),</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:])),</span>
+                                            <span class="n">quotechar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">delimiter</span><span class="o">=</span><span class="n">sep</span><span class="p">)),</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;secs&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;keydevid&#39;</span><span class="p">,</span> <span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">])</span>\
+               <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;keydevid&#39;</span><span class="p">])</span>      <span class="c1"># keep unique &#39;keydevid&#39;</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;keydevid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;keydevid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">,</span> <span class="s1">&#39;keydevid&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;headline&#39;</span><span class="p">,</span> <span class="s1">&#39;situation&#39;</span><span class="p">]]</span>
+
+
+    <span class="k">def</span> <span class="nf">update_keydev</span><span class="p">():</span> <span class="c1"># Sample code to read keydev situations text file</span>
+        <span class="n">keydev</span> <span class="o">=</span> <span class="n">Unstructured</span><span class="p">(</span><span class="n">mongodb</span><span class="p">,</span> <span class="s1">&#39;KeyDev&#39;</span><span class="p">)</span>
+        <span class="n">keydev</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="s1">&#39;keydevid&#39;</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">downloads</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;downloads&#39;</span><span class="p">],</span> <span class="s1">&#39;stocks2020&#39;</span><span class="p">,</span> <span class="s1">&#39;PSTAT&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">2019</span><span class="p">]:</span>
+            <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">csvfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">downloads</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;situations</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">.txt.gz&quot;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">read_situations</span><span class="p">(</span><span class="n">csvfile</span><span class="p">)</span>
+            <span class="n">keydev</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">)</span>
+        
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span><span class="n">t</span><span class="p">:</span> <span class="n">keydev</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span>\
+                         <span class="o">.</span><span class="n">count_documents</span><span class="p">({</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">})</span>
+                         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">keydev</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span>\
+                         <span class="o">.</span><span class="n">distinct</span><span class="p">(</span><span class="s1">&#39;keydeveventtypeid&#39;</span><span class="p">)})</span>
+    <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">mongodb</span> <span class="o">=</span> <span class="n">MongoDB</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unstructured&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

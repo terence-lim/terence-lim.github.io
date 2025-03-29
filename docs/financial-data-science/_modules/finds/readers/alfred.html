@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers.alfred &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.readers.alfred</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.readers.alfred</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class to access ALFRED/FRED apis, and FRED-MD/FRED-QD</span>
+
+<span class="sd">- FRED, ALFRED: St Louis Fed api&#39;s, with revision vintages</span>
+<span class="sd">- FRED-MD, FRED-QD: See McCracken website at St Louis Fed</span>
+
+<span class="sd">  - https://research.stlouisfed.org/econ/mccracken/fred-databases/</span>
+
+<span class="sd">Data are cached in memory. Vintage releases retrieved by sequence or date window.</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span>
+<span class="kn">from</span> <span class="nn">pandas.tseries.offsets</span> <span class="kn">import</span> <span class="n">MonthEnd</span><span class="p">,</span> <span class="n">YearEnd</span><span class="p">,</span> <span class="n">QuarterEnd</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span>
+<span class="kn">from</span> <span class="nn">finds.readers.readers</span> <span class="kn">import</span> <span class="n">requests_get</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># Helper functions: convert date formats</span>
+<span class="c1">#</span>
+<span class="k">def</span> <span class="nf">_int2date</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;helper method to convert int date to FRED api string format&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>    
+        <span class="k">return</span> <span class="p">[</span><span class="n">_int2date</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date</span><span class="p">]</span> 
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)[</span><span class="n">a</span><span class="p">:</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">]])</span>
+
+<span class="k">def</span> <span class="nf">_date2int</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;helper method to convert FRED api string format to int date&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_date2int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\D&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]))</span>
+
+<span class="k">def</span> <span class="nf">_to_date</span><span class="p">(</span><span class="n">datestamps</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="nb">format</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datestamps</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_to_monthend</span><span class="p">(</span><span class="n">dates</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+
+<span class="c1">#</span>
+<span class="c1"># Class Alfred to retrieve archival FRED series</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="Alfred"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred">[docs]</a><span class="k">class</span> <span class="nc">Alfred</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class for Alfred/Fred access, and manipulating retrieved data series</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      api_key : API key string registered with FRED</span>
+<span class="sd">      savefile: Name of local file to auto-save retrieved series</span>
+<span class="sd">      convert_date: Whether to convert date to int</span>
+<span class="sd">      verbose: whether to display messages</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        tcode: Reference dict of transformation codes</span>
+<span class="sd">        _fred_url(): Formatter to construct FRED api query from key-value string</span>
+<span class="sd">        _alfred_url(): Formatter to construct vintage FRED api query</span>
+<span class="sd">        _category_url(): Formatter to construct FRED category api query</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_header</span> <span class="o">=</span> <span class="p">{</span>    <span class="c1"># starter Dict of series descriptions for FRED-MD</span>
+        <span class="n">k</span> <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span>
+        <span class="p">[[</span><span class="s1">&#39;CPF3MTB3M&#39;</span><span class="p">,</span> <span class="s1">&#39;3-Month Commercial Paper Minus 3-Month Treasury Bill&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;CLAIMS&#39;</span><span class="p">,</span> <span class="s1">&#39;Initial Claims&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;HWIURATIO&#39;</span><span class="p">,</span> <span class="s1">&#39;Ratio of Help Wanted/No. Unemployed&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;HWI&#39;</span><span class="p">,</span> <span class="s1">&#39;Help Wanted Index for United States&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;AMDMNO&#39;</span><span class="p">,</span> <span class="s1">&#39;New Orders for Durable Goods&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;S&amp;P 500&#39;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P&#39;s Common Stock Price Index: Composite&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;RETAIL&#39;</span><span class="p">,</span> <span class="s2">&quot;Retail and Food Services Sales&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;OILPRICE&#39;</span><span class="p">,</span> <span class="s1">&#39;Crude Oil, spliced WTI and Cushing&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;COMPAPFF&#39;</span><span class="p">,</span> <span class="s2">&quot;3-Month Commercial Paper Minus FEDFUNDS&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;CP3M&#39;</span><span class="p">,</span> <span class="s2">&quot;3-Month AA Financial Commercial Paper Rates&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;CONSPI&#39;</span><span class="p">,</span> <span class="s1">&#39;Nonrevolving consumer credit to Personal Income&#39;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;S&amp;P div yield&#39;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P&#39;s Composite Common Stock: Dividend Yield&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;S&amp;P PE ratio&#39;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P&#39;s Composite Common Stock: Price-Earnings Ratio&quot;</span><span class="p">],</span>
+         <span class="p">[</span><span class="s1">&#39;S&amp;P: indust&#39;</span><span class="p">,</span> <span class="s2">&quot;S&amp;P&#39;s Common Stock Price Index: Industrials&quot;</span><span class="p">]]}</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">savefile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">convert_date</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create object, with api_key, for FRED access and data manipulation&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span> <span class="o">=</span> <span class="mi">17760704</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end</span> <span class="o">=</span> <span class="mi">99991231</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">savefile</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">savefile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_convert_date</span> <span class="o">=</span> <span class="n">convert_date</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+<div class="viewcode-block" id="Alfred.__call__"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">release</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">vintage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">99991231</span><span class="p">,</span>
+                 <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">realtime</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve from cache, else call FRED api, and apply transforms</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          series_id : Label of series to retrieve</span>
+<span class="sd">          start, end : Start and end period dates (inclusive) to keep</span>
+<span class="sd">          label : New label to rename returned series</span>
+<span class="sd">          release : release number (1 first, 0 latest), or latest up to date offset</span>
+<span class="sd">          vintage : Latest realtime_start date of observations to keep</span>
+<span class="sd">          realtime : Whether to return realtime_start and realtime_end</span>
+<span class="sd">          freq : Resample and replace date index with at periodic frequency;</span>
+<span class="sd">                 in {&#39;M&#39;, &#39;A&#39;. &#39;Q&#39;, &#39;D&#39;, &#39;Y&#39;}, else empty &#39;&#39; to auto select</span>
+<span class="sd">          kwargs : transformations key-value pairs</span>
+<span class="sd">            diff: Number of difference operations to apply</span>
+<span class="sd">            log: Number of log operations to apply</span>
+<span class="sd">            pct_change: Number of pct_change to apply</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            transformed values; name is set to label if provided else series_id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+        <span class="c1"># retrieve from cache or call api</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">series_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">series_id</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">freq</span><span class="p">:</span>
+            <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="s1">&#39;frequency_short&#39;</span><span class="p">)</span>
+            
+        <span class="n">df</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">construct_series</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">series_id</span><span class="p">][</span><span class="s1">&#39;observations&#39;</span><span class="p">],</span>
+                                     <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
+                                     <span class="n">vintage</span><span class="o">=</span><span class="n">vintage</span><span class="p">,</span>
+                                     <span class="n">start</span><span class="o">=</span><span class="n">start</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">,</span>
+                                     <span class="n">end</span><span class="o">=</span><span class="n">end</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">,</span>
+                                     <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+                                     <span class="n">convert_date</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">realtime</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+            <span class="n">s</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">s</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">label</span> <span class="ow">or</span> <span class="n">series_id</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">label</span> <span class="ow">or</span> <span class="n">series_id</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span></div>
+
+    <span class="n">tcode</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+             <span class="mi">2</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+             <span class="mi">3</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+             <span class="mi">4</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+             <span class="mi">5</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+             <span class="mi">6</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+             <span class="mi">7</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;pct_change&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+             <span class="s1">&#39;lin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+             <span class="s1">&#39;chg&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+             <span class="s1">&#39;ch1&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;pct_change&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;periods&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+             <span class="s1">&#39;pch&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;pct_change&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+             <span class="s1">&#39;pc1&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;pct_change&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;periods&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+             <span class="s1">&#39;pca&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;annualize&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+             <span class="s1">&#39;cch&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+             <span class="s1">&#39;cca&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;annualize&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">},</span>
+             <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;diff&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}}</span>
+
+    <span class="c1"># units - string that indicates a data value transformation.</span>
+    <span class="c1">#   lin = Levels (No transformation) [default]</span>
+    <span class="c1">#   chg = Change x(t) - x(t-1)</span>
+    <span class="c1">#   ch1 = Change from Year Ago x(t) - x(t-n_obs_per_yr)</span>
+    <span class="c1">#   pch = Percent Change ((x(t)/x(t-1)) - 1) * 100</span>
+    <span class="c1">#   pc1 = Percent Change from Year Ago ((x(t)/x(t-n_obs_per_yr)) - 1) * 100</span>
+    <span class="c1">#   pca = Compounded Annual Rate of Change (((x(t)/x(t-1))</span>
+    <span class="c1">#                                           ** (n_obs_per_yr)) - 1) * 100</span>
+    <span class="c1">#   cch = Cont Compounded Rate of Change (ln(x(t)) - ln(x(t-1))) * 100</span>
+    <span class="c1">#   cca = Cont Compounded Annual Rate of Change = cch * n_obs_per_yr</span>
+    <span class="c1">#   log = Natural Log ln(x(t))</span>
+    <span class="c1"># Frequency</span>
+    <span class="c1">#   A = Annual</span>
+    <span class="c1">#   SA = Semiannual</span>
+    <span class="c1">#   Q = Quarterly</span>
+    <span class="c1">#   M = Monthly</span>
+    <span class="c1">#   BW = Biweekly</span>
+    <span class="c1">#   W = Weekly</span>
+    <span class="c1">#   D = Daily</span>
+    <span class="c1"># Seasonal Adjustment</span>
+    <span class="c1">#   SA = Seasonally Adjusted</span>
+    <span class="c1">#   NSA = Not Seasonally Adjusted</span>
+    <span class="c1">#   SAAR = Seasonally Adjusted Annual Rate</span>
+    <span class="c1">#   SSA = Smoothed Seasonally Adjusted</span>
+    <span class="c1">#   NA = Not Applicable</span>
+
+<div class="viewcode-block" id="Alfred.transform"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.transform">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">tcode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Static method to apply time series transformations</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: DataFrame of input data</span>
+<span class="sd">            tcode: int transformation code in {1, ..., 7} or str. describing ho</span>
+<span class="sd">                   to apply sequence of operators to make series stationary</span>
+<span class="sd">            freq: str periodicity of dates in {&#39;M&#39;, &#39;Q&#39;, &#39;A&#39;}</span>
+<span class="sd">            kwargs: transformation operators and number of times</span>
+
+<span class="sd">        Transformation operators:</span>
+
+<span class="sd">          - log (int): Number of times to take log (default 0)</span>
+<span class="sd">          - diff (int): Number of times to take difference (default 0)</span>
+<span class="sd">          - pct_change (bool): Whether to apply pct_change operator</span>
+<span class="sd">          - periods (int): lags for pct_change or diff operator (default 1)</span>
+<span class="sd">          - annualize (int): annualization multiplier (default 1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># build up desired transformation set from input tcode and kwargs</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;periods&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;shift&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;pct_change&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;annualize&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">Alfred</span><span class="o">.</span><span class="n">tcode</span><span class="p">[</span><span class="n">tcode</span><span class="p">])</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>      
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;pct_change&#39;</span><span class="p">]:</span>
+            <span class="c1">#df = df.pct_change(fill_method=&#39;pad&#39;)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">df</span><span class="p">)</span> <span class="o">**</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;annualize&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># by compounding</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]):</span>
+            <span class="c1">#df = df.fillna(method=&#39;pad&#39;).diff(periods=t[&#39;periods&#39;])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;periods&#39;</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;annualize&#39;</span><span class="p">]</span>               <span class="c1"># by adding</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;shift&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Alfred.date_spans"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.date_spans">[docs]</a>    <span class="k">def</span> <span class="nf">date_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;USREC&#39;</span><span class="p">,</span>
+                   <span class="n">threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Return date spans as tuples of Timestamp</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">          series_id: Name of series</span>
+<span class="sd">          threshold: Values of series strictly above are included in date span</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">usrec</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span>
+        <span class="n">usrec</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">usrec</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;infer&#39;</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="p">((</span><span class="n">usrec</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">)</span> <span class="o">|</span>
+             <span class="p">(</span><span class="n">usrec</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">threshold</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span> <span class="o">!=</span> <span class="n">g</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">series_id</span><span class="p">)[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;first&#39;</span><span class="p">,</span><span class="s1">&#39;last&#39;</span><span class="p">])</span>
+        <span class="n">vspans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">vspans</span></div>
+
+<div class="viewcode-block" id="Alfred.popular"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.popular">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">popular</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Static method to web scrape popular series names, by page number&quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">page</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://fred.stlouisfed.org/tags/series?ob=pv&amp;pageID=</span><span class="si">{</span><span class="n">page</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;series-title&#39;</span><span class="p">})</span>
+        <span class="n">details</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">]</span>
+        <span class="c1">#tags = soup.findAll(name=&#39;input&#39;,attrs={&#39;class&#39;:&#39;pager-item-checkbox&#39;})</span>
+        <span class="c1">#details = [tag.get(&#39;value&#39;) for tag in tags]</span>
+        <span class="k">return</span> <span class="n">details</span></div>
+
+<div class="viewcode-block" id="Alfred.header"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.header">[docs]</a>    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;title&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns title (or other column) from last meta record of a series&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">series_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">series_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">series_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">series_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span>  <span class="c1"># load via api if not in cache</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">series_id</span><span class="p">][</span><span class="s1">&#39;series&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;*** </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s2"> ***&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;*** </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s2"> ***&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Alfred.categories"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.categories">[docs]</a>    <span class="k">def</span> <span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Returns categories parent_id&#39;s of series&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">series_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">series_id</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_series_categories</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="Alfred.observations"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.observations">[docs]</a>    <span class="k">def</span> <span class="nf">observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                     <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return all release of observations for a series and date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            series_id: series name</span>
+<span class="sd">            date: date of series</span>
+<span class="sd">            freq: in {&#39;M&#39;, &#39;A&#39;. &#39;Q&#39;, &#39;D&#39;, &#39;Y&#39;, &#39;&#39;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">series_id</span><span class="p">][</span><span class="s1">&#39;observations&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">match</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+            <span class="k">case</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">YearEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">YearEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s1">&#39;S&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s1">&#39;Q&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s1">&#39;M&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s1">&#39;W&#39;</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">date</span> <span class="o">+</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">date</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">)]</span>\
+            <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_axis</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)))</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;release&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Alfred.construct_series"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.construct_series">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">construct_series</span><span class="p">(</span><span class="n">observations</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+                         <span class="n">vintage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">99991231</span><span class="p">,</span>
+                         <span class="n">release</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                         <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                         <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">99991231</span><span class="p">,</span>
+                         <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                         <span class="n">convert_date</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to construct series from given full observations dataframe</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          observations : DataFrame from FRED &#39;series/observations&#39; api call</span>
+<span class="sd">          release : Sequence num (0 for latest), or latest to max date offset</span>
+<span class="sd">          vintage : Latest realtime_start date (inclusive) allowed</span>
+<span class="sd">          start, end : Start and end period dates (inclusive) to keep</span>
+<span class="sd">          freq : in {&#39;M&#39;, &#39;A&#39;. &#39;Q&#39;, &#39;D&#39;, &#39;Y&#39;}, else empty &#39;&#39; to auto select</span>
+<span class="sd">          convert_date : Whether to convert date format to int</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            value as of each period date, optionally indexed by realtime_start</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">observations</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">observations</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">freq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">YearEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">QuarterEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">freq</span><span class="o">.</span><span class="n">upper</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]:</span>
+                <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">_int2date</span><span class="p">(</span><span class="n">vintage</span><span class="p">)):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">_int2date</span><span class="p">(</span><span class="n">vintage</span><span class="p">)]</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;realtime_start&#39;</span><span class="p">])</span>
+
+        <span class="sd">&quot;&quot;&quot;This code is maximum release</span>
+<span class="sd">        if isinstance(release, int):  # keep latest up to max release</span>
+<span class="sd">            df[&#39;release&#39;] = df.groupby(&#39;date&#39;).cumcount()</span>
+<span class="sd">            df = pd.concat([df[df[&#39;release&#39;] + 1 == (release or 99999999)],</span>
+<span class="sd">                            df.drop_duplicates(&#39;date&#39;, keep=&#39;last&#39;)])\</span>
+<span class="sd">                   .drop_duplicates(&#39;date&#39;, keep=&#39;first&#39;)</span>
+<span class="sd">        else:    # else latest release up through date offset</span>
+<span class="sd">            df[&#39;release&#39;] = (df[&#39;date&#39;] + release).dt.strftime(&#39;%Y-%m-%d&#39;)</span>
+<span class="sd">            df = df[df[&#39;realtime_start&#39;] &lt;= df[&#39;release&#39;]]\</span>
+<span class="sd">                .drop_duplicates(&#39;date&#39;, keep=&#39;last&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">release</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># keep exactly release number</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">release</span><span class="p">]</span>\
+                <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>    <span class="c1"># else latest release up through date offset</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">release</span><span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]]</span>\
+                <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>            
+        <span class="k">if</span> <span class="n">convert_date</span><span class="p">:</span>   <span class="c1"># convert dates to int date format</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_date2int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">])</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_date2int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[(</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">vintage</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Interface methods to call API wrappers</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Alfred.get_series"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.get_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                   <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve metadata and full observations of a series with FRED api</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            series_id: list of ids of series to retrieve</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            length of observations dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">series_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">series_id</span><span class="p">]</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_series</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span>
+                                     <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span>
+                                     <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                     <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                                     <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">series</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;observations&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_series_observations</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span>
+                                                             <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span>
+                                                             <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                                                             <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                                                             <span class="n">archive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                             <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;series&#39;</span><span class="p">:</span> <span class="n">series</span><span class="p">}</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">series_id</span><span class="p">][</span><span class="s1">&#39;observations&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Alfred.get_category"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.get_category">[docs]</a>    <span class="k">def</span> <span class="nf">get_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve category information by calling related API</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">          category_id : id of category to retrieve</span>
+<span class="sd">          api_key : credentials to FRED</span>
+<span class="sd">          verbose : verbose flag</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        Uses request_category method to call these FRED API on given category_id</span>
+
+<span class="sd">        - &#39;category&#39; API gets meta information</span>
+<span class="sd">        - &#39;category/series&#39; API gets series_ids</span>
+<span class="sd">        - &#39;category/children&#39; API gets child categories</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_category</span><span class="p">(</span><span class="n">category_id</span><span class="p">,</span> <span class="n">api</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;categories&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;categories&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">c</span><span class="p">[</span><span class="s1">&#39;children&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_category</span><span class="p">(</span><span class="n">category_id</span><span class="p">,</span>
+                                              <span class="n">api</span><span class="o">=</span><span class="s2">&quot;category/children&quot;</span><span class="p">,</span>
+                                              <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>\
+                            <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;categories&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">c</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_category</span><span class="p">(</span><span class="n">category_id</span><span class="p">,</span>
+                                      <span class="n">api</span><span class="o">=</span><span class="s2">&quot;category/series&quot;</span><span class="p">,</span>
+                                      <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span>
+                                      <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;seriess&#39;</span><span class="p">]:</span>
+                <span class="k">break</span>
+            <span class="n">c</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;seriess&#39;</span><span class="p">])</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;limit&#39;</span><span class="p">]</span>        
+        <span class="k">return</span> <span class="n">c</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Wrappers around FRED api calls</span>
+    <span class="c1">#</span>
+
+    <span class="c1"># Format input key-values to form fred api&#39;s    </span>
+    <span class="n">_alfred_url</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://api.stlouisfed.org/fred/</span><span class="si">{api}</span><span class="s2">?series_id=</span><span class="si">{series_id}</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;&amp;realtime_start=</span><span class="si">{start}</span><span class="s2">&amp;realtime_end=</span><span class="si">{end}</span><span class="s2">&quot;</span>
+                   <span class="s2">&quot;&amp;api_key=</span><span class="si">{api_key}</span><span class="s2">&amp;file_type=json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">_fred_url</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://api.stlouisfed.org/fred/</span><span class="si">{api}</span><span class="s2">?series_id=</span><span class="si">{series_id}</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;&amp;api_key=</span><span class="si">{api_key}</span><span class="s2">&amp;file_type=json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">_category_url</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://api.stlouisfed.org/fred/</span><span class="si">{api}</span><span class="s2">?&quot;</span>
+                    <span class="s2">&quot;category_id=</span><span class="si">{category_id}</span><span class="s2">&amp;api_key=</span><span class="si">{api_key}</span><span class="s2">&amp;&quot;</span>
+                    <span class="s2">&quot;file_type=json</span><span class="si">{args}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+
+<div class="viewcode-block" id="Alfred.request_series"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series">[docs]</a>    <span class="k">def</span> <span class="nf">request_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                       <span class="n">end</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Requests &#39;series&#39; API for series metadata&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alfred_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">&quot;series&quot;</span><span class="p">,</span>
+                               <span class="n">series_id</span><span class="o">=</span><span class="n">series_id</span><span class="p">,</span>
+                               <span class="n">start</span><span class="o">=</span><span class="n">_int2date</span><span class="p">(</span><span class="n">start</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">),</span>
+                               <span class="n">end</span><span class="o">=</span><span class="n">_int2date</span><span class="p">(</span><span class="n">end</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">),</span>
+                               <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fred_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">&quot;series&quot;</span><span class="p">,</span>
+                                 <span class="n">series_id</span><span class="o">=</span><span class="n">series_id</span><span class="p">,</span>
+                                 <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            self._print(url)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;seriess&#39;</span><span class="p">])</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="Alfred.request_series_categories"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series_categories">[docs]</a>    <span class="k">def</span> <span class="nf">request_series_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                  <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Request `series/categories` API for series category ids&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fred_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">&quot;series/categories&quot;</span><span class="p">,</span>
+                             <span class="n">series_id</span><span class="o">=</span><span class="n">series_id</span><span class="p">,</span>
+                             <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;categories&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">series_id</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span></div>
+    
+
+<div class="viewcode-block" id="Alfred.request_series_observations"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.request_series_observations">[docs]</a>    <span class="k">def</span> <span class="nf">request_series_observations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                                    <span class="n">archive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Request `series/observations` API for full observations data&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alfred_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">&quot;series/observations&quot;</span><span class="p">,</span>
+                               <span class="n">series_id</span><span class="o">=</span><span class="n">series_id</span><span class="p">,</span>
+                               <span class="n">start</span><span class="o">=</span><span class="n">_int2date</span><span class="p">(</span><span class="n">start</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">),</span>
+                               <span class="n">end</span><span class="o">=</span><span class="n">_int2date</span><span class="p">(</span><span class="n">end</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end</span><span class="p">),</span>
+                               <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fred_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="s2">&quot;series/observations&quot;</span><span class="p">,</span>
+                                 <span class="n">series_id</span><span class="o">=</span><span class="n">series_id</span><span class="p">,</span>
+                                 <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+<span class="c1">#        else:</span>
+<span class="c1">#            self._print(url)</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;observations&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">archive</span><span class="p">:</span>  <span class="c1"># convert fred to alfred by backfilling realtime_start</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
+                 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;realtime_end&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>  <span class="c1"># observations may not have been sorted by date!</span></div>
+
+<div class="viewcode-block" id="Alfred.request_category"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.request_category">[docs]</a>    <span class="k">def</span> <span class="nf">request_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span>
+                         <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Request &#39;category&#39; related API for category data&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category_url</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="n">api</span><span class="p">,</span>
+                                 <span class="n">category_id</span><span class="o">=</span><span class="n">category_id</span><span class="p">,</span>
+                                 <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
+                                 <span class="n">args</span><span class="o">=</span><span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="n">args</span> <span class="k">if</span> <span class="n">args</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># Internal methods to manage cache in memory</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Alfred.__getitem__"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get observations and metadata from cache for {series_id}&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Alfred.keys"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return id names of all loaded series data&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+    <span class="n">_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;observation_start&#39;</span><span class="p">,</span> <span class="s1">&#39;observation_end&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;frequency_short&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;popularity&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;seasonal_adjustment_short&#39;</span><span class="p">,</span> <span class="s1">&#39;units_short&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="Alfred.values"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">_columns</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return headers (last metadata row) of all loaded series</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            columns: subset of header columns to return</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame of latest headers of all series loaded</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">values</span><span class="p">()],</span>
+                       <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span></div>
+            
+<div class="viewcode-block" id="Alfred.load"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savefile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load all series to memory from pickle file, return number loaded&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">savefile</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">savefile</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Alfred.dump"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savefile</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save all memory-cached series to pickle file, return number saved&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">savefile</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">savefile</span><span class="p">),</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Alfred.clear"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Clear internal memory cache of previously loaded series&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Alfred.pop"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Pop and return desired series, then clear from memory cache&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+    <span class="c1">#</span>
+    <span class="c1"># To splice series -- see FRED-MD appendix</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Alfred.multpl"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.multpl">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">multpl</span><span class="p">(</span><span class="n">page</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to retrieve shiller series by scraping multpl.com</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          page: Web page name in {&#39;s-p-500-dividend-yield&#39;, &#39;shiller-pe&#39;}</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">         Dataframe of monthly series (for updating FRED-MD)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.multpl.com/</span><span class="si">{</span><span class="n">page</span><span class="si">}</span><span class="s2">/table/by-month&quot;</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findChildren</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_to_date</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_to_monthend</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;[^\d\.\-]&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+    <span class="c1"># Reference dict for splicing/adjusting series for Fred-MD</span>
+    <span class="n">splice_</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;HWI&#39;</span><span class="p">:</span> <span class="s1">&#39;JTSJOL&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;AMDMNO&#39;</span><span class="p">:</span> <span class="s1">&#39;DGORDER&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;S&amp;P 500&#39;</span><span class="p">:</span> <span class="s1">&#39;SP500&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;RETAIL&#39;</span><span class="p">:</span> <span class="s1">&#39;RSAFS&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;OILPRICE&#39;</span><span class="p">:</span> <span class="s1">&#39;MCOILWTICO&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;COMPAPFF&#39;</span><span class="p">:</span> <span class="s1">&#39;CPFF&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;CP3M&#39;</span><span class="p">:</span> <span class="s1">&#39;CPF3M&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;CLAIMS&#39;</span><span class="p">:</span> <span class="s1">&#39;ICNSA&#39;</span><span class="p">,</span>  <span class="c1"># weekly</span>
+                     <span class="s1">&#39;S&amp;P div yield&#39;</span><span class="p">:</span> <span class="s1">&#39;s-p-500-dividend-yield&#39;</span><span class="p">,</span> <span class="c1"># multpl</span>
+                     <span class="s1">&#39;S&amp;P PE ratio&#39;</span><span class="p">:</span> <span class="s1">&#39;shiller-pe&#39;</span><span class="p">,</span> <span class="c1"># s-p-500-pe-ratio</span>
+                     <span class="s1">&#39;HWIURATIO&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Series</span><span class="o">.</span><span class="n">div</span><span class="p">,</span> <span class="s1">&#39;JTSJOL&#39;</span><span class="p">,</span> <span class="s1">&#39;UNEMPLOY&#39;</span><span class="p">],</span>
+                     <span class="s1">&#39;CPF3MTB3M&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Series</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="s1">&#39;CPF3M&#39;</span><span class="p">,</span> <span class="s1">&#39;DTB3&#39;</span><span class="p">],</span>
+                     <span class="s1">&#39;CONSPI&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">Series</span><span class="o">.</span><span class="n">div</span><span class="p">,</span> <span class="s1">&#39;NONREVSL&#39;</span><span class="p">,</span> <span class="s1">&#39;PI&#39;</span><span class="p">]}</span>
+
+<div class="viewcode-block" id="Alfred.splice"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.Alfred.splice">[docs]</a>    <span class="k">def</span> <span class="nf">splice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">19590101</span><span class="p">,</span>
+               <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;M&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve raw series to update a FRED-MD series</span>
+<span class="sd">    </span>
+<span class="sd">        e.g. Shiller series: </span>
+
+<span class="sd">        - http://www.econ.yale.edu/~shiller/data/ie_data.xls</span>
+<span class="sd">        - multpl.com</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shiller</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S&amp;P div yield&#39;</span><span class="p">,</span> <span class="s1">&#39;S&amp;P PE ratio&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;S&amp;P: indust&#39;</span><span class="p">]:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CLAIMS&#39;</span><span class="p">]:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="p">(</span><span class="s1">&#39;ICNSA&#39;</span><span class="p">))</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_to_monthend</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="n">shiller</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">multpl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="bp">self</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">),</span> <span class="bp">self</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">auto_request</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span></div></div>
+    
+<span class="c1">#</span>
+<span class="c1"># Functions to retrieve fred_md and fred_qd</span>
+<span class="c1">#</span>
+<span class="c1">#fred_md_url = &#39;https://files.stlouisfed.org/files/htdocs/fred-md/&#39;</span>
+<span class="c1"># https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/historical_fred-md.zip</span>
+<span class="c1"># https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/md-vintages-2-10-25.zip</span>
+
+<span class="c1"># https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/monthly/current.csv</span>
+<span class="n">fred_md_url</span> <span class="o">=</span> <span class="s2">&quot;https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/&quot;</span>
+
+<div class="viewcode-block" id="fred_md"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.fred_md">[docs]</a><span class="k">def</span> <span class="nf">fred_md</span><span class="p">(</span><span class="n">vintage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">fred_md_url</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve and parse current or vintage csv from McCracken FRED-MD site</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vintage: file name relative to base url or zipfile, or int date YYYYMM</span>
+<span class="sd">        url: base name of url, local file path or zipfile archive</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       DataFrame indexed by end-of-month date</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - if vintage is int: derive vintage csv file name from input date YYYYMM</span>
+<span class="sd">    - if url is &#39;&#39;: derive subfolder or zip archive name, from vintage</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; md_df, mt = fred_md()  # current in monthly/current.csv</span>
+<span class="sd">    &gt;&gt;&gt; md_df, mt = fred_md(&#39;Historical FRED-MD Vintages Final/2013-12.csv&#39;,</span>
+<span class="sd">                            url=fred_md_url+&#39;Historical_FRED-MD.zip&#39;) # pre-2015</span>
+<span class="sd">    &gt;&gt;&gt; md_df, mt = fred_md(&#39;monthly/2015-05.csv&#39;,</span>
+<span class="sd">                            url=fred_md_url+&#39;FRED_MD.zip&#39;)      # post-2015</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vintage</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">vintage</span><span class="p">:</span>
+        <span class="n">csvfile</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">vintage</span> <span class="o">//</span> <span class="mi">100</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">vintage</span> <span class="o">%</span> <span class="mi">100</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+        <span class="k">if</span> <span class="n">vintage</span> <span class="o">&lt;</span> <span class="mi">201500</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;historical_fred-md.zip&#39;</span>
+            <span class="n">vintage</span> <span class="o">=</span> <span class="s1">&#39;Historical FRED-MD Vintages Final/&#39;</span> <span class="o">+</span> <span class="n">csvfile</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vintage</span> <span class="o">=</span> <span class="s1">&#39;monthly/&#39;</span> <span class="o">+</span> <span class="n">csvfile</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vintage</span> <span class="o">=</span> <span class="n">vintage</span> <span class="ow">or</span> <span class="s1">&#39;monthly/current.csv&#39;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FRED-MD vintage:&#39;</span><span class="p">,</span> <span class="n">vintage</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">vintage</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">vintage</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>    <span class="c1"># this row has metadata, e.g. transform codes</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[^a-z]&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span> <span class="c1"># simplify label str</span>
+            <span class="n">meta</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>  <span class="c1"># as dict of int codes</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>      <span class="c1"># keep rows with valid date</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">_to_date</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">_to_monthend</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fred_qd"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.fred_qd">[docs]</a><span class="k">def</span> <span class="nf">fred_qd</span><span class="p">(</span><span class="n">vintage</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">fred_md_url</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve and parse current or vintage csv from McCracken FRED-MD site</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vintage: file name relative to base url or zipfile, or int date YYYYMM</span>
+<span class="sd">        url: base name of url, local file path or zipfile archive</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       DataFrame indexed by end-of-month date</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - if vintage is int: derive vintage csv file name from input date YYYYMM</span>
+<span class="sd">    - if url is &#39;&#39;: derive subfolder or zip archive name, from vintage</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vintage</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">vintage</span><span class="p">:</span>
+        <span class="n">vintage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;quarterly/</span><span class="si">{</span><span class="n">vintage</span> <span class="o">//</span> <span class="mi">100</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">vintage</span> <span class="o">%</span> <span class="mi">100</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vintage</span> <span class="o">=</span> <span class="n">vintage</span> <span class="ow">or</span> <span class="s1">&#39;quarterly/current.csv&#39;</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FRED-QD vintage:&#39;</span><span class="p">,</span> <span class="n">vintage</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">urljoin</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">vintage</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>    <span class="c1"># this row has metadata, e.g. transform codes</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[^a-z]&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>  <span class="c1"># simplify label str</span>
+            <span class="n">meta</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>      <span class="c1"># as dict of int codes</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>            <span class="c1"># keep rows with valid date</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">_to_date</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y&#39;</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">_to_monthend</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:],</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span></div>
+        
+
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<div class="viewcode-block" id="csv_from_zip"><a class="viewcode-back" href="../../../finds.readers.alfred.html#finds.readers.alfred.csv_from_zip">[docs]</a><span class="k">def</span> <span class="nf">csv_from_zip</span><span class="p">(</span><span class="n">zip_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">z</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">z</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">csv_filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">vintage</span> <span class="o">=</span> <span class="mi">202004</span>
+    <span class="n">vintage</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;quarterly/</span><span class="si">{</span><span class="n">vintage</span> <span class="o">//</span> <span class="mi">100</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">vintage</span> <span class="o">%</span> <span class="mi">100</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+    <span class="n">vintage</span> <span class="o">=</span> <span class="s1">&#39;assets/FRED-MD_2015m5.csv&#39;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">codes</span> <span class="o">=</span> <span class="n">fred_md</span><span class="p">(</span><span class="n">vintage</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="c1">#    df, codes = fred_qd(&#39;assets/FRED-QD_2020m04.csv&#39;, url=&#39;&#39;)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1943 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Value at Risk &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '3.4_value_at_risk';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Covariance Matrix" href="3.5_covariance_matrix.html" />
+    <link rel="prev" title="Options Pricing" href="3.3_options_pricing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F3.4_value_at_risk.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/3.4_value_at_risk.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Value at Risk</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-measures">Risk measures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coherence">Coherence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametric-method">Parametric method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#delta-normal-method">Delta-Normal method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monte-carlo-simulation-method">Monte Carlo simulation method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#historical-simulation-method">Historical Simulation method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stressed-var-method">Stressed VaR method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bootstrap-method">Bootstrap method</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditional-volatility-models">Conditional volatility models</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ewma-model">EWMA model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#garch-model">GARCH model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtesting-var">Backtesting VaR</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kupiec-likelihood-ratio-test">Kupiec Likelihood Ratio test</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditional-coverage-tests">Conditional coverage tests</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="value-at-risk">
+<h1>Value at Risk<a class="headerlink" href="#value-at-risk" title="Permalink to this heading">#</a></h1>
+<p><em>The only constant in life is change</em> - Heraclitus</p>
+<p>Value at Risk (VaR) is a widely used risk measure in financial risk management that quantifies the potential loss in a portfolio over a given time period with a specified confidence level. However, VaR has limitations, including its inability to capture the severity of losses beyond its threshold. To address this, alternative measures such as Expected Shortfall (ES) have been introduced. We explore different methodologies for calculating VaR, including parametric, historical, and Monte Carlo simulation approaches, as well as advanced techniques such as stressed VaR and bootstrapping. Additionally, we examine conditional volatility models, including EWMA and GARCH, to account for changing market conditions. Finally, we discuss backtesting methods, such as the Kupiec Likelihood Ratio test and conditional coverage tests, to validate the accuracy of VaR models in real-world scenarios.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Alfred</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">row_formatted</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+<span class="c1">#pd.set_option(&#39;display.max_rows&#39;, None)</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1">#%matplotlib qt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="risk-measures">
+<h2>Risk measures<a class="headerlink" href="#risk-measures" title="Permalink to this heading">#</a></h2>
+<p><strong>Value at Risk (VaR)</strong> is a fundamental risk measure that estimates the maximum potential loss in a portfolio over a specific period at a given confidence level. A VaR at an (\alpha%) confidence level represents the loss threshold that has an (\alpha%) probability of being exceeded.</p>
+<section id="coherence">
+<h3>Coherence<a class="headerlink" href="#coherence" title="Permalink to this heading">#</a></h3>
+<p>A major limitation of VaR is that it does not provide insight into the magnitude of losses beyond its threshold. Artzner et al. proposed four essential properties that a risk measure should satisfy:</p>
+<ol class="arabic simple">
+<li><p><strong>Monotonicity:</strong> If one portfolio consistently performs worse than another under all conditions, it should have a higher risk measure.</p></li>
+<li><p><strong>Translation Invariance:</strong> Adding a risk-free cash amount <span class="math notranslate nohighlight">\(K\)</span> to a portfolio should reduce its risk measure by <span class="math notranslate nohighlight">\(K\)</span>.</p></li>
+<li><p><strong>Homogeneity:</strong> Scaling a portfolio by a factor of <span class="math notranslate nohighlight">\(X\)</span> should scale its risk measure by the same factor.</p></li>
+<li><p><strong>Subadditivity:</strong> The risk measure of a merged portfolio should not exceed the sum of the individual risk measures, ensuring diversification benefits.</p></li>
+</ol>
+<p>A risk measure that satisfies all four properties is considered <strong>coherent</strong>. <strong>Expected Shortfall (ES)</strong> is a coherent risk measure, whereas VaR lacks subadditivity. ES is calculated as the probability-weighted average of losses beyond the VaR threshold. Other coherent risk measures can be derived by applying a risk aversion function to weight quantiles, with ES being a special case where tail quantiles receive equal weighting.</p>
+<p>Retrieve crypto currency index returns from FRED</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># retrieve crypto currency index from FRED, as log returns</span>
+<span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">,</span> <span class="n">convert_date</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cat</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">get_category</span><span class="p">(</span><span class="mi">33913</span><span class="p">)</span>
+<span class="n">cryptos</span> <span class="o">=</span> <span class="p">[</span><span class="n">alf</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">log</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+           <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">cat</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;DISCONT&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]]</span>
+<span class="n">cryptos</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="n">date_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">cryptos</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">cryptos</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">titles</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]:</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">cat</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;DISCONT&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]},</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">cat</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># crypto index names</span>
+<span class="n">titles</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">cat</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cryptocurrencies</th>
+    </tr>
+    <tr>
+      <th>33913</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CBBCHUSD</th>
+      <td>Coinbase Bitcoin Cash</td>
+    </tr>
+    <tr>
+      <th>CBBTCUSD</th>
+      <td>Coinbase Bitcoin</td>
+    </tr>
+    <tr>
+      <th>CBETHUSD</th>
+      <td>Coinbase Ethereum</td>
+    </tr>
+    <tr>
+      <th>CBLTCUSD</th>
+      <td>Coinbase Litecoin</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># recent crypto log returns</span>
+<span class="n">cryptos</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2014-12-01</th>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2014-12-02</th>
+      <td>NaN</td>
+      <td>0.021391</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2014-12-03</th>
+      <td>NaN</td>
+      <td>0.000000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2014-12-04</th>
+      <td>NaN</td>
+      <td>-0.002384</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2014-12-06</th>
+      <td>NaN</td>
+      <td>0.002384</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2025-02-26</th>
+      <td>0.010099</td>
+      <td>0.006085</td>
+      <td>-0.011953</td>
+      <td>0.018231</td>
+    </tr>
+    <tr>
+      <th>2025-02-27</th>
+      <td>0.062384</td>
+      <td>-0.003877</td>
+      <td>-0.030322</td>
+      <td>0.009735</td>
+    </tr>
+    <tr>
+      <th>2025-02-28</th>
+      <td>-0.014295</td>
+      <td>0.020210</td>
+      <td>-0.008916</td>
+      <td>-0.029413</td>
+    </tr>
+    <tr>
+      <th>2025-03-01</th>
+      <td>0.071640</td>
+      <td>0.091550</td>
+      <td>0.127686</td>
+      <td>0.028240</td>
+    </tr>
+    <tr>
+      <th>2025-03-02</th>
+      <td>-0.003326</td>
+      <td>-0.010081</td>
+      <td>-0.019098</td>
+      <td>0.015676</td>
+    </tr>
+  </tbody>
+</table>
+<p>3710 rows × 4 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="parametric-method">
+<h3>Parametric method<a class="headerlink" href="#parametric-method" title="Permalink to this heading">#</a></h3>
+<p>Assuming returns follow a normal distribution, VaR and ES at a confidence level <span class="math notranslate nohighlight">\(\alpha\)</span> are given by:</p>
+<div class="math notranslate nohighlight">
+\[
+VaR = -\mu + \sigma z_{1-\alpha}
+\]</div>
+<div class="math notranslate nohighlight">
+\[
+ES = -\mu + \sigma \dfrac{\exp(-z_{1-\alpha}^2/2)}{(1 - \alpha)\sqrt{2 \pi}}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\( z_{\alpha} \)</span> is the standard normal quantile corresponding to <span class="math notranslate nohighlight">\(\alpha\)</span>.</p>
+<p>For example, at a 95% confidence level (<span class="math notranslate nohighlight">\(\alpha = 0.95\)</span>), <span class="math notranslate nohighlight">\( z_{\alpha} = -1.645 \)</span>, which represents the lower 5% quantile. In practice, <span class="math notranslate nohighlight">\(\mu\)</span> and <span class="math notranslate nohighlight">\(\sigma\)</span> are estimated from historical data, but since short-term mean returns are difficult to measure accurately, <span class="math notranslate nohighlight">\(\mu\)</span> is often assumed to be zero.</p>
+<p>Under the assumption that geometric returns are normally distributed, then arithmetic returns follow a <strong>lognormal distribution</strong>. The skewness of the lognormal <span class="math notranslate nohighlight">\((\exp(\sigma^2) + 2)\sqrt{(\exp(\sigma^2) - 1)}\)</span> is always positive, hence the lognormal has a long right-tail. The lognormal has kurtosis
+<span class="math notranslate nohighlight">\(\exp(\sigma^2)^4 + 2\exp(\sigma^2)^3 + 3\exp(\sigma^2)^2 -3\)</span> which exceeds 3 and increases with volatility, hence exhibits fatter tails than the normal distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper to compute parametric VaR and ES</span>
+<span class="k">def</span> <span class="nf">parametric_risk</span><span class="p">(</span><span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate parametric gaussian VaR and ES&quot;&quot;&quot;</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">value_at_risk</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">expected_shortfall</span><span class="o">=</span><span class="n">es</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.95</span>
+<span class="n">volatility</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">}</span>
+<span class="n">parametric</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">label</span><span class="p">:</span> <span class="n">Series</span><span class="p">(</span><span class="n">parametric_risk</span><span class="p">(</span><span class="n">std</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+                        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">std</span> <span class="ow">in</span> <span class="n">volatility</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parametric Risk Measures (alpha=</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">volatility</span><span class="p">},</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">),</span>
+           <span class="n">parametric</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parametric Risk Measures (alpha=0.95)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>volatility</th>
+      <td>0.0576</td>
+      <td>0.0396</td>
+      <td>0.0505</td>
+      <td>0.0543</td>
+    </tr>
+    <tr>
+      <th>value_at_risk</th>
+      <td>0.0948</td>
+      <td>0.0651</td>
+      <td>0.0831</td>
+      <td>0.0894</td>
+    </tr>
+    <tr>
+      <th>expected_shortfall</th>
+      <td>0.1189</td>
+      <td>0.0817</td>
+      <td>0.1042</td>
+      <td>0.1121</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="delta-normal-method">
+<h3>Delta-Normal method<a class="headerlink" href="#delta-normal-method" title="Permalink to this heading">#</a></h3>
+<p>The delta-normal method provides an approximation for non-linear portfolios by assuming that underlying asset returns are normally distributed. The risk of the portfolio is modeled using <strong>delta</strong>, which measures the sensitivity of portfolio value to changes in underlying asset prices. A more refined approximation includes <strong>gamma</strong>, the second derivative of portfolio value with respect to asset prices, known as the <strong>delta-gamma method</strong>.</p>
+</section>
+<section id="monte-carlo-simulation-method">
+<h3>Monte Carlo simulation method<a class="headerlink" href="#monte-carlo-simulation-method" title="Permalink to this heading">#</a></h3>
+<p>Monte Carlo simulation applies to both linear and non-linear portfolios. This approach generates random scenarios based on an assumed distribution for underlying risk factors. If 1,000 scenarios are simulated, the 95% VaR is estimated as the 50th worst loss (i.e., the 5th percentile), while Expected Shortfall is calculated as the average of the 49 worst losses.</p>
+<p>However, standard Monte Carlo models assume normality and independence, which may not always reflect real-world financial data, necessitating the use of <strong>non-parametric approaches</strong>.</p>
+<p>A <strong>QQ plot</strong> compares the empirical distribution of returns to a theoretical normal distribution. If returns exhibit heavier tails than the reference distribution, the QQ plot will have steeper slopes at the extremes.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># QQ Plot for Gaussian assumption</span>
+<span class="kn">from</span> <span class="nn">statsmodels.graphics.gofplots</span> <span class="kn">import</span> <span class="n">ProbPlot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">pp</span> <span class="o">=</span> <span class="n">ProbPlot</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">fit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">pp</span><span class="o">.</span><span class="n">qqplot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">)</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">qqline</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;45&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">titles</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Daily Crypto Returns&quot;</span> <span class="o">+</span> <span class="n">date_str</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/terence/env3.11/lib/python3.11/site-packages/statsmodels/graphics/gofplots.py:1043: UserWarning: color is redundantly defined by the &#39;color&#39; keyword argument and the fmt string &quot;b&quot; (-&gt; color=(0.0, 0.0, 1.0, 1)). The keyword argument will take precedence.
+  ax.plot(x, y, fmt, **plot_style)
+</pre></div>
+</div>
+<img alt="_images/6137d835e104e78cea62bdd8a47572b070fe0e468497a494b82227da267b9e3a.png" src="_images/6137d835e104e78cea62bdd8a47572b070fe0e468497a494b82227da267b9e3a.png" />
+</div>
+</div>
+<p>Lag plot of daily returns</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Autocorrelation of returns</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">lag_plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axline</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">intercept</span><span class="p">),</span> <span class="n">slope</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">slope</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>    
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">titles</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Daily Crypto Returns&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/b17a9b9c89ac80508dbbb9c43689765b8b3136eff397d9aa0cd043b50a65684c.png" src="_images/b17a9b9c89ac80508dbbb9c43689765b8b3136eff397d9aa0cd043b50a65684c.png" />
+</div>
+</div>
+<p>Lag plot of squared daily returns</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Autocorrelation of squared returns</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">pd</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">lag_plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">lag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axline</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">intercept</span><span class="p">),</span> <span class="n">slope</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">slope</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>    
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">titles</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Daily Crypto Squared Returns&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/b0afee481403b79afc25a9902ac8a0ac0efa154e245fc9fb4e81a5d3d101a6f6.png" src="_images/b0afee481403b79afc25a9902ac8a0ac0efa154e245fc9fb4e81a5d3d101a6f6.png" />
+</div>
+</div>
+</section>
+<section id="historical-simulation-method">
+<h3>Historical Simulation method<a class="headerlink" href="#historical-simulation-method" title="Permalink to this heading">#</a></h3>
+<p><strong>Historical simulation (HS)</strong> is the simplest non-parametric approach that estimates VaR by ordering historical losses and selecting the appropriate quantile. Expected Shortfall is calculated as the average of losses beyond the VaR threshold. This method accommodates non-normal features such as skewness and fat tails, making it robust in capturing market risks. However, its accuracy depends on whether the historical dataset adequately represents future market conditions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper to compute VaR, ES and sample moments from historical simulation</span>
+<span class="k">def</span> <span class="nf">historical_risk</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate historical VaR, ES, and sample moments&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">))</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">X</span> <span class="o">&lt;</span> <span class="n">var</span><span class="p">])</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">skew</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">kurt</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">jb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">jbp</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">value_at_risk</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">expected_shortfall</span><span class="o">=</span><span class="n">es</span><span class="p">,</span> <span class="n">volatility</span><span class="o">=</span><span class="n">vol</span><span class="p">,</span>
+                <span class="n">skewness</span><span class="o">=</span><span class="n">skew</span><span class="p">,</span> <span class="n">excess_kurtosis</span><span class="o">=</span><span class="n">kurt</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">jb_statistic</span><span class="o">=</span><span class="n">jb</span><span class="p">,</span> <span class="n">jb_pvalue</span><span class="o">=</span><span class="n">jbp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hist</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">label</span><span class="p">:</span> <span class="n">historical_risk</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+                  <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Historical Risk Measures (alpha=</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">row_formatted</span><span class="p">(</span><span class="n">hist</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Historical Risk Measures (alpha=0.95)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>N</th>
+      <td>2623</td>
+      <td>3709</td>
+      <td>3207</td>
+      <td>3117</td>
+    </tr>
+    <tr>
+      <th>value_at_risk</th>
+      <td>0.0831</td>
+      <td>0.0583</td>
+      <td>0.074</td>
+      <td>0.0822</td>
+    </tr>
+    <tr>
+      <th>expected_shortfall</th>
+      <td>0.0078</td>
+      <td>0.0032</td>
+      <td>0.0055</td>
+      <td>0.0061</td>
+    </tr>
+    <tr>
+      <th>volatility</th>
+      <td>0.0576</td>
+      <td>0.0396</td>
+      <td>0.0505</td>
+      <td>0.0543</td>
+    </tr>
+    <tr>
+      <th>skewness</th>
+      <td>-0.2394</td>
+      <td>-1.822</td>
+      <td>-0.4136</td>
+      <td>0.7306</td>
+    </tr>
+    <tr>
+      <th>excess_kurtosis</th>
+      <td>13.159</td>
+      <td>52.3855</td>
+      <td>6.0638</td>
+      <td>10.3101</td>
+    </tr>
+    <tr>
+      <th>jb_statistic</th>
+      <td>28562.5232</td>
+      <td>476116.6693</td>
+      <td>11069.1899</td>
+      <td>23285.8936</td>
+    </tr>
+    <tr>
+      <th>jb_pvalue</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="stressed-var-method">
+<h3>Stressed VaR method<a class="headerlink" href="#stressed-var-method" title="Permalink to this heading">#</a></h3>
+<p>During periods of market stress, volatility and correlations tend to rise, often leading to <em>correlation breakdowns</em> where asset prices move more synchronously. It is sometimes stated that “in stressed markets all correlations go to one.” Standard VaR models may not capture these dynamics accurately.  <strong>Stressed VaR</strong> is calculated using historical periods of extreme market distress, such as the 2008 Financial Crisis or the 2021–2022 Crypto Winter, as opposed to simply the most recent number of years. Stress testing is designed to identify vulnerabilities, particularly those involving periods of high volatility.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s1">&#39;2021-11-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2022-11-21&#39;</span>  <span class="c1"># dubbed &quot;crypto winter&quot;</span>
+<span class="n">stress</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">label</span><span class="p">:</span> <span class="n">historical_risk</span><span class="p">(</span><span class="n">cryptos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">beg</span><span class="p">:</span><span class="n">end</span><span class="p">,</span> <span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stressed Risk Measures (</span><span class="si">{</span><span class="n">beg</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">row_formatted</span><span class="p">(</span><span class="n">stress</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;(alpha=0.05)&#39;</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Stressed Risk Measures (2021-11-01 to 2022-11-21)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>(alpha=0.05)</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>N</th>
+      <td>386</td>
+      <td>386</td>
+      <td>386</td>
+      <td>386</td>
+    </tr>
+    <tr>
+      <th>value_at_risk</th>
+      <td>0.0818</td>
+      <td>0.0624</td>
+      <td>0.0773</td>
+      <td>0.0911</td>
+    </tr>
+    <tr>
+      <th>expected_shortfall</th>
+      <td>0.0078</td>
+      <td>0.0058</td>
+      <td>0.0074</td>
+      <td>0.0053</td>
+    </tr>
+    <tr>
+      <th>volatility</th>
+      <td>0.0464</td>
+      <td>0.0348</td>
+      <td>0.0461</td>
+      <td>0.0478</td>
+    </tr>
+    <tr>
+      <th>skewness</th>
+      <td>-0.3194</td>
+      <td>-0.5904</td>
+      <td>-0.3785</td>
+      <td>-0.417</td>
+    </tr>
+    <tr>
+      <th>excess_kurtosis</th>
+      <td>-0.5048</td>
+      <td>0.7985</td>
+      <td>-0.6065</td>
+      <td>-1.0258</td>
+    </tr>
+    <tr>
+      <th>jb_statistic</th>
+      <td>106.6976</td>
+      <td>254.4822</td>
+      <td>101.3559</td>
+      <td>73.8708</td>
+    </tr>
+    <tr>
+      <th>jb_pvalue</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="bootstrap-method">
+<h3>Bootstrap method<a class="headerlink" href="#bootstrap-method" title="Permalink to this heading">#</a></h3>
+<p><strong>Bootstrap resampling</strong> improves historical simulation by repeatedly drawing random samples from the dataset with replacement. Each resampled dataset provides a new VaR or ES estimate, and the distribution of these estimates is used to compute confidence intervals. However, basic bootstrap methods assume that observations are independent over time, which may not hold for financial returns. Modifications such as the <strong>block bootstrap</strong> preserve time dependencies by sampling blocks of consecutive observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bootstrap_risk</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate bootstrap VaR, ES, confidence and plot VaR histogram&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">bootstraps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">bootstraps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">historical_risk</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="n">bootstraps</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">bootstraps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bootstraps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">confidence_intervals</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">confidence</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Extracts confidence intervals and median from a series&quot;&quot;&quot;</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">confidence</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">lower</span> <span class="o">+</span> <span class="n">confidence</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="p">[</span><span class="n">lower</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">upper</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;inverted_cdf&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run and plot bootstrapped VaR and ES</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">confidence</span> <span class="o">=</span> <span class="mf">0.9</span>
+<span class="n">intervals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">measure</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">,</span> <span class="s1">&#39;expected_shortfall&#39;</span><span class="p">]:</span>
+    <span class="n">intervals</span><span class="p">[</span><span class="n">measure</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+        <span class="n">bootstraps</span> <span class="o">=</span> <span class="n">bootstrap_risk</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="n">confidence_intervals</span><span class="p">(</span><span class="n">bootstraps</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span> <span class="n">confidence</span><span class="o">=</span><span class="n">confidence</span><span class="p">)</span>
+        <span class="n">intervals</span><span class="p">[</span><span class="n">measure</span><span class="p">][</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">interval</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bootstraps</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">interval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">interval</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;bootstrapped&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">confidence</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">% confidence bounds&quot;</span><span class="p">,</span>
+                   <span class="s1">&#39;median&#39;</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-small&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">interval</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Bootstrapped &#39;</span> <span class="o">+</span> <span class="n">measure</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/014cc1a2c67a777160a3d45cc14b4a08a98e31e32e515f6f9236f39a0bc6a700.png" src="_images/014cc1a2c67a777160a3d45cc14b4a08a98e31e32e515f6f9236f39a0bc6a700.png" />
+<img alt="_images/4ead1aa6de695f37d49c798a0e3a70403e3b566367d996bf53dce4430c7ccc56.png" src="_images/4ead1aa6de695f37d49c798a0e3a70403e3b566367d996bf53dce4430c7ccc56.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># display confidence intervals of VaR</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Value at Risk&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>Value at Risk</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>lower</th>
+      <td>0.078517</td>
+      <td>0.053589</td>
+      <td>0.069026</td>
+      <td>0.076687</td>
+    </tr>
+    <tr>
+      <th>median</th>
+      <td>0.082939</td>
+      <td>0.058818</td>
+      <td>0.073875</td>
+      <td>0.082435</td>
+    </tr>
+    <tr>
+      <th>upper</th>
+      <td>0.091576</td>
+      <td>0.061019</td>
+      <td>0.079481</td>
+      <td>0.085629</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># display confidence intervals of VaR</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">intervals</span><span class="p">[</span><span class="s1">&#39;expected_shortfall&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s1">&#39;upper&#39;</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Expected Shortfall&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>Expected Shortfall</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>lower</th>
+      <td>0.006168</td>
+      <td>0.002339</td>
+      <td>0.004729</td>
+      <td>0.004981</td>
+    </tr>
+    <tr>
+      <th>median</th>
+      <td>0.007616</td>
+      <td>0.003314</td>
+      <td>0.005362</td>
+      <td>0.006072</td>
+    </tr>
+    <tr>
+      <th>upper</th>
+      <td>0.008870</td>
+      <td>0.003924</td>
+      <td>0.006546</td>
+      <td>0.007182</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="conditional-volatility-models">
+<h2>Conditional volatility models<a class="headerlink" href="#conditional-volatility-models" title="Permalink to this heading">#</a></h2>
+<p>A return distribution’s characteristics may change over time. A mixture model of normal distributions with varying volatilities produces more peakedness and fatter tails than a simple normal distribution.
+In a model where returns re conditionally normal, the distribution is normal each day, while the standard deviation of the return varies over time. This leads to an unconditional distribution with fat tails.</p>
+<section id="ewma-model">
+<h3>EWMA model<a class="headerlink" href="#ewma-model" title="Permalink to this heading">#</a></h3>
+<p>Volatility can be estimated using an equal-weighted moving average of squared returns. However, this method suffers from sudden jumps when large returns enter or exit the dataset.</p>
+<p>The <strong>Exponentially Weighted Moving Average (EWMA)</strong> model addresses this by applying exponentially decreasing weights to past returns:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma^2_t = (1 - \lambda) r^2_{t-1} + \lambda \sigma^2_{t-1}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\( \lambda \)</span> is a positive value less than 1 which determines the decay rate of past observations. This formula provides a very simple way of implementing EWMA. The new estimate of the variance rate on day <span class="math notranslate nohighlight">\(t\)</span> is a weighted average of the estimate of the variance rate made for the previous day <span class="math notranslate nohighlight">\(t - 1\)</span>, and
+the most recent observation of the squared return on day <span class="math notranslate nohighlight">\(t - 1\)</span>. In the 1990s, JP Morgan’s <strong>RiskMetrics</strong> suggests <span class="math notranslate nohighlight">\( \lambda = 0.94 \)</span> for daily market volatility estimation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Estimate EWMA (lambda=0.94) rolling model predictions for all cryptos</span>
+<span class="n">lambda_</span> <span class="o">=</span> <span class="mf">0.94</span>
+<span class="n">ewma</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="o">-</span><span class="n">lambda_</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Helper to plot predicted VaR vs actual returns</span>
+<span class="k">def</span> <span class="nf">plot_var</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">VaR</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to plot returns and VaR predictions&quot;&quot;&quot;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">-</span><span class="n">VaR</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">VaR</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;VaR&#39;</span><span class="p">,</span> <span class="s1">&#39;$-$VaR&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot daily returns and EWMA predicted VaR of all cryptos</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span>
+                   <span class="n">parametric_risk</span><span class="p">(</span><span class="n">ewma</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">]</span>\
+                   <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;VaR&#39;</span><span class="p">)],</span>
+                  <span class="n">join</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">plot_var</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">VaR</span><span class="o">=</span><span class="n">Z</span><span class="p">[</span><span class="s1">&#39;VaR&#39;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titles</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Daily Returns and EWMA VaR (alpha=</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/1d86043c374293f0e54a1bb097f0aa5c76791ad0d8e86a15a2aed25fae3fa376.png" src="_images/1d86043c374293f0e54a1bb097f0aa5c76791ad0d8e86a15a2aed25fae3fa376.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Properties of EWMA normalized returns for all cryptos</span>
+<span class="n">ewma_hist</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">:</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">/</span> <span class="n">ewma</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># normalize by predict vol</span>
+    <span class="n">ewma_hist</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">historical_risk</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.95</span><span class="p">))</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalized by EWMA predicted volatility (alpha=0.95)&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">ewma_hist</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Normalized by EWMA predicted volatility (alpha=0.95)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>N</th>
+      <td>2622.0000</td>
+      <td>3708.0000</td>
+      <td>3206.0000</td>
+      <td>3116.0000</td>
+    </tr>
+    <tr>
+      <th>value_at_risk</th>
+      <td>1.5056</td>
+      <td>1.4695</td>
+      <td>1.5831</td>
+      <td>1.5697</td>
+    </tr>
+    <tr>
+      <th>expected_shortfall</th>
+      <td>0.1241</td>
+      <td>0.0717</td>
+      <td>0.0828</td>
+      <td>0.0896</td>
+    </tr>
+    <tr>
+      <th>volatility</th>
+      <td>0.9269</td>
+      <td>0.9252</td>
+      <td>0.9432</td>
+      <td>0.9425</td>
+    </tr>
+    <tr>
+      <th>skewness</th>
+      <td>0.1035</td>
+      <td>-0.0464</td>
+      <td>-0.0177</td>
+      <td>0.0048</td>
+    </tr>
+    <tr>
+      <th>excess_kurtosis</th>
+      <td>-1.5298</td>
+      <td>-1.5609</td>
+      <td>-2.1157</td>
+      <td>-1.8466</td>
+    </tr>
+    <tr>
+      <th>jb_statistic</th>
+      <td>240.8139</td>
+      <td>321.2816</td>
+      <td>104.6335</td>
+      <td>172.7197</td>
+    </tr>
+    <tr>
+      <th>jb_pvalue</th>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+      <td>0.0000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="garch-model">
+<h3>GARCH model<a class="headerlink" href="#garch-model" title="Permalink to this heading">#</a></h3>
+<p>The <strong>Generalized Autoregressive Conditional Heteroskedasticity (GARCH)</strong> model, developed by Robert Engel and Tim Bollerslev, can be intuitively regarded as an extension of EWMA. In <strong>GARCH (1,1)</strong>, we also give some weight to a long run average variance <span class="math notranslate nohighlight">\(\hat{\sigma}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma^2_t = \alpha r^2_{t-1} + \beta \sigma^2_{t-1} + \gamma \hat{\sigma}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\( \alpha + \beta + \gamma = 1 \)</span>. This introduces <strong>mean reversion</strong>, where the <span class="math notranslate nohighlight">\(\hat{\sigma}\)</span> term provides a “pull” toward the long-run average, ensuring that volatility stabilizes over time. And just as with ARMA specifications of time series models, more complex <strong>GARCH(p,q)</strong> models can incorporate additional lags of <span class="math notranslate nohighlight">\(q\)</span> squared returns and <span class="math notranslate nohighlight">\(p\)</span> variance estimates for improved accuracy.</p>
+<p><strong>rugarch package in R</strong></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Estimate GARCH(1, 1) by calling R&#39;s rugarch library</span>
+<span class="kn">import</span> <span class="nn">rpy2.robjects</span> <span class="k">as</span> <span class="nn">ro</span>
+<span class="kn">from</span> <span class="nn">rpy2.robjects.packages</span> <span class="kn">import</span> <span class="n">importr</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">PyR</span>
+<span class="k">def</span> <span class="nf">rugarch</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">savefig</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;GARCH(1,1) wrapper over rugarch&quot;&quot;&quot;</span>
+    <span class="n">rugarch_ro</span> <span class="o">=</span> <span class="n">importr</span><span class="p">(</span><span class="s1">&#39;rugarch&#39;</span><span class="p">)</span>  <span class="c1"># to use library rugarch</span>
+    <span class="n">c_</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
+    <span class="n">list_</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;list&#39;</span><span class="p">]</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;ugarchspec&#39;</span><span class="p">](</span><span class="n">mean_model</span><span class="o">=</span><span class="n">list_</span><span class="p">(</span><span class="n">armaOrder</span><span class="o">=</span><span class="n">c_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">include_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;ugarchfit&#39;</span><span class="p">](</span><span class="n">spec</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">PyR</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">ro</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;show&#39;</span><span class="p">](</span><span class="n">model</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">savefig</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">which</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">]:</span>
+            <span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;plot&#39;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="n">which</span><span class="p">)</span>
+            <span class="n">PyR</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">savefig</span><span class="si">}{</span><span class="n">which</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Series</span><span class="p">(</span><span class="n">PyR</span><span class="p">(</span><span class="n">ro</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">](</span><span class="n">model</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                  <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Estimate GARCH(1,1) full period model for all cryptos</span>
+<span class="n">garch</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">rugarch</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">())</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot daily returns and GARCH predicted VaR</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.95</span>   <span class="c1"># VaR parameter</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cryptos</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
+                   <span class="n">parametric_risk</span><span class="p">(</span><span class="n">garch</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">]</span>\
+                   <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;VaR&#39;</span><span class="p">)],</span>
+                  <span class="n">join</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">plot_var</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">VaR</span><span class="o">=</span><span class="n">Z</span><span class="p">[</span><span class="s1">&#39;VaR&#39;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">titles</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Daily Returns and GARCH VaR (alpha=</span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/4ace216915ff8ba7349606b58961962ef0caf7a64ddaa8e0a13d24d7e1e2cc9c.png" src="_images/4ace216915ff8ba7349606b58961962ef0caf7a64ddaa8e0a13d24d7e1e2cc9c.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Properties of GARCH normalized returns</span>
+<span class="n">garch_hist</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">:</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">/</span> <span class="n">garch</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># normalize by predict vol</span>
+    <span class="n">garch_hist</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">historical_risk</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.95</span><span class="p">))</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Normalized by GARCH predicted volatility (alpha=0.95)&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">garch_hist</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Normalized by GARCH predicted volatility (alpha=0.95)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>N</th>
+      <td>2622.0000</td>
+      <td>3708.0000</td>
+      <td>3206.0000</td>
+      <td>3116.0000</td>
+    </tr>
+    <tr>
+      <th>value_at_risk</th>
+      <td>1.3382</td>
+      <td>1.2965</td>
+      <td>1.4123</td>
+      <td>1.3956</td>
+    </tr>
+    <tr>
+      <th>expected_shortfall</th>
+      <td>0.1062</td>
+      <td>0.0504</td>
+      <td>0.0789</td>
+      <td>0.0843</td>
+    </tr>
+    <tr>
+      <th>volatility</th>
+      <td>0.7901</td>
+      <td>0.7740</td>
+      <td>0.8411</td>
+      <td>0.8454</td>
+    </tr>
+    <tr>
+      <th>skewness</th>
+      <td>0.0185</td>
+      <td>-0.0364</td>
+      <td>-0.0033</td>
+      <td>0.0350</td>
+    </tr>
+    <tr>
+      <th>excess_kurtosis</th>
+      <td>-2.5903</td>
+      <td>-2.9028</td>
+      <td>-2.7553</td>
+      <td>-1.9190</td>
+    </tr>
+    <tr>
+      <th>jb_statistic</th>
+      <td>18.4912</td>
+      <td>2.2795</td>
+      <td>8.0058</td>
+      <td>152.3519</td>
+    </tr>
+    <tr>
+      <th>jb_pvalue</th>
+      <td>0.0001</td>
+      <td>0.3199</td>
+      <td>0.0183</td>
+      <td>0.0000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="backtesting-var">
+<h2>Backtesting VaR<a class="headerlink" href="#backtesting-var" title="Permalink to this heading">#</a></h2>
+<p>The simplest method for validating a VaR model is failure rate analysis, which counts the proportion of times actual losses exceed the VaR estimate. If the model is accurate, these exceedances should follow a binomial distribution with probability <span class="math notranslate nohighlight">\( p = 1 - \alpha \)</span>, where <span class="math notranslate nohighlight">\(\alpha\)</span> is the VaR confidence level.  The VaR model can be rejected in two regions, both when the number of observed violations is too few or too many.</p>
+<section id="kupiec-likelihood-ratio-test">
+<h3>Kupiec Likelihood Ratio test<a class="headerlink" href="#kupiec-likelihood-ratio-test" title="Permalink to this heading">#</a></h3>
+<p>Kupiec (1995) proposed a likelihood ratio test for backtesting VaR based on the number of observed violations:<br />
+$<span class="math notranslate nohighlight">\(LR = -2 [(N - S) \ln(1 - p) + S \ln(p)] + 2 [(N - S) \ln(1 - S/N) + S \ln(S/N)]  \)</span>$</p>
+<p>where <span class="math notranslate nohighlight">\( S \)</span> is the number of VaR exceedances in <span class="math notranslate nohighlight">\( N \)</span> observations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">kupiec_LR</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute Kupiec likelihood ratio given s violations in n trials</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict of likelihood statistic and pvalue</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>       <span class="c1"># prob of violation</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">s</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">s</span><span class="o">/</span><span class="n">n</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">s</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">s</span>
+    <span class="n">lr</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">num</span> <span class="o">-</span> <span class="n">den</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="n">lr</span><span class="p">,</span> <span class="s1">&#39;violations&#39;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+            <span class="c1"># &#39;5%_critical&#39;: stats.chi2.ppf(0.95, df=1),</span>
+            <span class="s1">&#39;pvalue&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">kupiec</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">VaR</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Kupiec Likelihood Ratio test of VaR</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict of likelihood statistic and pvalue</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">VaR</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># number of violations &lt; -VaR</span>
+    <span class="k">return</span> <span class="n">kupiec_LR</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Kupiec likelihood ratio test for EWMA</span>
+<span class="n">row_formatted</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">kupiec</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
+                   <span class="n">VaR</span><span class="o">=</span><span class="n">parametric_risk</span><span class="p">(</span><span class="n">ewma</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">],</span>
+                   <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">})</span>\
+              <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;EWMA(</span><span class="si">{</span><span class="n">lambda_</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;Kupiec LR Test:&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+              <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.0f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;violations&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.0f}</span><span class="s1">&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Kupiec LR Test:</th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>EWMA(0.94)</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>lr</th>
+      <td>1.9136</td>
+      <td>3.8477</td>
+      <td>1.3918</td>
+      <td>3.0693</td>
+    </tr>
+    <tr>
+      <th>violations</th>
+      <td>116</td>
+      <td>160</td>
+      <td>146</td>
+      <td>135</td>
+    </tr>
+    <tr>
+      <th>N</th>
+      <td>2623</td>
+      <td>3709</td>
+      <td>3207</td>
+      <td>3117</td>
+    </tr>
+    <tr>
+      <th>pvalue</th>
+      <td>0.1666</td>
+      <td>0.0498</td>
+      <td>0.2381</td>
+      <td>0.0798</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Kupiec likelihood ratio test for GARCH(1,1)</span>
+<span class="n">row_formatted</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">kupiec</span><span class="p">(</span><span class="n">cryptos</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
+                   <span class="n">VaR</span><span class="o">=</span><span class="n">parametric_risk</span><span class="p">(</span><span class="n">garch</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)[</span><span class="s1">&#39;value_at_risk&#39;</span><span class="p">],</span>
+                   <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">cryptos</span><span class="p">})</span>\
+              <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;GARCH(1,1)&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;Kupiec LR Test:&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
+              <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.0f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;violations&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{:.0f}</span><span class="s1">&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Kupiec LR Test:</th>
+      <th>CBBCHUSD</th>
+      <th>CBBTCUSD</th>
+      <th>CBETHUSD</th>
+      <th>CBLTCUSD</th>
+    </tr>
+    <tr>
+      <th>GARCH(1,1)</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>lr</th>
+      <td>6.8446</td>
+      <td>5.5607</td>
+      <td>3.4345</td>
+      <td>12.3497</td>
+    </tr>
+    <tr>
+      <th>violations</th>
+      <td>103</td>
+      <td>155</td>
+      <td>138</td>
+      <td>115</td>
+    </tr>
+    <tr>
+      <th>N</th>
+      <td>2623</td>
+      <td>3709</td>
+      <td>3207</td>
+      <td>3117</td>
+    </tr>
+    <tr>
+      <th>pvalue</th>
+      <td>0.0089</td>
+      <td>0.0184</td>
+      <td>0.0638</td>
+      <td>0.0004</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="conditional-coverage-tests">
+<h3>Conditional coverage tests<a class="headerlink" href="#conditional-coverage-tests" title="Permalink to this heading">#</a></h3>
+<p>Value-at-Risk (VaR) violations should occur randomly over time; if violations cluster, it may suggest that the model is misspecified. Conditional coverage tests, which extend Kupiec’s test, evaluate not only the frequency but also the independence of exceptions over time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: conditional likelihood test</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Jorion, Phillippe. Value at Risk.</p>
+<p>P. Artzner, F. Delbaen, J.-M. Eber, and D. Heath, “Coherent Measures of Risk”, Mathematical Finance 9 (1999): 203–228.</p>
+<p>Kupiec, P. (1995). Techniques for Verifying the Accuracy of Risk Measurement Models. Journal of Derivatives, 3, 73-84.</p>
+<p>FRM Part I Exam Book Ch. 1-3</p>
+<p>FRM Part II Exam Book Market Risk Measurement and Management Ch. 1-2</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="3.3_options_pricing.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Options Pricing</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="3.5_covariance_matrix.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Covariance Matrix</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-measures">Risk measures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coherence">Coherence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametric-method">Parametric method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#delta-normal-method">Delta-Normal method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monte-carlo-simulation-method">Monte Carlo simulation method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#historical-simulation-method">Historical Simulation method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stressed-var-method">Stressed VaR method</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bootstrap-method">Bootstrap method</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditional-volatility-models">Conditional volatility models</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ewma-model">EWMA model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#garch-model">GARCH model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backtesting-var">Backtesting VaR</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kupiec-likelihood-ratio-test">Kupiec Likelihood Ratio test</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditional-coverage-tests">Conditional coverage tests</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

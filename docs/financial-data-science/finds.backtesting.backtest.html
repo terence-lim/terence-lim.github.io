@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.backtesting.backtest &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.backtesting.riskpremium" href="finds.backtesting.riskpremium.html" />
+    <link rel="prev" title="finds.backtesting.dailyperformance" href="finds.backtesting.dailyperformance.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.backtesting.html">finds.backtesting.backtesting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.dailyperformance.html">finds.backtesting.dailyperformance</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.backtesting.backtest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.backtesting.backtest.BackTest"><code class="docutils literal notranslate"><span class="pre">BackTest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.__call__"><code class="docutils literal notranslate"><span class="pre">BackTest.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.fit"><code class="docutils literal notranslate"><span class="pre">BackTest.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.get_series"><code class="docutils literal notranslate"><span class="pre">BackTest.get_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.plot"><code class="docutils literal notranslate"><span class="pre">BackTest.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.read"><code class="docutils literal notranslate"><span class="pre">BackTest.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.backtest.BackTest.write"><code class="docutils literal notranslate"><span class="pre">BackTest.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.backtesting.backtest.compound_ret"><code class="docutils literal notranslate"><span class="pre">compound_ret()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.riskpremium.html">finds.backtesting.riskpremium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.eventstudy.html">finds.backtesting.eventstudy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.backtesting.html">finds.backtesting</a></li>
+      <li class="breadcrumb-item active">finds.backtesting.backtest</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.backtesting.backtest.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.backtesting.backtest">
+<span id="finds-backtesting-backtest"></span><h1>finds.backtesting.backtest<a class="headerlink" href="#module-finds.backtesting.backtest" title="Permalink to this heading"></a></h1>
+<p>Evaluate backtests, event studies and risk premiums</p>
+<ul class="simple">
+<li><p>Walk-forward portfolio rebalances Backtest: Sharpe ratio, appraisal ratio, …</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.backtesting.backtest.</span></span><span class="sig-name descname"><span class="pre">BackTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.database.sql.html#finds.database.sql.SQL" title="finds.database.sql.SQL"><span class="pre">SQL</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bench</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.benchmarks.html#finds.structured.benchmarks.Benchmarks" title="finds.structured.benchmarks.Benchmarks"><span class="pre">Benchmarks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'backtests'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for computing portfolio backtest returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql</strong> – Database connection to store results</p></li>
+<li><p><strong>bench</strong> – Structured dataset to retrieve riskfree and benchmark returns</p></li>
+<li><p><strong>rf</strong> – Column name of riskfree rate in benchmark dataset</p></li>
+<li><p><strong>max_date</strong> – Last date of any backtest</p></li>
+<li><p><strong>table</strong> – Name of table in user database to store results in</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If backtest dates appears to be monthly
+frequency, monthly risk free rates will be retrieved and used
+rather than compounding from daily (reduce precision errors).
+Assumes that monthly risk free rates also available through {bench},
+with name suffixed by “(mo)”.</p></li>
+</ul>
+<p>Examples:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">backtest</span> <span class="o">=</span> <span class="n">BackTest</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">bench</span><span class="p">,</span> <span class="s1">&#39;RF&#39;</span><span class="p">,</span> <span class="mi">20200930</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.stocks.html#finds.structured.stocks.Stocks" title="finds.structured.stocks.Stocks"><span class="pre">Stocks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">holdings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Compute holding returns and rebalance statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stocks</strong> – Structured data set with stocks data</p></li>
+<li><p><strong>holdings</strong> – Sequence of holdings keyed by rebalance date
+Each Series is indexed by permno, with weights in column
+Last item (can be empty) is dropped for calculating returns</p></li>
+<li><p><strong>label</strong> – Name to save this backtest</p></li>
+<li><p><strong>overlap</strong> – Number of months to smooth overlapping holdings</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of holdings returns after every rebalance data</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>if CRSP (i.e. ‘delist’ table exists and using monthly),
+include dlst returns</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">benchnames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">haclags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Compute performance attribution against benchmarks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>benchnames</strong> – Names of benchmark returns to compute attribution against</p></li>
+<li><p><strong>beg</strong> – date range of returns</p></li>
+<li><p><strong>end</strong> – date range of returns</p></li>
+<li><p><strong>haclags</strong> – number of Newey-West lags for robustcov statistics</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of excess returns performance following each rebalance date</p>
+</dd>
+</dl>
+<p>Annualized (dict) performance ratios:</p>
+<ul class="simple">
+<li><p>‘excess’: annualized excess (of portfolio weight*riskfree) return</p></li>
+<li><p>‘sharpe’: annualized sharpe ratio</p></li>
+<li><p>‘alpha’: annualized alpha</p></li>
+<li><p>‘appraisal’: annualized appraisal ratio</p></li>
+<li><p>‘welch-t’: t-stat for structural break after 2002</p></li>
+<li><p>‘welch-p’: p-value for structural break after 2002</p></li>
+<li><p>‘turnover’: annualized total turnover rate</p></li>
+<li><p>‘buys’: annualized buy rate</p></li>
+<li><p>‘sells’: annualized sell rate</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.get_series">
+<span class="sig-name descname"><span class="pre">get_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ret'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">19000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.get_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.get_series" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve saved backtest as a series</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drawdown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(10,</span> <span class="pre">5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot time series of excess vs benchmark returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> – Figure number to use in plt</p></li>
+<li><p><strong>label</strong> – legend label</p></li>
+<li><p><strong>flip</strong> – Whether to flip returns. If None, then auto-detect</p></li>
+<li><p><strong>drawdown</strong> – To plot peak and trough points of maximum drawdown</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.read" title="Permalink to this definition"></a></dt>
+<dd><p>Load backtest performance returns from database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.BackTest.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#BackTest.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.BackTest.write" title="Permalink to this definition"></a></dt>
+<dd><p>Save backtest performance returns to database</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.backtesting.backtest.compound_ret">
+<span class="sig-prename descclassname"><span class="pre">finds.backtesting.backtest.</span></span><span class="sig-name descname"><span class="pre">compound_ret</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intervals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtest.html#compound_ret"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtest.compound_ret" title="Permalink to this definition"></a></dt>
+<dd><p>Compounds series of returns between (list of) date tuples (inclusive)</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.backtesting.dailyperformance.html" class="btn btn-neutral float-left" title="finds.backtesting.dailyperformance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.backtesting.riskpremium.html" class="btn btn-neutral float-right" title="finds.backtesting.riskpremium" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.ibes &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.ibes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.ibes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;IBES summary analysts earnings estimates</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">BigInteger</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.structured.busday</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.structured.structured</span> <span class="kn">import</span> <span class="n">Structured</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="IBES"><a class="viewcode-back" href="../../../finds.structured.ibes.html#finds.structured.ibes.IBES">[docs]</a><span class="k">class</span> <span class="nc">IBES</span><span class="p">(</span><span class="n">Structured</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide interface to IBES analyst estimates structured datasets</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      sql: Connection to SQL database</span>
+<span class="sd">      bd: Custom business day calendar object</span>
+<span class="sd">      name: Name of dataset is &quot;IBES&quot;</span>
+<span class="sd">      identifer: Stocks identifier field name is &quot;ticker&quot;</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - TICKER: IBES Ticker</span>
+<span class="sd">    - STATPERS : IBES Statistical Period (monthly)</span>
+<span class="sd">    - OFTIC: Official Ticker</span>
+<span class="sd">    - FPEDATS: Forecast Period End Date</span>
+<span class="sd">    - SDATES: Identification start date</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sql</span> <span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">bd</span> <span class="p">:</span> <span class="n">BusDay</span><span class="p">,</span> 
+                 <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;IBES&#39;</span><span class="p">,</span>
+                 <span class="n">identifier</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span>
+                 <span class="n">verbose</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize IBES tables&quot;&quot;&quot;</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ident&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>  <span class="c1"># identification</span>
+                <span class="s1">&#39;idsum&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sdates&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;oftic&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cname&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;dilfac&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;pdi&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+                <span class="c1">#Column(&#39;ccopcf&#39;, String(1)),</span>
+                <span class="c1">#Column(&#39;tnthfac&#39;, SmallInteger, default=0),</span>
+                <span class="c1">#Column(&#39;instrmnt&#39;, String(1)),</span>
+                <span class="c1">#Column(&#39;exchcd&#39;, String(2)),</span>
+                <span class="c1">#Column(&#39;country&#39;, String(1)),</span>
+                <span class="c1">#Column(&#39;compflag&#39;, String(1)),</span>
+                <span class="c1">#Column(&#39;usfirm&#39;, SmallInteger, default=0),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;statsum&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>   <span class="c1"># statistical summary of estimates</span>
+                <span class="s1">&#39;statsum&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> 
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fpedats&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;statpers&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;measure&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fpi&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;numest&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;numup&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;numdown&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;medest&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;meanest&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;stdev&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;highest&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;lowest&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;anndats_act&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;actpsum&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>   <span class="c1"># history of actuals</span>
+                <span class="s1">&#39;actpsum&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># IBES Ticker</span>
+                <span class="c1"># Column(&#39;oftic&#39;, String(8)),  # Official Ticker</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;statpers&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>  <span class="c1"># Stat Period</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;measure&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="c1"># forecast type</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fy0a&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;curcode&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fy0edats&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fvyrgro&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fvyrsta&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;int0a&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;int0dats&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;prdays&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;shout&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;iadiv&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;curr_price&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>                
+            <span class="p">),</span>
+            <span class="s1">&#39;adjsum&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>    <span class="c1"># adjustment factors</span>
+                <span class="s1">&#39;adjsum&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="c1">#Column(&#39;oftic&#39;, String(6)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;statpers&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;adjspf&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;surpsum&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>   <span class="c1"># surprise</span>
+                <span class="s1">&#39;surpsum&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="c1"># Column(&#39;oftic&#39;, String(6)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;measure&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;fiscalp&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;pyear&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;pmon&#39;</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;anndats&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;surpmean&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;surpstdev&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;suescore&#39;</span><span class="p">,</span> <span class="n">Float</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;links&#39;</span><span class="p">:</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>   <span class="c1"># </span>
+                <span class="s1">&#39;ibeslink&#39;</span><span class="p">,</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;sdates&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cname&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">32</span><span class="p">)),</span>
+                <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;cusip&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">)),</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IBES.build_lookup"><a class="viewcode-back" href="../../../finds.structured.ibes.html#finds.structured.ibes.IBES.build_lookup">[docs]</a>    <span class="k">def</span> <span class="nf">build_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date_field</span><span class="o">=</span><span class="s1">&#39;sdates&#39;</span><span class="p">,</span> 
+                     <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;links&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Build lookup function to return target identifier from source&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+                                    <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
+                                    <span class="n">fillna</span><span class="o">=</span><span class="n">fillna</span><span class="p">)</span> </div>
+
+<div class="viewcode-block" id="IBES.write_links"><a class="viewcode-back" href="../../../finds.structured.ibes.html#finds.structured.ibes.IBES.write_links">[docs]</a>    <span class="k">def</span> <span class="nf">write_links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create links table by merging &#39;ident&#39; and CRSP &#39;names&#39; on cusip-8&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;INSERT INTO </span><span class="si">{links}</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;  SELECT </span><span class="si">{ident}</span><span class="s2">.ticker, </span><span class="si">{ident}</span><span class="s2">.sdates, permno, date, comnam, &quot;</span>
+             <span class="s2">&quot;  cname, </span><span class="si">{ident}</span><span class="s2">.cusip FROM </span><span class="si">{ident}</span><span class="s2"> LEFT JOIN </span><span class="si">{names}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;    ON </span><span class="si">{ident}</span><span class="s2">.cusip = </span><span class="si">{names}</span><span class="s2">.ncusip AND </span><span class="si">{names}</span><span class="s2">.date = &quot;</span>
+             <span class="s2">&quot;      (SELECT MAX(date) FROM </span><span class="si">{names}</span><span class="s2"> c WHERE c.ncusip=</span><span class="si">{ident}</span><span class="s2">.cusip&quot;</span>
+             <span class="s2">&quot;       AND c.date&lt;=</span><span class="si">{ident}</span><span class="s2">.sdates)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">links</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">ident</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;ident&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">names</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(write_links) &quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT SUM(ISNULL(permno)) AS missing, &quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;  COUNT(*) AS count FROM </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IBES.get_permnos"><a class="viewcode-back" href="../../../finds.structured.ibes.html#finds.structured.ibes.IBES.get_permnos">[docs]</a>    <span class="k">def</span> <span class="nf">get_permnos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                          <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                          <span class="n">link_perm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">,</span> 
+                          <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sdates&#39;</span><span class="p">,</span> 
+                          <span class="n">permno</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return list of permnos mapped to IBES tickers as of a date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys: Input list of IBES tickers to lookup</span>
+<span class="sd">            date: Prevailing date of link        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permnos</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">link_perm</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> 
+                <span class="n">link_date</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">permno</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span></div>
+                
+<div class="viewcode-block" id="IBES.get_linked"><a class="viewcode-back" href="../../../finds.structured.ibes.html#finds.structured.ibes.IBES.get_linked">[docs]</a>    <span class="k">def</span> <span class="nf">get_linked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                         <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                         <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;statpers&#39;</span><span class="p">,</span> 
+                         <span class="n">link_perm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">,</span> 
+                         <span class="n">link_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sdates&#39;</span><span class="p">,</span> 
+                         <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                         <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Query an ibes table, and return with linked crsp permnos</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset: Dataset to query</span>
+<span class="sd">            fields : Fields to return</span>
+<span class="sd">            date_field: Name of date field in ibes table to query</span>
+<span class="sd">            link_perm: Name of permno field in links table</span>
+<span class="sd">            link_date: Name of match date in links table</span>
+<span class="sd">            where : Sql where clause, as sql string</span>
+<span class="sd">            limit : Max number of records to return</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; ibes.get_linked(&#39;ident&#39;, fields=[&#39;cname&#39;], date_field=&#39;statpers&#39;):</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            where fpi=&#39;6&#39;  /* 1 is for annual forecasts, 6 is for quarterly */</span>
+<span class="sd">            and statpers &lt; ANNDATS_ACT /* forecasts prior to earnings annoucement</span>
+<span class="sd">            and measure=&#39;EPS&#39; and not missing(medest)</span>
+<span class="sd">            and not missing(fpedats)  and (fpedats-statpers)&gt;=0;</span>
+<span class="sd">            (fpedats-statpers)&gt;=0;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_linked</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">fields</span><span class="p">,</span> 
+                <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span> <span class="n">link_perm</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">link_date</span><span class="o">=</span><span class="n">link_date</span><span class="p">,</span>
+                <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="n">ibes</span> <span class="o">=</span> <span class="n">IBES</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">)</span>
+    <span class="n">downloads</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;IBES&#39;</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # load IBES identifiers</span>
+<span class="sd">    df = ibes.load_csv(&#39;ident&#39;, downloads / &#39;idsum.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), 85550)</span>
+<span class="sd">    ibes.write_links()  #  (missing, count) = 15340  88963</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="c1"># load IBES actuals history</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">ibes</span><span class="o">.</span><span class="n">load_csv</span><span class="p">(</span><span class="s1">&#39;actpsum&#39;</span><span class="p">,</span> <span class="n">downloads</span> <span class="o">/</span> <span class="s1">&#39;actpsum.txt.gz&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # load IBES statistical summary</span>
+<span class="sd">    df = ibes.load_csv(&#39;statsum&#39;, downloads / &#39;statsum.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), 11776742)</span>
+
+<span class="sd">    # load IBES adjustment factors</span>
+<span class="sd">    df = ibes.load_csv(&#39;adjsum&#39;, downloads / &#39;adjsum.txt.gz&#39;, sep=&#39;\t&#39;) </span>
+<span class="sd">    print(len(df), 24777)</span>
+
+<span class="sd">    # load IBES surprises</span>
+<span class="sd">    ibes.load_csv(&#39;surpsum&#39;, downloads / &#39;surpsum.txt.gz&#39;, sep=&#39;\t&#39;)</span>
+<span class="sd">    print(len(df), 528933)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

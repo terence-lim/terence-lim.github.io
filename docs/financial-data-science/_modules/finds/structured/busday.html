@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.busday &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.busday</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.busday</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implement custom trading-day and weekly business date calendars</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">,</span> <span class="n">DatetimeIndex</span>
+<span class="kn">import</span> <span class="nn">pandas_datareader</span> <span class="k">as</span> <span class="nn">pdr</span>
+<span class="kn">from</span> <span class="nn">pandas.tseries.holiday</span> <span class="kn">import</span> <span class="n">USFederalHolidayCalendar</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span>
+<span class="kn">from</span> <span class="nn">pandas.tseries.offsets</span> <span class="kn">import</span> <span class="n">MonthEnd</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Integer</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># List of anticipated NYSE holidays</span>
+<span class="n">_hols</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20230102</span><span class="p">,</span> <span class="mi">20230116</span><span class="p">,</span> <span class="mi">20230220</span><span class="p">,</span> <span class="mi">20230407</span><span class="p">,</span> <span class="mi">20230529</span><span class="p">,</span>
+         <span class="mi">20230619</span><span class="p">,</span> <span class="mi">20230704</span><span class="p">,</span> <span class="mi">20230904</span><span class="p">,</span> <span class="mi">20231123</span><span class="p">,</span> <span class="mi">20231225</span><span class="p">,</span>
+         <span class="mi">20240101</span><span class="p">,</span> <span class="mi">20240115</span><span class="p">,</span> <span class="mi">20240219</span><span class="p">,</span> <span class="mi">20240329</span><span class="p">,</span> <span class="mi">20240527</span><span class="p">,</span>
+         <span class="mi">20240619</span><span class="p">,</span> <span class="mi">20240704</span><span class="p">,</span> <span class="mi">20240902</span><span class="p">,</span> <span class="mi">20241128</span><span class="p">,</span> <span class="mi">20241225</span><span class="p">,</span>
+         <span class="mi">20250101</span><span class="p">,</span> <span class="mi">20250129</span><span class="p">,</span> <span class="mi">20250217</span><span class="p">,</span> <span class="mi">20250418</span><span class="p">,</span> <span class="mi">20250526</span><span class="p">,</span> 
+         <span class="mi">20250619</span><span class="p">,</span> <span class="mi">20250704</span><span class="p">,</span> <span class="mi">20250901</span><span class="p">,</span> <span class="mi">20251127</span><span class="p">,</span> <span class="mi">20251225</span><span class="p">]</span> 
+<span class="n">_MAXDATE</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">_hols</span><span class="p">)</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10000</span> <span class="o">+</span> <span class="mi">1231</span>   <span class="c1"># last year with known hols</span>
+
+<span class="k">def</span> <span class="nf">_map</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">dates</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Helper function to apply a func to each date in list</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      func: function to apply</span>
+<span class="sd">      dates: int dates to apply func on</span>
+<span class="sd">      *args: list of optional arguments </span>
+<span class="sd">      **kwargs: list of keyword arguments</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">      Func is applied to unique dates, then values copies in order</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; _map(busday.offset, [20190526, 20190528], -2)</span>
+<span class="sd">    &gt;&gt;&gt; _map(busday.begmo, [20190526, 20190528], -2)</span>
+<span class="sd">    &gt;&gt;&gt; _map(busday.endmo, [20190526, 20190528], -2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">{</span><span class="n">d</span><span class="p">:</span> <span class="n">func</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dates</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="BusDay"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay">[docs]</a><span class="k">class</span> <span class="nc">BusDay</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Implement custom business-day and weekly dates calendar</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sql: SQL connection instance to store dates</span>
+<span class="sd">      hols: List of expected future holidays</span>
+<span class="sd">      start: Start date of calendar</span>
+<span class="sd">      end: End date of calendar</span>
+<span class="sd">      endweek: Ending day of week for weekly calendar: 0-6 or &#39;Mon&#39;-&#39;Sun&#39;</span>
+<span class="sd">      new: Load trading days from French library (True), else local database</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">      weeks : DataFrame of weeks in rows, index is weeknum and </span>
+<span class="sd">              columns for beg, end dates and ismonthend indicator</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Non-trading holidays inferred from Ken French and NYSE websites</span>
+<span class="sd">    - Earliest French daily factors is 19260701, except STRev is 19260126</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                 <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">19251231</span><span class="p">,</span> 
+                 <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_MAXDATE</span><span class="p">,</span>
+                 <span class="n">hols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">_hols</span><span class="p">,</span>
+                 <span class="n">endweek</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
+                 <span class="n">new</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+                 <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create or retrieve custom trading dates calendar&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="s1">&#39;busdates&#39;</span><span class="p">,</span>
+                               <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">new</span><span class="p">:</span>   <span class="c1"># load &#39;F-F_Research_Data_Factors_daily&#39; using pandas reader</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">pdr</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataReader</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;F-F_ST_Reversal_Factor_daily&#39;</span><span class="p">,</span>
+                                    <span class="n">data_source</span><span class="o">=</span><span class="s1">&#39;famafrench&#39;</span><span class="p">,</span>
+                                    <span class="n">start</span><span class="o">=</span><span class="mi">1900</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">2050</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>\
+                        <span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)})</span>
+            <span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="s1">&#39;busdates&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>     <span class="c1"># else load from local database</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM busdates&#39;</span><span class="p">)</span>
+
+        <span class="c1"># 1. Initially, actual dates = actual FamaFrench busdays</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))))</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;date&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Last FamaFrench Date&#39;</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
+
+        <span class="c1"># 2. Extend with pandas 5-day calendar from last through to maxdate</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">last</span><span class="p">,</span> 
+                                           <span class="n">end</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">end</span><span class="p">)),</span>
+                                           <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;B&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="c1"># 3. But remove list of anticipated NYSE holidays</span>
+        <span class="n">hols</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">hols</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hols</span><span class="p">)))</span>
+        
+        <span class="c1"># 4. Now list of all potential busdays from pandas 6-day calendar</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">CDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">busdaycalendar</span><span class="p">(</span><span class="s1">&#39;1111110&#39;</span><span class="p">),</span> 
+                               <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">alldates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">))</span>
+
+        <span class="c1"># 5. Set actual holidays = all potential dates less actual dates</span>
+        <span class="n">hols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">alldates</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">dates</span><span class="p">)),</span> 
+                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[D]&#39;</span><span class="p">)</span>
+        <span class="n">hols</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hols</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="s1">&#39;1926-01-01&#39;</span><span class="p">)]))</span>
+
+        <span class="c1"># 6. Finalize custom cal and offsets as 6-day week less actual holidays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_busdaycal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">busdaycalendar</span><span class="p">(</span><span class="n">weekmask</span><span class="o">=</span><span class="s1">&#39;1111110&#39;</span><span class="p">,</span> <span class="n">holidays</span><span class="o">=</span><span class="n">hols</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_customcal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">CDay</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_busdaycal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">CBMonthBegin</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_busdaycal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">CBMonthEnd</span><span class="p">(</span><span class="n">calendar</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_busdaycal</span><span class="p">)</span>
+
+
+        <span class="sd">&quot;&quot;&quot;Derive weekly trading calendar, ending on given day of week&quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">19251231</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">end</span><span class="p">),</span>
+                              <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_customcal</span><span class="p">)</span>
+        
+        <span class="c1"># parse specified day-of-week</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endweek</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">endweek</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Sun&#39;</span><span class="p">,</span><span class="s1">&#39;Mon&#39;</span><span class="p">,</span><span class="s1">&#39;Tue&#39;</span><span class="p">,</span><span class="s1">&#39;Wed&#39;</span><span class="p">,</span><span class="s1">&#39;Thu&#39;</span><span class="p">,</span><span class="s1">&#39;Fri&#39;</span><span class="p">,</span><span class="s1">&#39;Sat&#39;</span><span class="p">][</span><span class="n">endweek</span> <span class="o">%</span> <span class="mi">7</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">endweek</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;W-&#39;</span><span class="p">):</span>
+            <span class="n">endweek</span> <span class="o">=</span> <span class="s1">&#39;W-&#39;</span> <span class="o">+</span> <span class="n">endweek</span><span class="o">.</span><span class="n">upper</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c1"># generate weekly calender end dates</span>
+        <span class="n">weekly_end</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">end</span><span class="p">),</span>
+                                   <span class="n">freq</span><span class="o">=</span><span class="n">endweek</span><span class="p">)</span>
+        
+        <span class="c1"># require start(exclusve) and end(inclusive), and weekly end in dates</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[(</span><span class="n">dates</span> <span class="o">&gt;</span> <span class="n">weekly_end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">dates</span> <span class="o">&lt;=</span> <span class="n">weekly_end</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">weeks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">weekly_end</span><span class="p">,</span> <span class="n">dates</span><span class="p">),</span>
+                          <span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+
+        <span class="c1"># determine beg and end business date of each week, and save</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">weeks</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">weeks</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;beg&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span>
+             <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">values</span><span class="p">())},</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;ismonthend&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span> <span class="o">!=</span> <span class="n">m</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># last week fully in month</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;numwk&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq</span> <span class="o">=</span> <span class="n">endweek</span>
+
+<div class="viewcode-block" id="BusDay.datetime"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.datetime">[docs]</a>    <span class="k">def</span> <span class="nf">datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">date</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+                 <span class="n">month</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">day</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Convert int date or pandas timestamp to pydatetime type</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          date: Input date or year or pandas Timestamp or datetime64</span>
+<span class="sd">          month: If None, then month is inferred from input date</span>
+<span class="sd">          day: If None, then day is inferred from input date</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          datetime object or list-like with same shape as input date</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - If input day is 00, then returns custom business month begin date</span>
+<span class="sd">        - If input day is 99, then returns custom business month end date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s1">&#39;to_pydatetime&#39;</span><span class="p">):</span>  <span class="c1"># is pandas timestamp</span>
+                <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>     <span class="c1">#   or datetimeindex</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">date</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">month</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">day</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">if</span> <span class="n">day</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">day</span><span class="p">)</span>
+
+            <span class="k">except</span><span class="p">:</span>  <span class="c1"># catch if date is out of range of datetime.datetime</span>
+                <span class="k">try</span><span class="p">:</span>     <span class="c1"># if DD + 1 is &lt;= 99, so return custom month begin</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span>   <span class="c1"># // 100,</span>
+                                     <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
+                                     <span class="n">day</span><span class="o">=</span><span class="p">(</span><span class="n">day</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">day</span><span class="p">(</span><span class="n">date</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">))</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>  <span class="c1"># else must be DD == 99, so return custom month end</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span>   <span class="c1"># // 100,</span>
+                                     <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
+                                     <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+                            <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">))</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">date</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">)</span> </div>
+                       
+<div class="viewcode-block" id="BusDay.offset"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.offset">[docs]</a>    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">dates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> 
+               <span class="n">offsets</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+               <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+               <span class="n">roll</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;preceding&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return valid business date with optional offset or roll treatment</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          dates: Input dates in YYYYMMDD int format</span>
+<span class="sd">          offsets: Number of business days to offset</span>
+<span class="sd">          end: End index of offset window, None to return a single date</span>
+<span class="sd">          roll: How to treat dates that are not a valid day, in </span>
+<span class="sd">                {&#39;raise&#39;, &#39;forward&#39;, &#39;following&#39;, &#39;backward&#39;, &#39;preceding&#39;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">end</span><span class="p">:</span>  <span class="c1"># return all dates in window [left, right] around {date}</span>
+            <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">dates</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">roll</span><span class="o">=</span><span class="n">roll</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">roll</span><span class="o">=</span><span class="n">roll</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">dates</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">roll</span><span class="p">)</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">busday_offset</span><span class="p">(</span><span class="n">dates</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">dates</span><span class="p">)],</span>
+                                               <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[D]&#39;</span><span class="p">),</span>
+                                <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span>
+                                <span class="n">roll</span><span class="o">=</span><span class="n">roll</span><span class="p">,</span>
+                                <span class="n">busdaycal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_busdaycal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BusDay.date_range"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.date_range">[docs]</a>    <span class="k">def</span> <span class="nf">date_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                   <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return business dates at desired freq between beg and end dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          start: Inclusive start of date range</span>
+<span class="sd">          end: Inclusive end of date range</span>
+<span class="sd">          freq: If int, then annual ending on month-end business date, else in</span>
+<span class="sd">                {(&#39;d&#39;)aily, (&#39;b&#39;)egmo, (&#39;e&#39;)ndmo, (&#39;w&#39;)eekly, (&#39;q&#39;)uarterly </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>           <span class="c1"># annually as of calendar month end</span>
+            <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">month</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span> 
+                 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">match</span> <span class="n">freq</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">case</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>   <span class="c1"># same as 12</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span>
+                        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">month</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span> 
+                         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)])</span>
+                <span class="k">case</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>   <span class="c1"># custom weekly </span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span>\
+                               <span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_numwk</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numwk</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>\
+                               <span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+                <span class="k">case</span> <span class="s2">&quot;d&quot;</span><span class="p">:</span>    <span class="c1"># custom business daily</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">start</span><span class="p">),</span> 
+                                          <span class="n">end</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">end</span><span class="p">),</span>
+                                          <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_customcal</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span>  <span class="c1"># custom business month begin</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                          <span class="n">end</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">end</span><span class="p">)),</span>
+                                          <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span>  <span class="c1"># custom business month end</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                          <span class="n">end</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">end</span><span class="p">)),</span>
+                                          <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>  <span class="c1"># custom business month end</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                          <span class="n">end</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">end</span><span class="p">)),</span>
+                                          <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s2">&quot;q&quot;</span><span class="p">:</span>  <span class="c1"># custom business quarter end</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_quarterend</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                          <span class="n">end</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">end</span><span class="p">)),</span>
+                                          <span class="n">freq</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)[::</span><span class="mi">3</span><span class="p">]</span>
+                <span class="k">case</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">end</span><span class="p">)])</span>
+                <span class="k">case</span> <span class="k">_</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;invalid freq&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BusDay.date_tuples"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.date_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">date_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (beg, end) holding period between rebalance dates&quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dates</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span></div>
+
+<div class="viewcode-block" id="BusDay.to_datetime"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.to_datetime">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_datetime</span><span class="p">(</span><span class="n">arg</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                    <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Timestamp</span> <span class="o">|</span> <span class="n">DatetimeIndex</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Wraps pd.to_datetime to convert string to pandas TimeStamp format&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BusDay.to_date"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.to_date">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_date</span><span class="p">(</span><span class="n">dates</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+                <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Construct int date from strings using input and output formats</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            date: Input date strings or Timestamp or pydatetime to convert</span>
+<span class="sd">            format: Optional format of input date string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int dates with year, month, date components according to outformat</span>
+
+<span class="sd">        Formats specified as in strptime() and strftime():</span>
+
+<span class="sd">        -  %b %B %h = input month name</span>
+<span class="sd">        -  %F = %Y-%m-%d</span>
+<span class="sd">        -  %T = %H:%M:%S</span>
+<span class="sd">        -  %n = whitespace</span>
+<span class="sd">        -  %w %W %U %V = week number</span>
+<span class="sd">        -  %u = day of week (1-7)</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; to_date(&#39;12-31-1999&#39;, format=&#39;%m-%d-%Y&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; to_date([&#39;1999-01-01&#39;, &#39;1999-12-31&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; int(datetime.strptime(str(19991231), &#39;%Y%m%d&#39;).strftime(&#39;%Y%m%d&#39;))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="s1">&#39;strftime&#39;</span><span class="p">):</span> <span class="c1"># not already datetime or Timestamp</span>
+            <span class="n">dates</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dates</span><span class="p">),</span> <span class="nb">format</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dates</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BusDay.to_monthend"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.to_monthend">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_monthend</span><span class="p">(</span><span class="n">dates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return calendar monthend date given an int date or list</span>
+<span class="sd">            </span>
+<span class="sd">        Args:</span>
+<span class="sd">            dates: input YYYYMMDD (or first 4-, 6-digits) int date, or list</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Output dates converted to monthend of calendar    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_monthend</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dates</span> <span class="o">&lt;=</span> <span class="mi">9999</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dates</span> <span class="o">&lt;=</span> <span class="mi">999999</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">dates</span><span class="o">//</span><span class="mi">100</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">dates</span><span class="o">%</span><span class="mi">100</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">+</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BusDay.to_quarterend"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.to_quarterend">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_quarterend</span><span class="p">(</span><span class="n">dates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return calendar monthend date given an int date or list</span>
+<span class="sd">            </span>
+<span class="sd">        Args:</span>
+<span class="sd">            dates: input YYYYMMDD (or first 4-, 6-digits) int date, or list</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Output dates converted to quarterend of calendar    </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_quarterend</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dates</span> <span class="o">&lt;=</span> <span class="mi">9999</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">Busday</span><span class="o">.</span><span class="n">to_quarterend</span><span class="p">(</span><span class="n">dates</span><span class="o">*</span><span class="mi">10000</span> <span class="o">+</span> <span class="mi">1201</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dates</span> <span class="o">&lt;=</span> <span class="mi">999999</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_quarterend</span><span class="p">(</span><span class="n">dates</span><span class="o">*</span><span class="mi">100</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">month</span> <span class="o">=</span> <span class="p">((</span><span class="n">BusDay</span><span class="o">.</span><span class="n">month</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># round up to quarter</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">dates</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">MonthEnd</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BusDay.year"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.year">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to extract int years from input date or list&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">date</span> <span class="o">&gt;</span> <span class="mi">9999</span><span class="p">:</span>      <span class="c1"># input date may be missing month and day</span>
+            <span class="n">date</span> <span class="o">//=</span> <span class="mi">100</span>
+        <span class="k">return</span> <span class="n">date</span></div>
+
+<div class="viewcode-block" id="BusDay.month"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.month">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">month</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to extract int months from input date or list&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">date</span> <span class="o">&gt;</span> <span class="mi">999999</span><span class="p">:</span>        <span class="c1"># input date may be missing day</span>
+            <span class="n">date</span> <span class="o">//=</span> <span class="mi">100</span>
+        <span class="k">return</span> <span class="n">date</span> <span class="o">%</span> <span class="mi">100</span></div>
+        
+<div class="viewcode-block" id="BusDay.day"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.day">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">day</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Helper to extract int day of month from input date or list&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">date</span> <span class="o">%</span> <span class="mi">100</span>    <span class="c1"># date may be missing year or month</span></div>
+
+<div class="viewcode-block" id="BusDay.today"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.today">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">today</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return today&#39;s int date&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>    </div>
+
+<div class="viewcode-block" id="BusDay.endqr"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.endqr">[docs]</a>    <span class="k">def</span> <span class="nf">endqr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">quarters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) business month end date, optional months offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">quarters</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">else</span>
+                <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="p">((</span><span class="n">BusDay</span><span class="o">.</span><span class="n">month</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">//</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)</span> 
+                     <span class="o">+</span> <span class="p">(</span><span class="n">quarters</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span></div>
+    
+<div class="viewcode-block" id="BusDay.endmo"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.endmo">[docs]</a>    <span class="k">def</span> <span class="nf">endmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">months</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) business month end date, optional months offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">months</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">else</span>
+                <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> 
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)</span> 
+                     <span class="o">+</span> <span class="p">(</span><span class="n">months</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="BusDay.begmo"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.begmo">[docs]</a>    <span class="k">def</span> <span class="nf">begmo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">months</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) business month begin date, optional months offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begmo</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">months</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">else</span>
+                <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="n">months</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="BusDay.endyr"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.endyr">[docs]</a>    <span class="k">def</span> <span class="nf">endyr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">years</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) business year end date, optional years offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endyr</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">years</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">else</span>
+                <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">years</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endmocal</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="BusDay.begyr"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.begyr">[docs]</a>    <span class="k">def</span> <span class="nf">begyr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">years</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) business year begin date, optional years offset&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">begyr</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">years</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">else</span>
+                <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">)</span>
+                     <span class="o">+</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">years</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_begmocal</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)))</span></div>
+
+    <span class="k">def</span> <span class="nf">_numwk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return index number of weeks matching to input dates&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">],</span> <span class="n">dates</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BusDay.begwk"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.begwk">[docs]</a>    <span class="k">def</span> <span class="nf">begwk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">weeks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return beginning business week dates, with optional offset&quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;beg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_numwk</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">weeks</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">else</span> <span class="n">dates</span></div>
+
+<div class="viewcode-block" id="BusDay.endwk"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.endwk">[docs]</a>    <span class="k">def</span> <span class="nf">endwk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span> <span class="o">=</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">weeks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return ending business week dates, with optional offset&quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_numwk</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">weeks</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">else</span> <span class="n">dates</span></div>
+
+<div class="viewcode-block" id="BusDay.ismonthend"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.ismonthend">[docs]</a>    <span class="k">def</span> <span class="nf">ismonthend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;If dates is in last complete week in a month&quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weeks</span><span class="p">[</span><span class="s1">&#39;ismonthend&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_numwk</span><span class="p">(</span><span class="n">date</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="k">else</span> <span class="n">dates</span></div>
+
+<div class="viewcode-block" id="BusDay.december_fiscal"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.december_fiscal">[docs]</a>    <span class="k">def</span> <span class="nf">december_fiscal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) Fama-French December fiscal year-end date/s&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">december_fiscal</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BusDay.june_universe"><a class="viewcode-back" href="../../../finds.structured.busday.html#finds.structured.busday.BusDay.june_universe">[docs]</a>    <span class="k">def</span> <span class="nf">june_universe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return (list of) Fama-French June universe selection date/s&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">june_universe</span><span class="p">,</span> <span class="n">dates</span><span class="p">)</span> 
+        <span class="n">june</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">dates</span><span class="p">),</span> <span class="n">months</span><span class="o">=-</span><span class="mi">6</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">june</span><span class="p">,</span> <span class="n">months</span> <span class="o">=-</span><span class="mi">12</span> <span class="o">*</span> <span class="p">(</span><span class="n">dates</span> <span class="o">&lt;</span> <span class="n">june</span><span class="p">))</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+    <span class="c1"># Create business date calendar from French research data library</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">test_to_monthend</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_monthend</span><span class="p">(</span><span class="mi">1999</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_monthend</span><span class="p">(</span><span class="mi">199901</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_monthend</span><span class="p">(</span><span class="mi">19990101</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_monthend</span><span class="p">([</span><span class="mi">19991231</span><span class="p">,</span> <span class="mi">199901</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">test_to_date</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="s1">&#39;12-31-1999&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%Y&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">([</span><span class="s1">&#39;1999-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;1999-12-31&#39;</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">test_daily</span><span class="p">():</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+        <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">19990101</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">19991231</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">([</span><span class="mi">19991231</span><span class="p">,</span> <span class="mi">19990101</span><span class="p">,</span> <span class="mi">19991231</span><span class="p">],</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">BusDay</span><span class="o">.</span><span class="n">to_date</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">december_fiscal</span><span class="p">(</span><span class="mi">20100331</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">december_fiscal</span><span class="p">(</span><span class="mi">20100831</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">june_universe</span><span class="p">(</span><span class="mi">20100331</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">june_universe</span><span class="p">(</span><span class="mi">20100831</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">date_tuples</span><span class="p">([</span><span class="mi">20220131</span><span class="p">,</span> <span class="mi">20220228</span><span class="p">,</span> <span class="mi">20220331</span><span class="p">,</span> <span class="mi">20220430</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">test_weekly</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">weeks</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">begwk</span><span class="p">([</span><span class="mi">20220609</span><span class="p">,</span> <span class="mi">20220601</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endwk</span><span class="p">([</span><span class="mi">20220609</span><span class="p">,</span> <span class="mi">20220601</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="mi">20210603</span><span class="p">,</span> <span class="mi">20220610</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;weekly&#39;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">date_tuples</span><span class="p">([</span><span class="mi">20220520</span><span class="p">,</span> <span class="mi">20220527</span><span class="p">,</span> <span class="mi">20220603</span><span class="p">,</span> <span class="mi">20220610</span><span class="p">]))</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">])</span>
+    <span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+    <span class="n">test_to_date</span><span class="p">()</span>
+    <span class="n">test_to_monthend</span><span class="p">()</span>
+    <span class="n">test_daily</span><span class="p">()</span>
+    <span class="n">test_weekly</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="mi">19251231</span><span class="p">,</span> <span class="mi">19260131</span><span class="p">))</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

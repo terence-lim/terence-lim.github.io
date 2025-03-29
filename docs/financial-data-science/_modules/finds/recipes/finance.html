@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.recipes.finance &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.recipes.finance</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.recipes.finance</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Financial functions</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.ma</span> <span class="kn">import</span> <span class="n">masked_invalid</span> <span class="k">as</span> <span class="n">valid</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span><span class="p">,</span> <span class="n">chi2</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="c1">######################</span>
+<span class="c1">#</span>
+<span class="c1">#  Mean Variance Optimization</span>
+<span class="c1">#</span>
+<span class="c1">######################</span>
+
+<div class="viewcode-block" id="gmv_portfolio"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.gmv_portfolio">[docs]</a><span class="k">def</span> <span class="nf">gmv_portfolio</span><span class="p">(</span><span class="n">sigma</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns position weights of global minimum variance portfolio</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      sigma : covariance matrix</span>
+<span class="sd">      mu : vector of expected excess (of the risk-free) returns</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Dict of weights, volatility and mean (if mu provided) of the GMV</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ones</span><span class="p">)</span> <span class="o">/</span> <span class="n">ones</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ones</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">)),</span>
+            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">mu</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">)}</span></div>
+
+<div class="viewcode-block" id="efficient_portfolio"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.efficient_portfolio">[docs]</a><span class="k">def</span> <span class="nf">efficient_portfolio</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns weights of minimum variance portfolio that exceeds target return</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      sigma : covariance matrix</span>
+<span class="sd">      mu : vector of expected excess (of the risk-free) returns</span>
+<span class="sd">      target : required minimum expected return of portfolio</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Dict of weights, volatility and mean of efficient portfolio that achieves target</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+    <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">mu</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">ones</span><span class="p">])</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">B</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">target</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]]))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">))),</span>
+            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">))}</span></div>
+
+<div class="viewcode-block" id="tangency_portfolio"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.tangency_portfolio">[docs]</a><span class="k">def</span> <span class="nf">tangency_portfolio</span><span class="p">(</span><span class="n">mu</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns weights of tangency portfolio with largest slope (sharpe ratio)</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      sigma : covariance matrix</span>
+<span class="sd">      mu : vector of expected excess (of the risk-free) returns</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Dict of weights, volatility and mean of the tangency portfolio</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+    <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">/</span><span class="n">ones</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="n">w</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu</span><span class="p">)),</span>
+            <span class="s1">&#39;volatility&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">)))}</span></div>
+
+
+<span class="c1">######################</span>
+<span class="c1">#</span>
+<span class="c1"># Bond Math</span>
+<span class="c1">#</span>
+<span class="c1">######################</span>
+
+<div class="viewcode-block" id="bootstrap_spot"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.bootstrap_spot">[docs]</a><span class="k">def</span> <span class="nf">bootstrap_spot</span><span class="p">(</span><span class="n">coupon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">spots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute spot rate to maturity of par bond from yield and sequence of spots</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      coupon : Annual coupon rate</span>
+<span class="sd">      spots : Simple annual spot rates each period (excl last period before maturity</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      price: Present value of bond</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Simple spot interest rate till maturity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">spots</span><span class="p">:</span>           <span class="c1"># trivial one-period bond</span>
+        <span class="k">return</span> <span class="n">coupon</span> <span class="o">/</span> <span class="n">price</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>      <span class="c1"># number of coupons through maturity</span>
+
+    <span class="c1"># discount factors from given spot rates</span>
+    <span class="n">discount</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">spot</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">t</span><span class="p">))</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">spot</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spots</span><span class="p">)]</span>
+
+    <span class="c1"># nominal amount of last payment</span>
+    <span class="n">last_payment</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">coupon</span><span class="o">/</span><span class="n">m</span>
+    
+    <span class="c1"># infer present value of last coupon and principal</span>
+    <span class="n">last_pv</span> <span class="o">=</span> <span class="n">price</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">discount</span><span class="p">)</span> <span class="o">*</span> <span class="n">coupon</span><span class="o">/</span><span class="n">m</span> 
+
+    <span class="c1"># compute discount factor and annualize the effective rate</span>
+    <span class="n">spot</span> <span class="o">=</span> <span class="p">((</span><span class="n">last_payment</span><span class="o">/</span><span class="n">last_pv</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">m</span>
+    <span class="k">return</span> <span class="n">spot</span></div>
+
+<div class="viewcode-block" id="bond_price"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.bond_price">[docs]</a><span class="k">def</span> <span class="nf">bond_price</span><span class="p">(</span><span class="n">coupon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">yields</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+               <span class="n">par</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute present value of bond given spot rates or yield-to-maturity</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      coupon : Annual coupon rate</span>
+<span class="sd">      n : Number of remaining coupons</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      yields : Simple annual yield-to-maturity or spot rates each period</span>
+<span class="sd">      par : face or par value of bond</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Present value of bond</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">yields</span><span class="p">):</span>
+        <span class="n">yields</span> <span class="o">=</span> <span class="p">[</span><span class="n">yields</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>        <span class="c1"># same spot rate every period</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">yields</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Number of spot rates must equal number of couponds&quot;</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">yields</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">coupon</span><span class="o">/</span><span class="n">m</span> <span class="o">+</span> <span class="n">par</span><span class="o">*</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">n</span><span class="p">))</span>
+          <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>    <span class="c1"># discount every period&#39;s payment, plus last par</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="forwards_from_spots"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.forwards_from_spots">[docs]</a><span class="k">def</span> <span class="nf">forwards_from_spots</span><span class="p">(</span><span class="n">spots</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">skip</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Compute forward rates given spot rates</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      spots : Sequence of simple annual spot rates</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      skip: Number of initial periods skipped</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      List of forward rates, excluding first period of spot rates input</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Require at least two spot rates as input&quot;</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">skip</span> <span class="o">+</span> <span class="n">t</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">spots</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="n">n</span>         <span class="c1"># discounted value of period n</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">spots</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># discounter value of period n-1</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="macaulay_duration"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.macaulay_duration">[docs]</a><span class="k">def</span> <span class="nf">macaulay_duration</span><span class="p">(</span><span class="n">coupon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+                      <span class="n">yields</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">par</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute macaulay duration of a bond given spot rates or yield-to-maturity</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      coupon : Annual coupon rate</span>
+<span class="sd">      n : Number of remaining coupons</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      price : current market price of bond</span>
+<span class="sd">      yields : Simple annual yield-to-maturity or spot rates each period</span>
+<span class="sd">      par : face or par value of bond</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Macaulay duration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">yields</span><span class="p">):</span>
+        <span class="n">yields</span> <span class="o">=</span> <span class="p">[</span><span class="n">yields</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>        <span class="c1"># same spot rate every period</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">yields</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Number of spot rates must equal number of couponds&quot;</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">yields</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="o">/</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">coupon</span><span class="o">/</span><span class="n">m</span> <span class="o">+</span> <span class="n">par</span><span class="o">*</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">n</span><span class="p">))</span>
+          <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>    <span class="c1"># discount every period&#39;s time-weighted payment</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span> <span class="o">/</span> <span class="n">price</span></div>
+
+<div class="viewcode-block" id="modified_duration"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.modified_duration">[docs]</a><span class="k">def</span> <span class="nf">modified_duration</span><span class="p">(</span><span class="n">coupon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+                      <span class="n">yields</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">par</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute modified duration of a bond given spot rates or yield-to-maturity</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      coupon : Annual coupon rate</span>
+<span class="sd">      n : Number of remaining coupons</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      price : current market price of bond</span>
+<span class="sd">      yields : Simple annual yield-to-maturity or spot rates each period</span>
+<span class="sd">      par : face or par value of bond</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Modified duration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">yields</span><span class="p">),</span> <span class="s2">&quot;Not Implemented&quot;</span>
+    <span class="n">ytm</span> <span class="o">=</span> <span class="n">yields</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">macaulay_duration</span><span class="p">(</span><span class="n">coupon</span><span class="o">=</span><span class="n">coupon</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">price</span><span class="o">=</span><span class="n">price</span><span class="p">,</span>
+                              <span class="n">yields</span><span class="o">=</span><span class="n">yields</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="n">par</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ytm</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="modified_convexity"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.modified_convexity">[docs]</a><span class="k">def</span> <span class="nf">modified_convexity</span><span class="p">(</span><span class="n">coupon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
+                       <span class="n">yields</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">par</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute mocified convexity of a bond given spot rates or yield-to-maturity</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      coupon : Annual coupon rate</span>
+<span class="sd">      n : Number of remaining coupons</span>
+<span class="sd">      m : Number of compounding periods per year</span>
+<span class="sd">      price : current market price of bond</span>
+<span class="sd">      yields : Simple annual yield-to-maturity or spot rates each period</span>
+<span class="sd">      par : face or par value of bond</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Modified convexity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">yields</span><span class="p">),</span> <span class="s2">&quot;Not Implemented&quot;</span>
+    <span class="n">ytm</span> <span class="o">=</span> <span class="n">yields</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">yields</span><span class="p">):</span>
+        <span class="n">yields</span> <span class="o">=</span> <span class="p">[</span><span class="n">yields</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>        <span class="c1"># same spot rate every period</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">yields</span><span class="p">)</span> <span class="o">==</span> <span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Number of spot rates must equal number of coupons&quot;</span>
+    <span class="n">pv</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">yields</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">t</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">t</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">m</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">coupon</span><span class="o">/</span><span class="n">m</span> <span class="o">+</span> <span class="n">par</span><span class="o">*</span><span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">n</span><span class="p">))</span>
+          <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>    <span class="c1"># discount every period&#39;s time-weighted payment</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ytm</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+<span class="c1">######################</span>
+<span class="c1">#</span>
+<span class="c1"># High Frequency</span>
+<span class="c1">#</span>
+<span class="c1">######################</span>
+
+<div class="viewcode-block" id="hl_vol"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.hl_vol">[docs]</a><span class="k">def</span> <span class="nf">hl_vol</span><span class="p">(</span><span class="n">high</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+           <span class="n">low</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+           <span class="n">last</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute Parkinson volatility from high and low prices</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      high : DataFrame of high prices (observations x stocks)</span>
+<span class="sd">      low : DataFrame of low prices (observations x stocks)</span>
+<span class="sd">      last : DataFrame of last prices, for forward filling if high low missing</span>
+
+<span class="sd">      Returns:</span>
+<span class="sd">        Estimated volatility</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">last</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">high</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">high</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="n">last</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+        <span class="n">low</span> <span class="o">=</span> <span class="n">low</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">high</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="n">last</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">low</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                   <span class="o">/</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="ohlc_vol"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.ohlc_vol">[docs]</a><span class="k">def</span> <span class="nf">ohlc_vol</span><span class="p">(</span><span class="n">first</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">low</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+             <span class="n">last</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">ffill</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="n">zero_mean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute Garman-Klass or Rogers-Satchell (non zero mean) OHLC vol</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      first : DataFrame of open prices (observations x stocks)</span>
+<span class="sd">      high : DataFrame of high prices (observations x stocks)</span>
+<span class="sd">      low : DataFrame of low prices (observations x stocks)</span>
+<span class="sd">      last : DataFrame of close prices (observations x stocks)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Estimated volatility </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ffill</span><span class="p">:</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">high</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">high</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="n">last</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+        <span class="n">low</span> <span class="o">=</span> <span class="n">low</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">low</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="n">last</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">low</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="n">last</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">zero_mean</span><span class="p">:</span>  <span class="c1"># Garman-Klass (assuming zero mean drift)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">low</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+             <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">last</span> <span class="o">/</span> <span class="n">first</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>\
+             <span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>          <span class="c1"># Rogers-Satchell (non zero mean drift)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">close</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">close</span><span class="p">))</span>
+             <span class="o">+</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">close</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">high</span> <span class="o">/</span> <span class="n">close</span><span class="p">)))</span>\
+             <span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+    
+
+<span class="c1">######################</span>
+<span class="c1">#</span>
+<span class="c1"># Risk Management</span>
+<span class="c1">#</span>
+<span class="c1">######################</span>
+
+    
+<div class="viewcode-block" id="maximum_drawdown"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.maximum_drawdown">[docs]</a><span class="k">def</span> <span class="nf">maximum_drawdown</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">is_price_level</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute max drawdown (max loss from previous high) period and returns</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: Returns or price level series</span>
+<span class="sd">        is_price_level: Whether input are price index levels, or returns</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Series with start and end levels, keyed by dates, of maximum drawdown</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        MDD = (Trough - Peak) / Peak</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_price_level</span><span class="p">:</span>
+        <span class="n">cumsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cumsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">cummax</span> <span class="o">=</span> <span class="n">cumsum</span><span class="o">.</span><span class="n">cummax</span><span class="p">()</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">cummax</span> <span class="o">-</span> <span class="n">cumsum</span><span class="p">)</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+    <span class="n">beg</span> <span class="o">=</span> <span class="n">cumsum</span><span class="p">[</span><span class="n">cumsum</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">cumsum</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="parametric_risk"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.parametric_risk">[docs]</a><span class="k">def</span> <span class="nf">parametric_risk</span><span class="p">(</span><span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate parametric gaussian VaR and ES</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      sigma : predicted volatility, or a Series</span>
+<span class="sd">      alpha : Var level (e.g. 0.95)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="o">-</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">value_at_risk</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">expected_shortfall</span><span class="o">=</span><span class="n">es</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="historical_risk"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.historical_risk">[docs]</a><span class="k">def</span> <span class="nf">historical_risk</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate historical VaR, ES, and sample moments</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      X : Series of observed returns</span>
+<span class="sd">      alpha : Var level (e.g. 0.95)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">))</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">X</span> <span class="o">&lt;</span> <span class="n">var</span><span class="p">])</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">skew</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">kurt</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">jb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">jbp</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">jarque_bera</span><span class="p">(</span><span class="n">X</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">value_at_risk</span><span class="o">=</span><span class="n">var</span><span class="p">,</span> <span class="n">expected_shortfall</span><span class="o">=</span><span class="n">es</span><span class="p">,</span> <span class="n">volatility</span><span class="o">=</span><span class="n">vol</span><span class="p">,</span>
+                <span class="n">skewness</span><span class="o">=</span><span class="n">skew</span><span class="p">,</span> <span class="n">excess_kurtosis</span><span class="o">=</span><span class="n">kurt</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">jb_statistic</span><span class="o">=</span><span class="n">jb</span><span class="p">,</span> <span class="n">jb_pvalue</span><span class="o">=</span><span class="n">jbp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="bootstrap_risk"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.bootstrap_risk">[docs]</a><span class="k">def</span> <span class="nf">bootstrap_risk</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returned bootstrapped risk statistics</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      X : Series of observed returns</span>
+<span class="sd">      alpha : VaR level (e.g. 0.95)</span>
+<span class="sd">      n : Number of bootstrap samples</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      DataFrame of n bootstrapped samples of risk statistics</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">bootstraps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">bootstraps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">historical_risk</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="n">bootstraps</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">bootstraps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bootstraps</span></div>
+
+<div class="viewcode-block" id="kupiec_LR"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.kupiec_LR">[docs]</a><span class="k">def</span> <span class="nf">kupiec_LR</span><span class="p">(</span><span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute Kupiec likelihood ratio given s violations in n trials</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      s : number of violations</span>
+<span class="sd">      n : number of observations</span>
+<span class="sd">      alpha : VaR level (e.g. 0.95)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span>       <span class="c1"># prob of violation</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">s</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">s</span><span class="o">/</span><span class="n">n</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">s</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">s</span>
+    <span class="n">lr</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">num</span> <span class="o">-</span> <span class="n">den</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span class="n">lr</span><span class="p">,</span> <span class="s1">&#39;violations&#39;</span><span class="p">:</span> <span class="n">s</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+            <span class="c1"># &#39;5%_critical&#39;: stats.chi2.ppf(0.95, df=1),</span>
+            <span class="s1">&#39;pvalue&#39;</span><span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">chi2</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">1</span><span class="p">)}</span></div>
+
+<div class="viewcode-block" id="kupiec"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.kupiec">[docs]</a><span class="k">def</span> <span class="nf">kupiec</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">VaR</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Kupiec proportion of failures likelihood ratio test of VaR</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      X : Series of observed returns</span>
+<span class="sd">      VaR : Series of predicted VaR</span>
+<span class="sd">      alpha : VaR level (e.g. 0.95)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Dict of likelihood statistic and pvalue</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">VaR</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># number of violations &lt; -VaR</span>
+    <span class="k">return</span> <span class="n">kupiec_LR</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span></div>
+
+<span class="c1"># convert alpha to halflife</span>
+<div class="viewcode-block" id="halflife"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.halflife">[docs]</a><span class="k">def</span> <span class="nf">halflife</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns halflife from alpha = -ln(2)/ln(lambda), where lambda=1-alpha&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">halflife</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alpha</span><span class="p">]</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span></div>
+
+
+<span class="kn">from</span> <span class="nn">cvxopt</span> <span class="kn">import</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">solvers</span>
+<div class="viewcode-block" id="quadprog"><a class="viewcode-back" href="../../../finds.recipes.finance.html#finds.recipes.finance.quadprog">[docs]</a><span class="k">def</span> <span class="nf">quadprog</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Quadratic solver for portfolio optimization&quot;&quot;&quot;</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">]</span><span class="o">*</span><span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sigma</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">solvers</span><span class="o">.</span><span class="n">qp</span><span class="p">(</span><span class="n">P</span><span class="o">=</span><span class="n">matrix</span><span class="p">(</span><span class="n">sigma</span><span class="p">),</span> <span class="n">q</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">G</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+                     <span class="n">options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">show_progress</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+    
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Verify with Jorion Chapter 5 Solution</span>
+    <span class="n">ytm</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0525</span><span class="p">,</span> <span class="mf">0.1025</span><span class="p">,</span> <span class="mf">0.0025</span><span class="p">))</span>
+    <span class="n">spot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">ytm</span><span class="p">:</span>
+        <span class="n">spot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spot</span><span class="p">,</span> <span class="n">Interest</span><span class="o">.</span><span class="n">bootstrap_rates</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">nominal</span><span class="o">=</span><span class="n">spot</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">jorion_sol5</span> <span class="o">=</span> <span class="p">[</span><span class="mf">.0797</span><span class="p">,</span><span class="mf">.0827</span><span class="p">,</span><span class="mf">.0859</span><span class="p">,</span><span class="mf">.0892</span><span class="p">,</span><span class="mf">.0925</span><span class="p">,</span><span class="mf">.0961</span><span class="p">,</span><span class="mf">.0997</span><span class="p">,</span><span class="mf">.1036</span><span class="p">,</span><span class="mf">.1077</span><span class="p">,</span><span class="mf">.112</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">jorion_sol5</span><span class="p">,</span> <span class="n">spot</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">jorion_sol5</span><span class="p">):],</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">spot</span><span class="p">)</span>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

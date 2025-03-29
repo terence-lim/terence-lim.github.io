@@ -1,0 +1,3300 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Business Textual Analysis &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '5.3_business_textual';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Machine Learning: Classification" href="6.1_classification_models.html" />
+    <link rel="prev" title="Management Sentiment Analysis" href="5.2_management_sentiment.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F5.3_business_textual.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/5.3_business_textual.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Business Textual Analysis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#syntactic-analysis">Syntactic analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spacy">SpaCy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lemmatization">Lemmatization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-of-speech">Part-of-speech</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#named-entity-recognition">Named entity recognition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-parsing">Dependency parsing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-vectors">Word vectors</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction">Dimensionality reduction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#t-sne-visualization">t-SNE visualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dbscan-clustering">DBSCAN clustering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#umap-vizualization">UMAP vizualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hdbscan-clustering">HDBSCAN clustering</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="business-textual-analysis">
+<h1>Business Textual Analysis<a class="headerlink" href="#business-textual-analysis" title="Permalink to this heading">#</a></h1>
+<p><em>You shall know a word by the company it keeps</em> - J. R. Firth</p>
+<p>Text mining techniques allow new insights to be extracted from unstructured text documents. We retrieve business descriptions text from 10-K filings, and use the <strong>Spacy</strong> NLP package for syntactic analysis, including part-of-speech tagging, named entity recognition and dependency parsing. Additionally, we explore dimentionality reduction techniques to visualize and cluster companies based on the relationships between business descriptions, represented as word embeddings, in a lower-dimensional space.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">spatial</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">spacy</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">cluster</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">BusDay</span>
+<span class="kn">from</span> <span class="nn">finds.unstructured</span> <span class="kn">import</span> <span class="n">Edgar</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">Store</span><span class="p">,</span> <span class="n">Finder</span><span class="p">,</span> <span class="n">ColorMap</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+<span class="c1"># %matplotlib qt</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+<span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">ed</span> <span class="o">=</span> <span class="n">Edgar</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;10X&#39;</span><span class="p">],</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">store</span> <span class="o">=</span> <span class="n">Store</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">])</span>
+<span class="n">find</span> <span class="o">=</span> <span class="n">Finder</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+
+<span class="n">begdate</span><span class="p">,</span> <span class="n">enddate</span> <span class="o">=</span> <span class="mi">20240101</span><span class="p">,</span> <span class="mi">20241231</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Retrieve the usual investment universe and retain only the largest size decile (based on NYSE market cap breakpoints).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieve universe of stocks</span>
+<span class="n">univ</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">begdate</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">comnam</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;comnam&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>  <span class="c1"># company name</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;comnam&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comnam</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;ticker&#39;</span><span class="p">,</span> <span class="n">fillna</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>  <span class="c1"># tickers</span>
+<span class="n">univ</span><span class="p">[</span><span class="s1">&#39;ticker&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Extract Business Description text from 10-K filings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># retrieve business decriptions from 10K&#39;s</span>
+<span class="n">item</span><span class="p">,</span> <span class="n">form</span> <span class="o">=</span> <span class="s1">&#39;bus10K&#39;</span><span class="p">,</span> <span class="s1">&#39;10-K&#39;</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">ed</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">))</span>
+<span class="n">found</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="n">rows</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">univ</span><span class="o">.</span><span class="n">decile</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># largest decile only</span>
+             <span class="o">&amp;</span> <span class="n">rows</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">begdate</span><span class="p">,</span> <span class="n">enddate</span><span class="p">)]</span>\
+             <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>\
+             <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="syntactic-analysis">
+<h2>Syntactic analysis<a class="headerlink" href="#syntactic-analysis" title="Permalink to this heading">#</a></h2>
+<p>Syntactic analysis examines the roles of words in sentences and how they combine to form phrases and larger linguistic structures. This process helps model relationships such as subject-verb-object dependencies, which are fundamental for NLP tasks like dependency and constituent parsing.</p>
+<section id="spacy">
+<h3>SpaCy<a class="headerlink" href="#spacy" title="Permalink to this heading">#</a></h3>
+<p>spaCy is a widely used open-source Python library for advanced NLP tasks, including POS tagging, named entity recognition (NER), and dependency parsing. It provides pre-trained models for various languages and domains, as well as customizable pipelines for processing text data.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://spacy.io/models">spaCy Models</a></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ! python -m spacy download en_core_web_sm</span>
+<span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_lg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="lemmatization">
+<h3>Lemmatization<a class="headerlink" href="#lemmatization" title="Permalink to this heading">#</a></h3>
+<p>Lemmatization reduces a word to its base or dictionary form (lemma), representing its morphological root.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using spaCy pipeline to tokenize NVIDIA&#39;s 10-K business description text</span>
+<span class="n">nvidia</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="s1">&#39;NVIDIA&#39;</span><span class="p">)[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">ed</span><span class="p">[</span><span class="n">found</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">nvidia</span><span class="p">,</span> <span class="s1">&#39;pathname&#39;</span><span class="p">]][:</span><span class="n">nlp</span><span class="o">.</span><span class="n">max_length</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                  <span class="s1">&#39;lemma&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">lemma_</span><span class="p">,</span>
+                                  <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">is_alpha</span><span class="p">,</span>
+                                  <span class="s1">&#39;stop&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">is_stop</span><span class="p">,</span>
+                                  <span class="s1">&#39;punct&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">is_punct</span><span class="p">}</span>
+                                 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">)))</span>
+<span class="n">tokens</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+      <th>lemma</th>
+      <th>alpha</th>
+      <th>stop</th>
+      <th>punct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>item</td>
+      <td>item</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>.</td>
+      <td>.</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>business</td>
+      <td>business</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>\n\n</td>
+      <td>\n\n</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>our</td>
+      <td>our</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>company</td>
+      <td>company</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>\n\n</td>
+      <td>\n\n</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>nvidia</td>
+      <td>nvidia</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>pioneered</td>
+      <td>pioneer</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>accelerated</td>
+      <td>accelerate</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>computing</td>
+      <td>computing</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>to</td>
+      <td>to</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>help</td>
+      <td>help</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>solve</td>
+      <td>solve</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>the</td>
+      <td>the</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>most</td>
+      <td>most</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>challenging</td>
+      <td>challenging</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>computational</td>
+      <td>computational</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>problems</td>
+      <td>problem</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>.</td>
+      <td>.</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>nvidia</td>
+      <td>nvidia</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>is</td>
+      <td>be</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>now</td>
+      <td>now</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>a</td>
+      <td>a</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>full</td>
+      <td>full</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>-</td>
+      <td>-</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>stack</td>
+      <td>stack</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>computing</td>
+      <td>computing</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>infrastructure</td>
+      <td>infrastructure</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="part-of-speech">
+<h3>Part-of-speech<a class="headerlink" href="#part-of-speech" title="Permalink to this heading">#</a></h3>
+<p><strong>Part-of-speech (POS) tagging</strong> assigns grammatical categories (e.g., noun, verb, adjective) to words in a text corpus. This aids in understanding sentence structure and extracting meaning by identifying the roles of words within sentences.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tags</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                <span class="s1">&#39;pos&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span><span class="p">,</span>
+                                <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">tag_</span><span class="p">,</span>
+                                <span class="s1">&#39;dep&#39;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">dep_</span><span class="p">}</span>
+                                 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">)))</span>
+<span class="n">tags</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+      <th>pos</th>
+      <th>tag</th>
+      <th>dep</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>item</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>ROOT</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>NUM</td>
+      <td>CD</td>
+      <td>nummod</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>.</td>
+      <td>PUNCT</td>
+      <td>.</td>
+      <td>punct</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>business</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>nsubj</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>\n\n</td>
+      <td>SPACE</td>
+      <td>_SP</td>
+      <td>dep</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>our</td>
+      <td>PRON</td>
+      <td>PRP$</td>
+      <td>poss</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>company</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>appos</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>\n\n</td>
+      <td>SPACE</td>
+      <td>_SP</td>
+      <td>dep</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>nvidia</td>
+      <td>PROPN</td>
+      <td>NNP</td>
+      <td>appos</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>pioneered</td>
+      <td>VERB</td>
+      <td>VBD</td>
+      <td>ROOT</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>accelerated</td>
+      <td>VERB</td>
+      <td>VBD</td>
+      <td>xcomp</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>computing</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>dobj</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>to</td>
+      <td>PART</td>
+      <td>TO</td>
+      <td>aux</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>help</td>
+      <td>VERB</td>
+      <td>VB</td>
+      <td>advcl</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>solve</td>
+      <td>VERB</td>
+      <td>VB</td>
+      <td>xcomp</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>the</td>
+      <td>DET</td>
+      <td>DT</td>
+      <td>det</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>most</td>
+      <td>ADV</td>
+      <td>RBS</td>
+      <td>advmod</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>challenging</td>
+      <td>ADJ</td>
+      <td>JJ</td>
+      <td>amod</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>computational</td>
+      <td>ADJ</td>
+      <td>JJ</td>
+      <td>amod</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>problems</td>
+      <td>NOUN</td>
+      <td>NNS</td>
+      <td>dobj</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>.</td>
+      <td>PUNCT</td>
+      <td>.</td>
+      <td>punct</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>nvidia</td>
+      <td>PROPN</td>
+      <td>NNP</td>
+      <td>nsubj</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>is</td>
+      <td>AUX</td>
+      <td>VBZ</td>
+      <td>ROOT</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>now</td>
+      <td>ADV</td>
+      <td>RB</td>
+      <td>advmod</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>a</td>
+      <td>DET</td>
+      <td>DT</td>
+      <td>det</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>full</td>
+      <td>ADJ</td>
+      <td>JJ</td>
+      <td>amod</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>-</td>
+      <td>PUNCT</td>
+      <td>HYPH</td>
+      <td>punct</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>stack</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>compound</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>computing</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>compound</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>infrastructure</td>
+      <td>NOUN</td>
+      <td>NN</td>
+      <td>compound</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="named-entity-recognition">
+<h3>Named entity recognition<a class="headerlink" href="#named-entity-recognition" title="Permalink to this heading">#</a></h3>
+<p><strong>Named Entity Recognition (NER)</strong> identifies and categorizes named entities (e.g., people, organizations, locations, dates) in text. This process helps classify textual data into meaningful categories.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ents</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">ent</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                                <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">ent</span><span class="o">.</span><span class="n">label_</span><span class="p">,</span>
+                                <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="n">ent</span><span class="o">.</span><span class="n">start_char</span><span class="p">,</span>
+                                <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="n">ent</span><span class="o">.</span><span class="n">end_char</span><span class="p">}</span>
+                               <span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">)))</span>
+<span class="n">ents</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+      <th>label</th>
+      <th>start</th>
+      <th>end</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>CARDINAL</td>
+      <td>5</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>nvidia</td>
+      <td>PERSON</td>
+      <td>133</td>
+      <td>139</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>as well as hundreds</td>
+      <td>CARDINAL</td>
+      <td>352</td>
+      <td>371</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>healthcare</td>
+      <td>ORG</td>
+      <td>853</td>
+      <td>863</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>tens of thousands</td>
+      <td>CARDINAL</td>
+      <td>1012</td>
+      <td>1029</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>gpu</td>
+      <td>ORG</td>
+      <td>1033</td>
+      <td>1036</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>gpu</td>
+      <td>ORG</td>
+      <td>1239</td>
+      <td>1242</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>today</td>
+      <td>DATE</td>
+      <td>1347</td>
+      <td>1352</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>thousands</td>
+      <td>CARDINAL</td>
+      <td>1498</td>
+      <td>1507</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>gpu</td>
+      <td>ORG</td>
+      <td>1771</td>
+      <td>1774</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>thousands</td>
+      <td>CARDINAL</td>
+      <td>1819</td>
+      <td>1828</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>gpus</td>
+      <td>GPE</td>
+      <td>2594</td>
+      <td>2598</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>multi-billion-dollar</td>
+      <td>MONEY</td>
+      <td>2708</td>
+      <td>2728</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>third</td>
+      <td>ORDINAL</td>
+      <td>2849</td>
+      <td>2854</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>over 45.3 billion</td>
+      <td>MONEY</td>
+      <td>3100</td>
+      <td>3117</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>gpu</td>
+      <td>ORG</td>
+      <td>3248</td>
+      <td>3251</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1999</td>
+      <td>DATE</td>
+      <td>3255</td>
+      <td>3259</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>2006</td>
+      <td>DATE</td>
+      <td>3391</td>
+      <td>3395</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>gpu</td>
+      <td>ORG</td>
+      <td>3451</td>
+      <td>3454</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>2012</td>
+      <td>DATE</td>
+      <td>3557</td>
+      <td>3561</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Entity Visualizer</span>
+<span class="kn">from</span> <span class="nn">spacy</span> <span class="kn">import</span> <span class="n">displacy</span>
+<span class="n">displacy</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">doc</span><span class="p">[:</span><span class="mi">300</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;ent&quot;</span><span class="p">,</span> <span class="n">jupyter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><span class="tex2jax_ignore"><div class="entities" style="line-height: 2.5; direction: ltr">item 
+<mark class="entity" style="background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    1
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">CARDINAL</span>
+</mark>
+. business <br><br> our company <br><br> nvidia pioneered accelerated computing to help solve the most challenging computational problems. 
+<mark class="entity" style="background: #aa9cfc; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    nvidia
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">PERSON</span>
+</mark>
+ is now a full-stack computing infrastructure company with data-center-scale offerings that are reshaping industry. <br><br> our full-stack includes the foundational cuda programming model that runs on all nvidia gpus, 
+<mark class="entity" style="background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    as well as hundreds
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">CARDINAL</span>
+</mark>
+ of domain-specific software libraries, software development kits, or sdks, and application programming interfaces, or apis. this deep and broad software stack accelerates the performance and eases the deployment of nvidia accelerated computing for computationally intensive workloads such as artificial intelligence, or ai, model training and inference, data analytics, scientific computing, and 3d graphics, with vertical-specific optimizations to address industries ranging from 
+<mark class="entity" style="background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    healthcare
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">ORG</span>
+</mark>
+ and telecom to automotive and manufacturing. <br><br> our data-center-scale offerings are comprised of compute and networking solutions that can scale to 
+<mark class="entity" style="background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    tens of thousands
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">CARDINAL</span>
+</mark>
+ of 
+<mark class="entity" style="background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    gpu
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">ORG</span>
+</mark>
+-accelerated servers interconnected to function as a single giant computer; this type of data center architecture and scale is needed for the development and deployment of modern ai applications. <br><br> the 
+<mark class="entity" style="background: #7aecec; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    gpu
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">ORG</span>
+</mark>
+ was initially used to simulate human imagination, enabling the virtual worlds of video games and films. 
+<mark class="entity" style="background: #bfe1d9; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    today
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">DATE</span>
+</mark>
+, it also simulates human intelligence, enabling a deeper understanding of the physical world. its parallel processing capabilities, supported by 
+<mark class="entity" style="background: #e4e7d2; padding: 0.45em 0.6em; margin: 0 0.25em; line-height: 1; border-radius: 0.35em;">
+    thousands
+    <span style="font-size: 0.8em; font-weight: bold; line-height: 1; border-radius: 0.35em; vertical-align: middle; margin-left: 0.5rem">CARDINAL</span>
+</mark>
+ of computing cores, are essential for deep learning algorithms. this form of ai, in which software writes itself by learning from large amounts of data, can serve as the brain of computers, robots and self-driving cars that can perceive and understand the </div></span></div></div>
+</div>
+</section>
+<section id="dependency-parsing">
+<h3>Dependency parsing<a class="headerlink" href="#dependency-parsing" title="Permalink to this heading">#</a></h3>
+<p><strong>Dependency parsing</strong> determines grammatical relationships between words in a sentence, representing these relationships as a tree structure where each word (except the root) depends on another word (its head). This technique helps identify syntactic roles, such as subjects, objects, and modifiers.</p>
+<p>Transition-based parsing algorithms uses a set of transition operations (e.g. shift, reduce) to incrementally build a dependency tree from an input sentence.</p>
+<p>Unlike dependency parsing, <strong>constituent parsing</strong> focuses on identifying and representing the hierarchical structure of phrases in a sentence based on formal grammar rules. It groups words into nested syntactic units (e.noun phrases and verb phrases) and represents them in a tree structure.</p>
+<p>The <strong>CKY (Cocke-Kasami-Younger) algorithm</strong> is a dynamic programming technique used for parsing sentences and constructing parse trees.</p>
+<p><strong>Probabilistic Context-Free Grammar (PCFG)</strong> extends standard Context-Free Grammar (CFG) by assigning probabilities to production rules, indicating the likelihood of specific grammatical structures. Each rule defines how non-terminal symbols (e.g., NP for noun phrase) expand into words or other non-terminals, guiding sentence generation and parsing.</p>
+<p>Models for automatic tagging and parsing rely on labeled datasets known as <strong>treebanks</strong>, which contain syntactically annotated sentences. The <strong>Penn Treebank</strong> is a widely used treebank for English, providing annotations for POS tags and parse trees.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sentence_spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">)</span>
+<span class="n">displacy</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">sentence_spans</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;dep&quot;</span><span class="p">,</span> <span class="n">jupyter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                <span class="n">options</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">compact</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">175</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><span class="tex2jax_ignore"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:lang="en" id="2496258ae27149219065ea299fce3181-0" class="displacy" width="3375" height="574.5" direction="ltr" style="max-width: none; height: 574.5px; color: #000000; background: #ffffff; font-family: Arial; direction: ltr">
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="50">nvidia</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="50">PROPN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="225">is</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="225">AUX</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="400">now</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="400">ADV</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="575">a</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="575">DET</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="750">full-</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="750">ADJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="925">stack</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="925">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1100">computing</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1100">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1275">infrastructure</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1275">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1450">company</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1450">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1625">with</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1625">ADP</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1800">data-</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1800">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1975">center-</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1975">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2150">scale</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2150">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2325">offerings</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2325">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2500">that</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2500">PRON</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2675">are</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2675">AUX</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2850">reshaping</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2850">VERB</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3025">industry.</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3025">PUNCT</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3200">
+
+ </tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3200">SPACE</tspan>
+</text>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-0" stroke-width="2px" d="M70,439.5 C70,352.0 205.0,352.0 205.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-0" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">nsubj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M70,441.5 L62,429.5 78,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-1" stroke-width="2px" d="M245,439.5 C245,352.0 380.0,352.0 380.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-1" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">advmod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M380.0,441.5 L388.0,429.5 372.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-2" stroke-width="2px" d="M595,439.5 C595,177.0 1440.0,177.0 1440.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-2" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">det</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M595,441.5 L587,429.5 603,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-3" stroke-width="2px" d="M770,439.5 C770,352.0 905.0,352.0 905.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-3" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">amod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M770,441.5 L762,429.5 778,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-4" stroke-width="2px" d="M945,439.5 C945,264.5 1435.0,264.5 1435.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-4" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M945,441.5 L937,429.5 953,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-5" stroke-width="2px" d="M1120,439.5 C1120,352.0 1255.0,352.0 1255.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-5" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1120,441.5 L1112,429.5 1128,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-6" stroke-width="2px" d="M1295,439.5 C1295,352.0 1430.0,352.0 1430.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-6" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1295,441.5 L1287,429.5 1303,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-7" stroke-width="2px" d="M245,439.5 C245,89.5 1445.0,89.5 1445.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-7" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">attr</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1445.0,441.5 L1453.0,429.5 1437.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-8" stroke-width="2px" d="M1470,439.5 C1470,352.0 1605.0,352.0 1605.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-8" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">prep</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1605.0,441.5 L1613.0,429.5 1597.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-9" stroke-width="2px" d="M1820,439.5 C1820,352.0 1955.0,352.0 1955.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-9" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">npadvmod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1820,441.5 L1812,429.5 1828,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-10" stroke-width="2px" d="M1995,439.5 C1995,352.0 2130.0,352.0 2130.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-10" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">amod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1995,441.5 L1987,429.5 2003,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-11" stroke-width="2px" d="M2170,439.5 C2170,352.0 2305.0,352.0 2305.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-11" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2170,441.5 L2162,429.5 2178,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-12" stroke-width="2px" d="M1645,439.5 C1645,264.5 2310.0,264.5 2310.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-12" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">pobj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2310.0,441.5 L2318.0,429.5 2302.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-13" stroke-width="2px" d="M2520,439.5 C2520,264.5 2835.0,264.5 2835.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-13" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">nsubj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2520,441.5 L2512,429.5 2528,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-14" stroke-width="2px" d="M2695,439.5 C2695,352.0 2830.0,352.0 2830.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-14" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">aux</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2695,441.5 L2687,429.5 2703,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-15" stroke-width="2px" d="M2345,439.5 C2345,177.0 2840.0,177.0 2840.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-15" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">relcl</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2840.0,441.5 L2848.0,429.5 2832.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-16" stroke-width="2px" d="M245,439.5 C245,2.0 3025.0,2.0 3025.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-16" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">punct</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3025.0,441.5 L3033.0,429.5 3017.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-0-17" stroke-width="2px" d="M3045,439.5 C3045,352.0 3180.0,352.0 3180.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-0-17" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">dep</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3180.0,441.5 L3188.0,429.5 3172.0,429.5" fill="currentColor"/>
+</g>
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:lang="en" id="2496258ae27149219065ea299fce3181-1" class="displacy" width="6175" height="574.5" direction="ltr" style="max-width: none; height: 574.5px; color: #000000; background: #ffffff; font-family: Arial; direction: ltr">
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="50">our</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="50">PRON</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="225">full-</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="225">ADJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="400">stack</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="400">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="575">includes</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="575">VERB</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="750">the</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="750">DET</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="925">foundational</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="925">PROPN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1100">cuda</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1100">PROPN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1275">programming</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1275">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1450">model</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1450">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1625">that</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1625">PRON</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1800">runs</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1800">VERB</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="1975">on</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="1975">ADP</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2150">all</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2150">DET</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2325">nvidia</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2325">PROPN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2500">gpus,</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2500">PROPN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2675">as</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2675">ADV</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="2850">well</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="2850">ADV</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3025">as</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3025">ADP</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3200">hundreds</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3200">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3375">of</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3375">ADP</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3550">domain-</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3550">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3725">specific</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3725">ADJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="3900">software</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="3900">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4075">libraries,</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4075">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4250">software</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4250">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4425">development</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4425">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4600">kits,</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4600">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4775">or</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4775">CCONJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="4950">sdks,</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="4950">ADJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="5125">and</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="5125">CCONJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="5300">application</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="5300">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="5475">programming</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="5475">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="5650">interfaces,</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="5650">NOUN</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="5825">or</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="5825">CCONJ</tspan>
+</text>
+
+<text class="displacy-token" fill="currentColor" text-anchor="middle" y="484.5">
+    <tspan class="displacy-word" fill="currentColor" x="6000">apis.</tspan>
+    <tspan class="displacy-tag" dy="2em" fill="currentColor" x="6000">NOUN</tspan>
+</text>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-0" stroke-width="2px" d="M70,439.5 C70,264.5 385.0,264.5 385.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-0" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">poss</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M70,441.5 L62,429.5 78,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-1" stroke-width="2px" d="M245,439.5 C245,352.0 380.0,352.0 380.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-1" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">amod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M245,441.5 L237,429.5 253,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-2" stroke-width="2px" d="M420,439.5 C420,352.0 555.0,352.0 555.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-2" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">nsubj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M420,441.5 L412,429.5 428,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-3" stroke-width="2px" d="M770,439.5 C770,89.5 1445.0,89.5 1445.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-3" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">det</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M770,441.5 L762,429.5 778,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-4" stroke-width="2px" d="M945,439.5 C945,177.0 1440.0,177.0 1440.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-4" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">amod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M945,441.5 L937,429.5 953,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-5" stroke-width="2px" d="M1120,439.5 C1120,264.5 1435.0,264.5 1435.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-5" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1120,441.5 L1112,429.5 1128,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-6" stroke-width="2px" d="M1295,439.5 C1295,352.0 1430.0,352.0 1430.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-6" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1295,441.5 L1287,429.5 1303,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-7" stroke-width="2px" d="M595,439.5 C595,2.0 1450.0,2.0 1450.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-7" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">dobj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1450.0,441.5 L1458.0,429.5 1442.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-8" stroke-width="2px" d="M1645,439.5 C1645,352.0 1780.0,352.0 1780.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-8" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">nsubj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1645,441.5 L1637,429.5 1653,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-9" stroke-width="2px" d="M1470,439.5 C1470,264.5 1785.0,264.5 1785.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-9" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">relcl</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1785.0,441.5 L1793.0,429.5 1777.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-10" stroke-width="2px" d="M1820,439.5 C1820,352.0 1955.0,352.0 1955.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-10" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">prep</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M1955.0,441.5 L1963.0,429.5 1947.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-11" stroke-width="2px" d="M2170,439.5 C2170,264.5 2485.0,264.5 2485.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-11" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">det</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2170,441.5 L2162,429.5 2178,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-12" stroke-width="2px" d="M2345,439.5 C2345,352.0 2480.0,352.0 2480.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-12" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2345,441.5 L2337,429.5 2353,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-13" stroke-width="2px" d="M1995,439.5 C1995,177.0 2490.0,177.0 2490.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-13" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">pobj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2490.0,441.5 L2498.0,429.5 2482.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-14" stroke-width="2px" d="M2695,439.5 C2695,264.5 3010.0,264.5 3010.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-14" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">advmod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2695,441.5 L2687,429.5 2703,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-15" stroke-width="2px" d="M2870,439.5 C2870,352.0 3005.0,352.0 3005.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-15" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">advmod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M2870,441.5 L2862,429.5 2878,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-16" stroke-width="2px" d="M1470,439.5 C1470,89.5 3020.0,89.5 3020.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-16" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">cc</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3020.0,441.5 L3028.0,429.5 3012.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-17" stroke-width="2px" d="M1470,439.5 C1470,2.0 3200.0,2.0 3200.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-17" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">conj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3200.0,441.5 L3208.0,429.5 3192.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-18" stroke-width="2px" d="M3220,439.5 C3220,352.0 3355.0,352.0 3355.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-18" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">prep</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3355.0,441.5 L3363.0,429.5 3347.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-19" stroke-width="2px" d="M3570,439.5 C3570,352.0 3705.0,352.0 3705.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-19" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">npadvmod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3570,441.5 L3562,429.5 3578,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-20" stroke-width="2px" d="M3745,439.5 C3745,264.5 4060.0,264.5 4060.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-20" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">amod</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3745,441.5 L3737,429.5 3753,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-21" stroke-width="2px" d="M3920,439.5 C3920,352.0 4055.0,352.0 4055.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-21" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M3920,441.5 L3912,429.5 3928,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-22" stroke-width="2px" d="M3395,439.5 C3395,177.0 4065.0,177.0 4065.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-22" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">pobj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4065.0,441.5 L4073.0,429.5 4057.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-23" stroke-width="2px" d="M4270,439.5 C4270,352.0 4405.0,352.0 4405.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-23" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4270,441.5 L4262,429.5 4278,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-24" stroke-width="2px" d="M4445,439.5 C4445,352.0 4580.0,352.0 4580.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-24" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4445,441.5 L4437,429.5 4453,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-25" stroke-width="2px" d="M3220,439.5 C3220,89.5 4595.0,89.5 4595.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-25" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">conj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4595.0,441.5 L4603.0,429.5 4587.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-26" stroke-width="2px" d="M4620,439.5 C4620,352.0 4755.0,352.0 4755.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-26" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">cc</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4755.0,441.5 L4763.0,429.5 4747.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-27" stroke-width="2px" d="M4620,439.5 C4620,264.5 4935.0,264.5 4935.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-27" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">conj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M4935.0,441.5 L4943.0,429.5 4927.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-28" stroke-width="2px" d="M4970,439.5 C4970,352.0 5105.0,352.0 5105.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-28" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">cc</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5105.0,441.5 L5113.0,429.5 5097.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-29" stroke-width="2px" d="M5320,439.5 C5320,352.0 5455.0,352.0 5455.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-29" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5320,441.5 L5312,429.5 5328,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-30" stroke-width="2px" d="M5495,439.5 C5495,352.0 5630.0,352.0 5630.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-30" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">compound</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5495,441.5 L5487,429.5 5503,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-31" stroke-width="2px" d="M4970,439.5 C4970,264.5 5635.0,264.5 5635.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-31" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">conj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5635.0,441.5 L5643.0,429.5 5627.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-32" stroke-width="2px" d="M5670,439.5 C5670,352.0 5805.0,352.0 5805.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-32" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">cc</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5805.0,441.5 L5813.0,429.5 5797.0,429.5" fill="currentColor"/>
+</g>
+
+<g class="displacy-arrow">
+    <path class="displacy-arc" id="arrow-2496258ae27149219065ea299fce3181-1-33" stroke-width="2px" d="M5670,439.5 C5670,264.5 5985.0,264.5 5985.0,439.5" fill="none" stroke="currentColor"/>
+    <text dy="1.25em" style="font-size: 0.8em; letter-spacing: 1px">
+        <textPath xlink:href="#arrow-2496258ae27149219065ea299fce3181-1-33" class="displacy-label" startOffset="50%" side="left" fill="currentColor" text-anchor="middle">conj</textPath>
+    </text>
+    <path class="displacy-arrowhead" d="M5985.0,441.5 L5993.0,429.5 5977.0,429.5" fill="currentColor"/>
+</g>
+</svg></span></div></div>
+</div>
+</section>
+<section id="word-vectors">
+<h3>Word vectors<a class="headerlink" href="#word-vectors" title="Permalink to this heading">#</a></h3>
+<p><em>Word embeddings</em>* are numerical representations of words in a multidimensional space, capturing syntactic and semantic relationships based on co-occurrence in large text corpora.</p>
+<p>For example, spaCy’s <code class="docutils literal notranslate"><span class="pre">en_core_web_lg</span></code> model represents over 500,000 words using 300-dimensional vectors.</p>
+<ul class="simple">
+<li><p>Extract lemmatized noun forms from business descriptions using spaCy’s POS tagger.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract nouns</span>
+<span class="n">bus</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">ed</span><span class="p">[</span><span class="n">found</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permno</span><span class="p">,</span> <span class="s1">&#39;pathname&#39;</span><span class="p">]][:</span><span class="n">nlp</span><span class="o">.</span><span class="n">max_length</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">nouns</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;[^a-zA-Z]+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">.</span><span class="n">lemma_</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span>
+                      <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pos_</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NOUN&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">lemma_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nouns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">bus</span><span class="p">[</span><span class="n">permno</span><span class="p">]</span> <span class="o">=</span> <span class="n">nouns</span>        
+<span class="n">store</span><span class="p">[</span><span class="s1">&#39;business&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bus</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 192/192 [03:12&lt;00:00,  1.00s/it]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bus</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;business&#39;</span><span class="p">)</span>
+<span class="n">permnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bus</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permnos</span><span class="p">,</span> <span class="s1">&#39;ticker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Compute the average word vector for NVIDIA’s business description text.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># example of word vector</span>
+<span class="n">vec1</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="n">nvidia</span><span class="p">])</span><span class="o">.</span><span class="n">vector</span>
+<span class="n">vec1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-0.5495549 ,  0.0522468 , -0.70095205,  1.1134154 ,  2.659689  ,
+        0.29627848,  1.3154105 ,  3.8272932 , -2.232087  , -1.3053178 ,
+        6.069174  ,  2.0604212 , -4.542866  ,  2.3177896 , -1.1287518 ,
+        2.3917935 ,  3.1968606 ,  1.5996909 , -2.3438275 ,  0.03434967,
+        0.22686806,  1.7824569 , -2.384547  ,  0.8608239 , -1.2319311 ,
+       -1.774604  , -1.8425854 , -1.7403452 , -0.7102895 ,  1.0869901 ,
+        1.2046682 ,  1.2530138 , -1.1417824 , -0.4984767 ,  0.34321743,
+       -0.37546915,  1.4804035 ,  0.8114897 ,  1.3119912 ,  0.38791072,
+        0.25189775, -0.1770816 ,  0.1785395 ,  1.0146813 , -1.4704382 ,
+        1.6199547 ,  2.021769  , -1.9505422 ,  0.4602281 , -1.281002  ,
+        0.07107421,  2.3507724 , -0.18837918, -3.80177   , -0.54604673,
+        0.5786306 , -1.7812697 ,  1.5003949 ,  0.40720284, -1.5742034 ,
+        2.2474368 ,  1.2563457 , -2.2915537 , -1.2388986 ,  2.408017  ,
+        1.9807013 , -2.2583349 , -3.3942797 ,  0.5241013 ,  3.0477126 ,
+       -0.97571445,  0.7010974 , -1.2003129 ,  0.38448045, -0.30499592,
+        1.3931054 , -1.3777359 ,  0.99693114, -1.8231292 , -0.1508515 ,
+       -2.595402  , -0.6554817 ,  0.96918464,  1.4329529 , -0.2420673 ,
+       -0.08297056, -1.2713333 , -1.8489853 ,  0.77105236, -0.235054  ,
+       -1.2015461 ,  1.0783287 ,  1.5740684 , -2.2493582 ,  0.43573543,
+       -0.56152374,  0.58803385, -0.5924455 ,  0.8756682 ,  1.2502667 ,
+        3.0838132 ,  0.3415912 ,  1.887193  ,  1.8639498 ,  0.2804779 ,
+        4.218261  , -1.1121116 , -1.805579  , -0.22270828, -2.56832   ,
+        2.4099169 , -0.22422643, -1.1543158 ,  0.06765282,  0.83664316,
+        1.7835015 , -2.6237123 , -1.3570241 , -0.46247697, -2.476458  ,
+       -1.9124763 , -2.6474092 ,  0.44025388,  1.1519567 , -0.42653838,
+       -2.8462713 ,  0.2980864 , -2.9798195 ,  2.9588706 , -1.819657  ,
+       -2.464192  ,  0.32522804,  3.3010955 ,  0.7937097 , -0.15216802,
+       -0.42828757, -0.9942988 , -0.44921628,  1.9312432 ,  0.28458852,
+       -0.6386989 , -0.87969756, -0.13129689,  0.85792863,  1.7823339 ,
+        0.16759728, -3.5592077 , -0.2112106 ,  0.06164274,  3.368905  ,
+       -0.3132938 ,  1.2434231 ,  0.21065742,  1.2389091 , -0.66589624,
+        0.5398899 ,  2.8091311 ,  1.7358444 , -0.91453594, -2.6195803 ,
+       -0.9402572 , -1.2330531 ,  0.71588945,  1.699086  , -1.72446   ,
+       -1.1087135 , -2.044233  ,  0.5116665 ,  0.7511035 , -1.510701  ,
+       -1.5667175 , -0.22543517, -0.37966043,  0.95050013,  2.100138  ,
+        1.966492  ,  0.6108724 , -0.31808442, -1.9397378 , -1.2919445 ,
+       -1.7783433 ,  1.7884035 ,  1.1175009 , -1.9068832 , -1.0304377 ,
+        0.6533309 , -0.94094557, -1.4831365 ,  1.5252017 ,  1.73394   ,
+        0.05441582, -1.1678139 ,  0.10588835, -1.8394533 ,  1.820474  ,
+        0.70712596, -2.8049684 , -0.1084957 ,  0.5009497 , -0.05614741,
+       -0.74415725, -1.0815455 , -0.28300503, -1.0312603 ,  3.5577624 ,
+        0.81285644, -3.4548876 ,  1.3007482 , -0.0527516 , -1.5823797 ,
+        0.94375974,  0.01696876, -1.1761798 ,  2.141124  ,  0.8728857 ,
+        1.7190704 ,  2.6591263 , -4.227103  , -0.5748424 ,  0.36368647,
+       -1.838823  ,  1.3353976 , -1.5363356 , -0.98404247, -0.64337295,
+       -2.6795921 ,  0.4494206 ,  2.0296626 ,  1.1337993 , -0.15482494,
+        2.2946403 , -2.6738138 , -1.2725773 ,  1.763216  ,  2.8063855 ,
+        0.46778396, -0.36578366, -0.26262623,  0.9403954 ,  1.0015386 ,
+       -2.0167701 , -1.1006184 , -0.1618742 ,  0.9444055 , -0.27051136,
+        0.33339593, -1.7367964 ,  1.3408182 ,  0.32765946,  1.1382856 ,
+        0.6616231 , -1.8980618 , -3.5863128 , -2.049999  ,  0.11113743,
+       -2.0100012 ,  0.91014284, -1.1377766 ,  0.30864185,  0.8823487 ,
+       -1.5351313 ,  4.9388237 ,  1.6379622 ,  1.251249  ,  1.8976227 ,
+       -0.77638566, -0.17837228,  1.8998926 , -0.8797592 , -0.77389985,
+       -0.19354557, -0.14190447,  0.15318388, -1.0070832 ,  0.3741701 ,
+       -2.8941076 ,  0.9670155 , -1.7984045 , -1.1186454 ,  1.0722593 ,
+        3.4040382 ,  0.38004097,  1.4921545 , -0.0391783 ,  3.8353264 ,
+        0.2084171 ,  1.266672  ,  1.8079621 , -2.3702457 , -0.04794558,
+        0.3776366 , -0.42777508, -0.809167  ,  0.7592459 , -1.5167016 ,
+        0.2553154 ,  1.1878173 , -2.2171407 , -0.76328766,  2.2422533 ],
+      dtype=float32)
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Compute the average word vector for all companies’ business descriptions.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute sentence vectors</span>
+<span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">nlp</span><span class="p">(</span><span class="n">bus</span><span class="p">[</span><span class="n">permno</span><span class="p">])</span><span class="o">.</span><span class="n">vector</span> <span class="k">for</span> <span class="n">permno</span> <span class="ow">in</span> <span class="n">bus</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
+<span class="n">store</span><span class="p">[</span><span class="s1">&#39;vectors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vecs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vecs</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s1">&#39;vectors&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Distance matrix</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bus</span><span class="p">)</span>
+<span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">distances</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">cosine</span><span class="p">(</span><span class="n">vecs</span><span class="p">[</span><span class="n">row</span><span class="p">],</span> <span class="n">vecs</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+        <span class="n">distances</span><span class="p">[</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Identify companies with the most similar business descriptions.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">most_similar</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">permnos</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span>
+    <span class="n">dist</span><span class="p">[</span><span class="n">permnos</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>   <span class="c1"># to ignore own distance</span>
+    <span class="k">return</span> <span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">permnos</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist</span><span class="p">)]]</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;NVIDIA&#39;</span><span class="p">,</span> <span class="s1">&#39;APPLE COMPUTER&#39;</span><span class="p">,</span> <span class="s1">&#39;JNJ&#39;</span><span class="p">,</span> <span class="s1">&#39;EXXON MOBIL&#39;</span><span class="p">,</span> <span class="s1">&#39;AMERICAN EXPRESS&#39;</span><span class="p">]:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="p">)[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">most_similar</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="s1">&#39;comnam&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; is most similar to &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>QUALCOMM INC&#39; is most similar to &#39;NVIDIA&#39;
+SALESFORCE INC&#39; is most similar to &#39;APPLE COMPUTER&#39;
+PFIZER INC&#39; is most similar to &#39;JNJ&#39;
+PIONEER NATURAL RESOURCES CO&#39; is most similar to &#39;EXXON MOBIL&#39;
+U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="dimensionality-reduction">
+<h2>Dimensionality reduction<a class="headerlink" href="#dimensionality-reduction" title="Permalink to this heading">#</a></h2>
+<section id="t-sne-visualization">
+<h3>t-SNE visualization<a class="headerlink" href="#t-sne-visualization" title="Permalink to this heading">#</a></h3>
+<p><strong>T-distributed Stochastic Neighbor Embedding (t-SNE)</strong> visualizes high-dimensional data by converting similarities between points into joint probabilities and minimizing the Kullback-Leibler divergence between the high-dimensional and lower-dimensional representations. t-SNE preserves local structures, making it effective for clustering and uncovering hidden patterns in business descriptions.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">t-SNE in scikit-learn</a></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Reduce business description vectors to 2D using t-SNE and label points with ticker symbols.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;t-SNE visualization of largest decile stocks (</span><span class="si">{</span><span class="n">enddate</span><span class="o">//</span><span class="mi">10000</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/a24fe65bb0a42852d9d8cb87abace0c601ede163538e8d67ddc64c87de4b09a8.png" src="_images/a24fe65bb0a42852d9d8cb87abace0c601ede163538e8d67ddc64c87de4b09a8.png" />
+</div>
+</div>
+</section>
+<section id="dbscan-clustering">
+<h3>DBSCAN clustering<a class="headerlink" href="#dbscan-clustering" title="Permalink to this heading">#</a></h3>
+<p><strong>DBSCAN (Density-Based Spatial Clustering of Applications with Noise)</strong> is an unsupervised clustering algorithm that detects clusters of varying densities and identifies outliers. Unlike k-means, it does not require a predefined number of clusters. Instead, it uses two parameters: epsilon (ε) and the minimum number of points required to form a dense region.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># eps is the most important parameter for DBSCAN</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>   <span class="c1"># default eps</span>
+
+<span class="n">db</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">}))</span>
+<span class="n">n_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">n_noise</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">),</span>  <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;DBSCAN&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>clusters</th>
+      <th>noise</th>
+      <th>eps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>DBSCAN</th>
+      <td>12</td>
+      <td>19</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>Visualize DBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">ColorMap</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="c1"># plot core samples with larger marker size</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+           <span class="n">Z</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+           <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">]],</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># plot non-core samples with smaller marker size</span>
+<span class="n">non_core</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+<span class="n">non_core</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">non_core</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">non_core</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[</span><span class="n">non_core</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span><span class="p">[</span><span class="n">non_core</span><span class="p">]],</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># plot noise samples </span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;darkgrey&quot;</span><span class="p">,</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># annotate with tickers not in core samples</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">xy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">Z</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">db</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="o">+</span><span class="mf">.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-small&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="o">+</span><span class="mf">.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="o">+</span><span class="mf">.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Largest decile stocks (</span><span class="si">{</span><span class="n">enddate</span><span class="o">//</span><span class="mi">10000</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/99f222fa309a3872e859f931fa6613710756b4291d75256d7dec66b336034b9c.png" src="_images/99f222fa309a3872e859f931fa6613710756b4291d75256d7dec66b336034b9c.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>List companies tagged as noisy samples</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Samples tagged as noise:&quot;</span><span class="p">)</span>
+<span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">permnos</span><span class="p">)[</span><span class="n">db</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Samples tagged as noise:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cap</th>
+      <th>capco</th>
+      <th>decile</th>
+      <th>nyse</th>
+      <th>siccd</th>
+      <th>prc</th>
+      <th>naics</th>
+      <th>comnam</th>
+      <th>ticker</th>
+    </tr>
+    <tr>
+      <th>permno</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>75241</th>
+      <td>5.246653e+07</td>
+      <td>5.246653e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>1311</td>
+      <td>224.88</td>
+      <td>211120</td>
+      <td>PIONEER NATURAL RESOURCES CO</td>
+      <td>PXD</td>
+    </tr>
+    <tr>
+      <th>21207</th>
+      <td>4.770164e+07</td>
+      <td>4.770164e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>1041</td>
+      <td>41.39</td>
+      <td>212220</td>
+      <td>NEWMONT CORP</td>
+      <td>NEM</td>
+    </tr>
+    <tr>
+      <th>81774</th>
+      <td>6.104440e+07</td>
+      <td>6.104440e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>1021</td>
+      <td>42.57</td>
+      <td>212230</td>
+      <td>FREEPORT MCMORAN INC</td>
+      <td>FCX</td>
+    </tr>
+    <tr>
+      <th>82800</th>
+      <td>6.654158e+07</td>
+      <td>6.654158e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>1021</td>
+      <td>86.07</td>
+      <td>212230</td>
+      <td>SOUTHERN COPPER CORP</td>
+      <td>SCCO</td>
+    </tr>
+    <tr>
+      <th>69796</th>
+      <td>4.440053e+07</td>
+      <td>4.440053e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2084</td>
+      <td>241.75</td>
+      <td>312130</td>
+      <td>CONSTELLATION BRANDS INC</td>
+      <td>STZ</td>
+    </tr>
+    <tr>
+      <th>11850</th>
+      <td>4.005332e+08</td>
+      <td>4.005332e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2911</td>
+      <td>99.98</td>
+      <td>324110</td>
+      <td>EXXON MOBIL CORP</td>
+      <td>XOM</td>
+    </tr>
+    <tr>
+      <th>78975</th>
+      <td>1.749684e+08</td>
+      <td>1.749684e+08</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7370</td>
+      <td>625.03</td>
+      <td>513210</td>
+      <td>INTUIT INC</td>
+      <td>INTU</td>
+    </tr>
+    <tr>
+      <th>26403</th>
+      <td>1.652592e+08</td>
+      <td>1.652592e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4833</td>
+      <td>90.29</td>
+      <td>516120</td>
+      <td>DISNEY WALT CO</td>
+      <td>DIS</td>
+    </tr>
+    <tr>
+      <th>44644</th>
+      <td>9.568078e+07</td>
+      <td>9.568078e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7374</td>
+      <td>232.97</td>
+      <td>518210</td>
+      <td>AUTOMATIC DATA PROCESSING INC</td>
+      <td>ADP</td>
+    </tr>
+    <tr>
+      <th>47896</th>
+      <td>4.917605e+08</td>
+      <td>4.917605e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6021</td>
+      <td>170.10</td>
+      <td>522110</td>
+      <td>JPMORGAN CHASE &amp; CO</td>
+      <td>JPM</td>
+    </tr>
+    <tr>
+      <th>90993</th>
+      <td>7.350871e+07</td>
+      <td>7.350871e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6231</td>
+      <td>128.43</td>
+      <td>523210</td>
+      <td>INTERCONTINENTALEXCHANGE GRP INC</td>
+      <td>ICE</td>
+    </tr>
+    <tr>
+      <th>89626</th>
+      <td>7.565405e+07</td>
+      <td>7.565405e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>6200</td>
+      <td>210.60</td>
+      <td>523210</td>
+      <td>C M E GROUP INC</td>
+      <td>CME</td>
+    </tr>
+    <tr>
+      <th>17478</th>
+      <td>1.395567e+08</td>
+      <td>1.395567e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6282</td>
+      <td>440.52</td>
+      <td>523930</td>
+      <td>S &amp; P GLOBAL INC</td>
+      <td>SPGI</td>
+    </tr>
+    <tr>
+      <th>61621</th>
+      <td>4.285840e+07</td>
+      <td>4.285840e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>8700</td>
+      <td>119.11</td>
+      <td>541219</td>
+      <td>PAYCHEX INC</td>
+      <td>PAYX</td>
+    </tr>
+    <tr>
+      <th>13628</th>
+      <td>5.769654e+07</td>
+      <td>5.769654e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7372</td>
+      <td>276.06</td>
+      <td>541511</td>
+      <td>WORKDAY INC</td>
+      <td>WDAY</td>
+    </tr>
+    <tr>
+      <th>48506</th>
+      <td>7.147248e+07</td>
+      <td>7.147248e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>7323</td>
+      <td>390.56</td>
+      <td>561450</td>
+      <td>MOODYS CORP</td>
+      <td>MCO</td>
+    </tr>
+    <tr>
+      <th>92402</th>
+      <td>4.473782e+07</td>
+      <td>4.473782e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>7389</td>
+      <td>565.65</td>
+      <td>561499</td>
+      <td>M S C I INC</td>
+      <td>MSCI</td>
+    </tr>
+    <tr>
+      <th>85913</th>
+      <td>6.551968e+07</td>
+      <td>6.551968e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7011</td>
+      <td>225.51</td>
+      <td>721110</td>
+      <td>MARRIOTT INTERNATIONAL INC NEW</td>
+      <td>MAR</td>
+    </tr>
+    <tr>
+      <th>14338</th>
+      <td>4.669516e+07</td>
+      <td>4.669516e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>7011</td>
+      <td>182.09</td>
+      <td>721110</td>
+      <td>HILTON WORLDWIDE HOLDINGS INC</td>
+      <td>HLT</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="umap-vizualization">
+<h3>UMAP vizualization<a class="headerlink" href="#umap-vizualization" title="Permalink to this heading">#</a></h3>
+<p><strong>UMAP (Uniform Manifold Approximation and Projection)</strong> is a dimensionality reduction technique that constructs a high-dimensional graph of data points and optimizes a lower-dimensional representation while preserving essential relationships. Compared to t-SNE, UMAP is faster, scales better for large datasets, and retains more global structure.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/index.html">UMAP Documentation</a></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">umap</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_dist</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;UMAP visualization of largest decile stocks (</span><span class="si">{</span><span class="n">enddate</span><span class="o">//</span><span class="mi">10000</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ee0833563d1eae2cacc13c32139ad52425d0c0dbd496ed39ec3b15b6bb6ce25c.png" src="_images/ee0833563d1eae2cacc13c32139ad52425d0c0dbd496ed39ec3b15b6bb6ce25c.png" />
+</div>
+</div>
+</section>
+<section id="hdbscan-clustering">
+<h3>HDBSCAN clustering<a class="headerlink" href="#hdbscan-clustering" title="Permalink to this heading">#</a></h3>
+<p><strong>HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise)</strong> extends DBSCAN by varying the epsilon parameter and optimizing cluster stability. This makes it more robust to variations in density and parameter selection.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># eps is the most important parameter for DBSCAN</span>
+<span class="n">hdb</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">HDBSCAN</span><span class="p">()</span>
+<span class="n">hdb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+<span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">({</span><span class="o">-</span><span class="mi">1</span><span class="p">}))</span>
+<span class="n">n_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="n">n_noise</span><span class="p">),</span>  <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;HDBSCAN&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>clusters</th>
+      <th>noise</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>HDBSCAN</th>
+      <td>14</td>
+      <td>32</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<ul class="simple">
+<li><p>Visualize HDBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">ColorMap</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="c1"># plot core samples with larger marker size</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+           <span class="n">Z</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+           <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]],</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># plot noise samples </span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">Z</span><span class="p">[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;darkgrey&quot;</span><span class="p">,</span>
+           <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># annotate with tickers not in core samples</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">xy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">Z</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="o">+</span><span class="mf">.01</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-small&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="o">+</span><span class="mf">.01</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;medium&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Largest decile stocks (</span><span class="si">{</span><span class="n">enddate</span><span class="o">//</span><span class="mi">10000</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/c3409ab909fb6cff3eda058c5aec5c28b5837e8ca53ddbbb557265ca3f2445a7.png" src="_images/c3409ab909fb6cff3eda058c5aec5c28b5837e8ca53ddbbb557265ca3f2445a7.png" />
+</div>
+</div>
+<ul class="simple">
+<li><p>List companies tagged as noisy samples</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Samples tagged as noise:&quot;</span><span class="p">)</span>
+<span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">permnos</span><span class="p">)[</span><span class="n">hdb</span><span class="o">.</span><span class="n">labels_</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;naics&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Samples tagged as noise:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cap</th>
+      <th>capco</th>
+      <th>decile</th>
+      <th>nyse</th>
+      <th>siccd</th>
+      <th>prc</th>
+      <th>naics</th>
+      <th>comnam</th>
+      <th>ticker</th>
+    </tr>
+    <tr>
+      <th>permno</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>69796</th>
+      <td>4.440053e+07</td>
+      <td>4.440053e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2084</td>
+      <td>241.75</td>
+      <td>312130</td>
+      <td>CONSTELLATION BRANDS INC</td>
+      <td>STZ</td>
+    </tr>
+    <tr>
+      <th>11850</th>
+      <td>4.005332e+08</td>
+      <td>4.005332e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2911</td>
+      <td>99.98</td>
+      <td>324110</td>
+      <td>EXXON MOBIL CORP</td>
+      <td>XOM</td>
+    </tr>
+    <tr>
+      <th>36468</th>
+      <td>7.983580e+07</td>
+      <td>7.983580e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2851</td>
+      <td>311.90</td>
+      <td>325510</td>
+      <td>SHERWIN WILLIAMS CO</td>
+      <td>SHW</td>
+    </tr>
+    <tr>
+      <th>70578</th>
+      <td>5.655752e+07</td>
+      <td>5.655752e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2841</td>
+      <td>198.35</td>
+      <td>325611</td>
+      <td>ECOLAB INC</td>
+      <td>ECL</td>
+    </tr>
+    <tr>
+      <th>18163</th>
+      <td>3.453781e+08</td>
+      <td>3.453781e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2844</td>
+      <td>146.54</td>
+      <td>325620</td>
+      <td>PROCTER &amp; GAMBLE CO</td>
+      <td>PG</td>
+    </tr>
+    <tr>
+      <th>18729</th>
+      <td>6.563098e+07</td>
+      <td>6.563098e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>2844</td>
+      <td>79.71</td>
+      <td>325620</td>
+      <td>COLGATE PALMOLIVE CO</td>
+      <td>CL</td>
+    </tr>
+    <tr>
+      <th>22103</th>
+      <td>5.548783e+07</td>
+      <td>5.548783e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3491</td>
+      <td>97.33</td>
+      <td>332911</td>
+      <td>EMERSON ELECTRIC CO</td>
+      <td>EMR</td>
+    </tr>
+    <tr>
+      <th>19350</th>
+      <td>1.120656e+08</td>
+      <td>1.120656e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3523</td>
+      <td>399.87</td>
+      <td>333111</td>
+      <td>DEERE &amp; CO</td>
+      <td>DE</td>
+    </tr>
+    <tr>
+      <th>14702</th>
+      <td>1.345954e+08</td>
+      <td>1.345954e+08</td>
+      <td>1</td>
+      <td>False</td>
+      <td>3550</td>
+      <td>162.07</td>
+      <td>333248</td>
+      <td>APPLIED MATERIALS INC</td>
+      <td>AMAT</td>
+    </tr>
+    <tr>
+      <th>41355</th>
+      <td>5.918889e+07</td>
+      <td>5.918889e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3593</td>
+      <td>460.70</td>
+      <td>333995</td>
+      <td>PARKER HANNIFIN CORP</td>
+      <td>PH</td>
+    </tr>
+    <tr>
+      <th>56573</th>
+      <td>7.881408e+07</td>
+      <td>7.881408e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3569</td>
+      <td>261.94</td>
+      <td>333999</td>
+      <td>ILLINOIS TOOL WORKS INC</td>
+      <td>ITW</td>
+    </tr>
+    <tr>
+      <th>12490</th>
+      <td>1.493406e+08</td>
+      <td>1.493406e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3571</td>
+      <td>163.55</td>
+      <td>334111</td>
+      <td>INTERNATIONAL BUSINESS MACHS COR</td>
+      <td>IBM</td>
+    </tr>
+    <tr>
+      <th>77338</th>
+      <td>5.827867e+07</td>
+      <td>5.827867e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>3823</td>
+      <td>545.17</td>
+      <td>334513</td>
+      <td>ROPER TECHNOLOGIES INC</td>
+      <td>ROP</td>
+    </tr>
+    <tr>
+      <th>22592</th>
+      <td>6.037929e+07</td>
+      <td>6.037929e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>3841</td>
+      <td>109.32</td>
+      <td>339112</td>
+      <td>3M CO</td>
+      <td>MMM</td>
+    </tr>
+    <tr>
+      <th>66181</th>
+      <td>3.449080e+08</td>
+      <td>3.449080e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>5211</td>
+      <td>346.55</td>
+      <td>444110</td>
+      <td>HOME DEPOT INC</td>
+      <td>HD</td>
+    </tr>
+    <tr>
+      <th>84788</th>
+      <td>1.556169e+09</td>
+      <td>1.556169e+09</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7370</td>
+      <td>151.94</td>
+      <td>454110</td>
+      <td>AMAZON COM INC</td>
+      <td>AMZN</td>
+    </tr>
+    <tr>
+      <th>48725</th>
+      <td>1.497292e+08</td>
+      <td>1.497292e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4011</td>
+      <td>245.62</td>
+      <td>482111</td>
+      <td>UNION PACIFIC CORP</td>
+      <td>UNP</td>
+    </tr>
+    <tr>
+      <th>64311</th>
+      <td>5.345403e+07</td>
+      <td>5.345403e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4731</td>
+      <td>236.38</td>
+      <td>488510</td>
+      <td>NORFOLK SOUTHERN CORP</td>
+      <td>NSC</td>
+    </tr>
+    <tr>
+      <th>60628</th>
+      <td>6.321543e+07</td>
+      <td>6.321543e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4513</td>
+      <td>252.97</td>
+      <td>492110</td>
+      <td>FEDEX CORP</td>
+      <td>FDX</td>
+    </tr>
+    <tr>
+      <th>26403</th>
+      <td>1.652592e+08</td>
+      <td>1.652592e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4833</td>
+      <td>90.29</td>
+      <td>516120</td>
+      <td>DISNEY WALT CO</td>
+      <td>DIS</td>
+    </tr>
+    <tr>
+      <th>47896</th>
+      <td>4.917605e+08</td>
+      <td>4.917605e+08</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6021</td>
+      <td>170.10</td>
+      <td>522110</td>
+      <td>JPMORGAN CHASE &amp; CO</td>
+      <td>JPM</td>
+    </tr>
+    <tr>
+      <th>92108</th>
+      <td>9.302455e+07</td>
+      <td>9.302455e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6282</td>
+      <td>130.92</td>
+      <td>523940</td>
+      <td>BLACKSTONE INC</td>
+      <td>BX</td>
+    </tr>
+    <tr>
+      <th>87842</th>
+      <td>4.894876e+07</td>
+      <td>4.894876e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6311</td>
+      <td>66.13</td>
+      <td>524113</td>
+      <td>METLIFE INC</td>
+      <td>MET</td>
+    </tr>
+    <tr>
+      <th>57904</th>
+      <td>4.821135e+07</td>
+      <td>4.821135e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6321</td>
+      <td>82.50</td>
+      <td>524114</td>
+      <td>AFLAC INC</td>
+      <td>AFL</td>
+    </tr>
+    <tr>
+      <th>59459</th>
+      <td>4.350773e+07</td>
+      <td>4.350773e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6331</td>
+      <td>190.49</td>
+      <td>524126</td>
+      <td>TRAVELERS COMPANIES INC</td>
+      <td>TRV</td>
+    </tr>
+    <tr>
+      <th>64390</th>
+      <td>9.318533e+07</td>
+      <td>9.318533e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6331</td>
+      <td>159.28</td>
+      <td>524126</td>
+      <td>PROGRESSIVE CORP OH</td>
+      <td>PGR</td>
+    </tr>
+    <tr>
+      <th>66800</th>
+      <td>4.756321e+07</td>
+      <td>4.756321e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6331</td>
+      <td>67.75</td>
+      <td>524126</td>
+      <td>AMERICAN INTERNATIONAL GROUP INC</td>
+      <td>AIG</td>
+    </tr>
+    <tr>
+      <th>38093</th>
+      <td>4.855159e+07</td>
+      <td>4.855159e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6411</td>
+      <td>224.88</td>
+      <td>524210</td>
+      <td>GALLAGHER ARTHUR J &amp; CO</td>
+      <td>AJG</td>
+    </tr>
+    <tr>
+      <th>45751</th>
+      <td>9.342235e+07</td>
+      <td>9.342235e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>6411</td>
+      <td>189.47</td>
+      <td>524210</td>
+      <td>MARSH &amp; MCLENNAN COS INC</td>
+      <td>MMC</td>
+    </tr>
+    <tr>
+      <th>89393</th>
+      <td>2.107022e+08</td>
+      <td>2.107022e+08</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7841</td>
+      <td>486.88</td>
+      <td>532282</td>
+      <td>NETFLIX INC</td>
+      <td>NFLX</td>
+    </tr>
+    <tr>
+      <th>13511</th>
+      <td>9.297566e+07</td>
+      <td>9.297566e+07</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7371</td>
+      <td>294.88</td>
+      <td>541511</td>
+      <td>PALO ALTO NETWORKS INC</td>
+      <td>PANW</td>
+    </tr>
+    <tr>
+      <th>11955</th>
+      <td>7.213700e+07</td>
+      <td>7.213700e+07</td>
+      <td>1</td>
+      <td>True</td>
+      <td>4953</td>
+      <td>179.10</td>
+      <td>562219</td>
+      <td>WASTE MANAGEMENT INC DEL</td>
+      <td>WM</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>References:</strong></p>
+<p>Greg Durrett, 2023, “CS388 Natural Language Processing course materisl”, retrieved from <a class="reference external" href="https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html">https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html</a></p>
+<p>Text-Based Network Industries and Endogenous Product Differentiation.
+Gerard Hoberg and Gordon Phillips, 2016, Journal of Political Economy 124 (5), 1423-1465.</p>
+<p>Product Market Synergies and Competition in Mergers and Acquisitions: A Text-Based Analysis.
+Gerard Hoberg and Gordon Phillips, 2010, Review of Financial Studies 23 (10), 3773-3811.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="5.2_management_sentiment.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Management Sentiment Analysis</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="6.1_classification_models.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Machine Learning: Classification</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#syntactic-analysis">Syntactic analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spacy">SpaCy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lemmatization">Lemmatization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-of-speech">Part-of-speech</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#named-entity-recognition">Named entity recognition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-parsing">Dependency parsing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-vectors">Word vectors</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction">Dimensionality reduction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#t-sne-visualization">t-SNE visualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dbscan-clustering">DBSCAN clustering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#umap-vizualization">UMAP vizualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hdbscan-clustering">HDBSCAN clustering</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

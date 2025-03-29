@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.database.sql &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.database.sql</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.database.sql</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;SQL class wrapper, with convenience methods for pandas DataFrames</span>
+
+<span class="sd">Copyright 2022-2024, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">sqlalchemy</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">text</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">String</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">sessionmaker</span>      
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">Database</span>
+
+<div class="viewcode-block" id="as_dtypes"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.as_dtypes">[docs]</a><span class="k">def</span> <span class="nf">as_dtypes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
+              <span class="n">columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> 
+              <span class="n">drop_duplicates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> 
+              <span class="n">sort_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> 
+              <span class="n">keep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span>
+              <span class="n">replace</span> <span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{})</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert DataFrame dtypes to the given sqlalchemy Column types</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      df: Input DataFrame to apply new data types from target columns</span>
+<span class="sd">      columns: Target sqlalchemy column types as dict of {column: type}</span>
+<span class="sd">      sort_values: List of column names to sort by</span>
+<span class="sd">      drop_duplicates: list of fields if all duplicated to drop rows</span>
+<span class="sd">      keep : &#39;first&#39; or &#39;last&#39; row to keep if drop duplicates</span>
+<span class="sd">      replace : dict of {column label: tuple(old, replacement) values}</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      DataFrame with columns and rows transformed</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Columns of DataFrame are dropped if not specified in columns input</span>
+<span class="sd">    - If input is None, then return empty DataFrame with given column types</span>
+<span class="sd">    - Blank values in boolean and int fields are set to False/0.</span>
+<span class="sd">    - Invalid/blank values in double field are coerced to NaN.</span>
+<span class="sd">    - Invalid values in int field are coerced to 0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">)</span> <span class="c1"># clean column names</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span>  <span class="c1"># reorder and only keep columns</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sort_values</span><span class="p">):</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">sort_values</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">drop_duplicates</span><span class="p">):</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="n">drop_duplicates</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">keep</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">replace</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">*</span><span class="n">replace</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Integer</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">SmallInteger</span><span class="p">):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(?&lt;=\d)-&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># crsp dates</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Float</span><span class="p">):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">String</span><span class="p">):</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>\
+                                                 <span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;(as_dtypes) Unknown type for column: &#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;(as_dtypes) bad data in column: &#39;</span> <span class="o">+</span> <span class="n">col</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+
+<div class="viewcode-block" id="SQL"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL">[docs]</a><span class="k">class</span> <span class="nc">SQL</span><span class="p">(</span><span class="n">Database</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interface to sqlalchemy, with convenience functions for dataframes&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                 <span class="n">port</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;3306&#39;</span><span class="p">,</span>
+                 <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">autocommit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+                 <span class="n">charset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span>
+                 <span class="n">temp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;temp</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8192</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mysql+pymysql://</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s2">&quot;</span>\
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;?charset=</span><span class="si">{</span><span class="n">charset</span><span class="si">}</span><span class="s2">&amp;local_infile=1&amp;autocommit=</span><span class="si">{</span><span class="n">autocommit</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">temp</span>  <span class="c1"># name of temp table for this process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_engine</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SQL.create_database"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.create_database">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_database</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                        <span class="n">port</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;3306&#39;</span><span class="p">,</span> <span class="n">database</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new database using this user&#39;s credentials&quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;mysql+pymysql://</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>        
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">engine</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">text</span><span class="p">(</span><span class="s2">&quot;COMMIT&quot;</span><span class="p">))</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">text</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CREATE DATABASE </span><span class="si">{</span><span class="n">database</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SQL.create_engine"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.create_engine">[docs]</a>    <span class="k">def</span> <span class="nf">create_engine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call and store sqlalchemy.create_engine() and MetaData()&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">create_engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">MetaData</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SQL.rollback"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.rollback">[docs]</a>    <span class="k">def</span> <span class="nf">rollback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call sessionmaker() to rollback current transaction in progress&quot;&quot;&quot;</span>
+        <span class="n">Session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SQL.Table"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.Table">[docs]</a>    <span class="k">def</span> <span class="nf">Table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Table</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Wraps sqlalchemy.Table() after removing key from metadata&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>    <span class="c1"># remove from metadata if existed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1">#self.metadata.create_all(self.engine)</span>
+        <span class="k">return</span> <span class="n">table</span></div>
+
+<div class="viewcode-block" id="SQL.create_all"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.create_all">[docs]</a>    <span class="k">def</span> <span class="nf">create_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create all tables in metadata&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>        </div>
+
+<div class="viewcode-block" id="SQL.Index"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.Index">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">Index</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Wraps sqlalchemy.Index() with auto-generated index name from args&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sqlalchemy</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SQL.remove"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a table by key name from metadata instance&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SQL.run"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Execute sql command</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          q: query string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          The result set {&#39;data&#39;, &#39;columns&#39;}, or None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          RuntimeError: failed to run query</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&quot;show databases&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&quot;show tables&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&#39;select * from testing&#39;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&#39;select distinct permno from benchmarks&#39;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&quot;show create table _&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&quot;describe _&quot;)</span>
+<span class="sd">          &gt;&gt;&gt; sql.run(&quot;truncate table _&quot;, fetch=False)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">text</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_engine</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;(sql.run) &#39;</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SQL.summary"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">val</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return summary statistics for a field, optionally grouped-by key</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          table: Physical name of table</span>
+<span class="sd">          val: Field name to summarise</span>
+<span class="sd">          key: Field to group by</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame with columns (count, average, max, min)</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">          &gt;&gt;&gt; sql.summary(&#39;annual&#39;, &#39;revt&#39;, &#39;sic&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">, COUNT(*) as count, AVG(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as avg, &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot; STD(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as std, MAX(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as max, MIN(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as min &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot; FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> GROUP BY </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT COUNT(*) as count, AVG(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as avg, &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot;  MAX(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as max, MIN(</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">) as min FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">val</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SQL.load_infile"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.load_infile">[docs]</a>    <span class="k">def</span> <span class="nf">load_infile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">csvfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">options</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load table from csv file, using mysql&#39;s load data local infile</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          table: Physical name of table to load into</span>
+<span class="sd">          csvfile: CSV filename</span>
+<span class="sd">          options: String appended to SQL load infile query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LOAD DATA LOCAL INFILE &#39;</span><span class="si">{</span><span class="n">csvfile</span><span class="si">}</span><span class="s2">&#39; INTO TABLE </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> &quot;</span>
+             <span class="sa">f</span><span class="s2">&quot; FIELDS TERMINATED BY &#39;,&#39; ENCLOSED BY &#39;</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span>
+             <span class="sa">f</span><span class="s2">&quot; LINES TERMINATED BY &#39;</span><span class="se">\\</span><span class="s2">n&#39; IGNORE 1 ROWS </span><span class="si">{</span><span class="n">options</span><span class="si">}</span><span class="s2">;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(load_infile)&quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;(load_infile) Got exception = &quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="s2">&quot; Query = &quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="SQL.load_dataframe"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.load_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                       <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+                       <span class="n">index_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                       <span class="n">to_sql</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                       <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load dataframe into sql table, ignoring duplicate primary keys</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          table: Physical name of table to insert into</span>
+<span class="sd">          df: Source dataframe</span>
+<span class="sd">          index_label: Column name to load index as, None (default) to ignore</span>
+<span class="sd">          to_sql: first attempt pandas.to_sql(), which may fail if duplicate</span>
+<span class="sd">                  keys; then/else insert ignore from temp table instead.</span>
+<span class="sd">          replace: set True to overwrite table, else append (default)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">)</span>
+        <span class="n">chunksize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">32</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>     <span class="c1"># to_sql raises exception if exist duplicate keys</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">to_sql</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+                      <span class="n">if_exists</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;replace&#39;</span> <span class="k">if</span> <span class="n">replace</span> <span class="k">else</span> <span class="s1">&#39;append&#39;</span><span class="p">),</span>
+                      <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">,</span>
+                      <span class="n">index</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">index_label</span><span class="p">),</span>
+                      <span class="n">index_label</span><span class="o">=</span><span class="n">index_label</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># duplicates exist</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(load_dataframe) Retrying insert ignore&quot;</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;drop table if exists &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span>
+                      <span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">,</span>
+                      <span class="n">chunksize</span><span class="o">=</span><span class="n">chunksize</span><span class="p">,</span>
+                      <span class="n">index</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">index_label</span><span class="p">),</span>
+                      <span class="n">index_label</span><span class="o">=</span><span class="n">index_label</span><span class="p">)</span>
+            <span class="c1"># warnings.filterwarnings(&quot;ignore&quot;, category=pymysql.Warning)</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INSERT IGNORE INTO </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">)&quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot; SELECT </span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2"> FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+            <span class="c1"># warnings.filterwarnings(&quot;default&quot;, category=pymysql.Warning)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;drop table if exists &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SQL.read_dataframe"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.read_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">read_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return sql query result as data frame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          q: query string or SQLAlchemy Selectable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame of results</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          RuntimeError: Failed to run query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;read_dataframe error in database: &#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="o">**</span><span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SQL.pivot"><a class="viewcode-back" href="../../../finds.database.sql.html#finds.database.sql.SQL.pivot">[docs]</a>    <span class="k">def</span> <span class="nf">pivot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">table</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+              <span class="n">index</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+              <span class="n">columns</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+              <span class="n">values</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+              <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+              <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">chunksize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return sql query result as pivoted data frame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          table: Physical name of table to retrieve from</span>
+<span class="sd">          index: Field name to select as dataframe index</span>
+<span class="sd">          columns: Field name to select as column labels</span>
+<span class="sd">          values: Field name to select as values</span>
+<span class="sd">          where: Where clause, optional</span>
+<span class="sd">          limit: Maximum optional number of rows or chunks to return</span>
+<span class="sd">          chunksize: To optionally buildup results in chunks of this size</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Query result as a pivoted (wide) DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">where</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">where</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;WHERE&#39;</span><span class="p">):</span>
+            <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;WHERE &#39;</span> <span class="o">+</span> <span class="n">where</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chunksize</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># execute in chunks</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;SELECT DISTINCT </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+            <span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+            <span class="n">n_splits</span> <span class="o">=</span> <span class="n">n_features</span> <span class="o">//</span> <span class="n">chunksize</span>
+            <span class="k">if</span> <span class="n">n_splits</span> <span class="o">*</span> <span class="n">chunksize</span> <span class="o">&lt;</span> <span class="n">n_features</span><span class="p">:</span>
+                <span class="n">n_splits</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_splits</span><span class="p">):</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">chunksize</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="n">chunksize</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;slice #&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">limit</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">limit</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">where</span> <span class="o">+=</span> <span class="s2">&quot; AND &quot;</span> <span class="k">if</span> <span class="n">where</span> <span class="k">else</span> <span class="s2">&quot; WHERE &quot;</span>
+                <span class="n">indexes</span> <span class="o">=</span> <span class="s2">&quot;&#39;,&#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">values</span><span class="si">}</span><span class="s2"> FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> in (&#39;</span><span class="si">{</span><span class="n">indexes</span><span class="si">}</span><span class="s2">&#39;)&quot;</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                                          <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+                                          <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">),</span>
+                                 <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># execute as single chunk</span>
+            <span class="n">where</span> <span class="o">+=</span> <span class="s2">&quot; LIMIT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span> <span class="k">if</span> <span class="n">limit</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">columns</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">values</span><span class="si">}</span><span class="s2"> FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(pivot)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+                                                <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
+                                                <span class="n">values</span><span class="o">=</span><span class="n">values</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Create new databases</span>
+    <span class="n">SQL</span><span class="o">.</span><span class="n">create_database</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">])</span>
+    <span class="n">SQL</span><span class="o">.</span><span class="n">create_database</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Show data tables</span>
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;show tables&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Show user tables</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;show tables&#39;</span><span class="p">))</span>
+
+    <span class="c1"># test a transaction</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;2.5&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span>
+                   <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+                   <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">])</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;drop table if exists test&#39;</span><span class="p">)</span>
+    <span class="n">user</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;select * from test&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;test:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="o">**</span><span class="n">s</span><span class="p">))</span>
+        
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

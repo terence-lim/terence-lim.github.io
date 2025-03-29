@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.recipes.finance &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.recipes.graph" href="finds.recipes.graph.html" />
+    <link rel="prev" title="finds.recipes.econs" href="finds.recipes.econs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.recipes.html">finds.recipes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.recipes.econs.html">finds.recipes.econs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.recipes.finance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.bond_price"><code class="docutils literal notranslate"><span class="pre">bond_price()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.bootstrap_risk"><code class="docutils literal notranslate"><span class="pre">bootstrap_risk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.bootstrap_spot"><code class="docutils literal notranslate"><span class="pre">bootstrap_spot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.efficient_portfolio"><code class="docutils literal notranslate"><span class="pre">efficient_portfolio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.forwards_from_spots"><code class="docutils literal notranslate"><span class="pre">forwards_from_spots()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.gmv_portfolio"><code class="docutils literal notranslate"><span class="pre">gmv_portfolio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.halflife"><code class="docutils literal notranslate"><span class="pre">halflife()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.historical_risk"><code class="docutils literal notranslate"><span class="pre">historical_risk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.hl_vol"><code class="docutils literal notranslate"><span class="pre">hl_vol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.kupiec"><code class="docutils literal notranslate"><span class="pre">kupiec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.kupiec_LR"><code class="docutils literal notranslate"><span class="pre">kupiec_LR()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.macaulay_duration"><code class="docutils literal notranslate"><span class="pre">macaulay_duration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.maximum_drawdown"><code class="docutils literal notranslate"><span class="pre">maximum_drawdown()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.modified_convexity"><code class="docutils literal notranslate"><span class="pre">modified_convexity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.modified_duration"><code class="docutils literal notranslate"><span class="pre">modified_duration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.ohlc_vol"><code class="docutils literal notranslate"><span class="pre">ohlc_vol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.parametric_risk"><code class="docutils literal notranslate"><span class="pre">parametric_risk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.quadprog"><code class="docutils literal notranslate"><span class="pre">quadprog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.recipes.finance.tangency_portfolio"><code class="docutils literal notranslate"><span class="pre">tangency_portfolio()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.recipes.graph.html">finds.recipes.graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.recipes.filters.html">finds.recipes.filters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.recipes.learn.html">finds.recipes.learn</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.recipes.html">finds.recipes</a></li>
+      <li class="breadcrumb-item active">finds.recipes.finance</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.recipes.finance.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.recipes.finance">
+<span id="finds-recipes-finance"></span><h1>finds.recipes.finance<a class="headerlink" href="#module-finds.recipes.finance" title="Permalink to this heading"></a></h1>
+<p>Financial functions</p>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.bond_price">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">bond_price</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coupon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#bond_price"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.bond_price" title="Permalink to this definition"></a></dt>
+<dd><p>Compute present value of bond given spot rates or yield-to-maturity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coupon</strong> – Annual coupon rate</p></li>
+<li><p><strong>n</strong> – Number of remaining coupons</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>yields</strong> – Simple annual yield-to-maturity or spot rates each period</p></li>
+<li><p><strong>par</strong> – face or par value of bond</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Present value of bond</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.bootstrap_risk">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">bootstrap_risk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#bootstrap_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.bootstrap_risk" title="Permalink to this definition"></a></dt>
+<dd><p>Returned bootstrapped risk statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – Series of observed returns</p></li>
+<li><p><strong>alpha</strong> – VaR level (e.g. 0.95)</p></li>
+<li><p><strong>n</strong> – Number of bootstrap samples</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of n bootstrapped samples of risk statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.bootstrap_spot">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">bootstrap_spot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coupon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#bootstrap_spot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.bootstrap_spot" title="Permalink to this definition"></a></dt>
+<dd><p>Compute spot rate to maturity of par bond from yield and sequence of spots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coupon</strong> – Annual coupon rate</p></li>
+<li><p><strong>spots</strong> – Simple annual spot rates each period (excl last period before maturity</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>price</strong> – Present value of bond</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Simple spot interest rate till maturity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.efficient_portfolio">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">efficient_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#efficient_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.efficient_portfolio" title="Permalink to this definition"></a></dt>
+<dd><p>Returns weights of minimum variance portfolio that exceeds target return</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> – covariance matrix</p></li>
+<li><p><strong>mu</strong> – vector of expected excess (of the risk-free) returns</p></li>
+<li><p><strong>target</strong> – required minimum expected return of portfolio</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of weights, volatility and mean of efficient portfolio that achieves target</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.forwards_from_spots">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">forwards_from_spots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spots</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#forwards_from_spots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.forwards_from_spots" title="Permalink to this definition"></a></dt>
+<dd><p>Compute forward rates given spot rates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spots</strong> – Sequence of simple annual spot rates</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>skip</strong> – Number of initial periods skipped</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of forward rates, excluding first period of spot rates input</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.gmv_portfolio">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">gmv_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#gmv_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.gmv_portfolio" title="Permalink to this definition"></a></dt>
+<dd><p>Returns position weights of global minimum variance portfolio</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> – covariance matrix</p></li>
+<li><p><strong>mu</strong> – vector of expected excess (of the risk-free) returns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of weights, volatility and mean (if mu provided) of the GMV</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.halflife">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">halflife</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#halflife"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.halflife" title="Permalink to this definition"></a></dt>
+<dd><p>Returns halflife from alpha = -ln(2)/ln(lambda), where lambda=1-alpha</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.historical_risk">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">historical_risk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#historical_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.historical_risk" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate historical VaR, ES, and sample moments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – Series of observed returns</p></li>
+<li><p><strong>alpha</strong> – Var level (e.g. 0.95)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.hl_vol">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">hl_vol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#hl_vol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.hl_vol" title="Permalink to this definition"></a></dt>
+<dd><p>Compute Parkinson volatility from high and low prices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>high</strong> – DataFrame of high prices (observations x stocks)</p></li>
+<li><p><strong>low</strong> – DataFrame of low prices (observations x stocks)</p></li>
+<li><p><strong>last</strong> – DataFrame of last prices, for forward filling if high low missing</p></li>
+<li><p><strong>Returns</strong> – Estimated volatility</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.kupiec">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">kupiec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VaR</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#kupiec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.kupiec" title="Permalink to this definition"></a></dt>
+<dd><p>Kupiec proportion of failures likelihood ratio test of VaR</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – Series of observed returns</p></li>
+<li><p><strong>VaR</strong> – Series of predicted VaR</p></li>
+<li><p><strong>alpha</strong> – VaR level (e.g. 0.95)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of likelihood statistic and pvalue</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.kupiec_LR">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">kupiec_LR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#kupiec_LR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.kupiec_LR" title="Permalink to this definition"></a></dt>
+<dd><p>Compute Kupiec likelihood ratio given s violations in n trials</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – number of violations</p></li>
+<li><p><strong>n</strong> – number of observations</p></li>
+<li><p><strong>alpha</strong> – VaR level (e.g. 0.95)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.macaulay_duration">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">macaulay_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coupon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#macaulay_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.macaulay_duration" title="Permalink to this definition"></a></dt>
+<dd><p>Compute macaulay duration of a bond given spot rates or yield-to-maturity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coupon</strong> – Annual coupon rate</p></li>
+<li><p><strong>n</strong> – Number of remaining coupons</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>price</strong> – current market price of bond</p></li>
+<li><p><strong>yields</strong> – Simple annual yield-to-maturity or spot rates each period</p></li>
+<li><p><strong>par</strong> – face or par value of bond</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Macaulay duration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.maximum_drawdown">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">maximum_drawdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_price_level</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#maximum_drawdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.maximum_drawdown" title="Permalink to this definition"></a></dt>
+<dd><p>Compute max drawdown (max loss from previous high) period and returns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Returns or price level series</p></li>
+<li><p><strong>is_price_level</strong> – Whether input are price index levels, or returns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series with start and end levels, keyed by dates, of maximum drawdown</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>MDD = (Trough - Peak) / Peak</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.modified_convexity">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">modified_convexity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coupon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#modified_convexity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.modified_convexity" title="Permalink to this definition"></a></dt>
+<dd><p>Compute mocified convexity of a bond given spot rates or yield-to-maturity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coupon</strong> – Annual coupon rate</p></li>
+<li><p><strong>n</strong> – Number of remaining coupons</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>price</strong> – current market price of bond</p></li>
+<li><p><strong>yields</strong> – Simple annual yield-to-maturity or spot rates each period</p></li>
+<li><p><strong>par</strong> – face or par value of bond</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Modified convexity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.modified_duration">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">modified_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coupon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#modified_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.modified_duration" title="Permalink to this definition"></a></dt>
+<dd><p>Compute modified duration of a bond given spot rates or yield-to-maturity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coupon</strong> – Annual coupon rate</p></li>
+<li><p><strong>n</strong> – Number of remaining coupons</p></li>
+<li><p><strong>m</strong> – Number of compounding periods per year</p></li>
+<li><p><strong>price</strong> – current market price of bond</p></li>
+<li><p><strong>yields</strong> – Simple annual yield-to-maturity or spot rates each period</p></li>
+<li><p><strong>par</strong> – face or par value of bond</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Modified duration</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.ohlc_vol">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">ohlc_vol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#ohlc_vol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.ohlc_vol" title="Permalink to this definition"></a></dt>
+<dd><p>Compute Garman-Klass or Rogers-Satchell (non zero mean) OHLC vol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>first</strong> – DataFrame of open prices (observations x stocks)</p></li>
+<li><p><strong>high</strong> – DataFrame of high prices (observations x stocks)</p></li>
+<li><p><strong>low</strong> – DataFrame of low prices (observations x stocks)</p></li>
+<li><p><strong>last</strong> – DataFrame of close prices (observations x stocks)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated volatility</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.parametric_risk">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">parametric_risk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/finds/recipes/finance.html#parametric_risk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.parametric_risk" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate parametric gaussian VaR and ES</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> – predicted volatility, or a Series</p></li>
+<li><p><strong>alpha</strong> – Var level (e.g. 0.95)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.quadprog">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">quadprog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#quadprog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.quadprog" title="Permalink to this definition"></a></dt>
+<dd><p>Quadratic solver for portfolio optimization</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.recipes.finance.tangency_portfolio">
+<span class="sig-prename descclassname"><span class="pre">finds.recipes.finance.</span></span><span class="sig-name descname"><span class="pre">tangency_portfolio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/recipes/finance.html#tangency_portfolio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.recipes.finance.tangency_portfolio" title="Permalink to this definition"></a></dt>
+<dd><p>Returns weights of tangency portfolio with largest slope (sharpe ratio)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> – covariance matrix</p></li>
+<li><p><strong>mu</strong> – vector of expected excess (of the risk-free) returns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of weights, volatility and mean of the tangency portfolio</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.recipes.econs.html" class="btn btn-neutral float-left" title="finds.recipes.econs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.recipes.graph.html" class="btn btn-neutral float-right" title="finds.recipes.graph" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

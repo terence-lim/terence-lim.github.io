@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.utils.plots &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.utils.utils" href="finds.utils.utils.html" />
+    <link rel="prev" title="finds.utils.finder" href="finds.utils.finder.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.utils.html">finds.utils</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.store.html">finds.utils.store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.gdrive.html">finds.utils.gdrive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.pyR.html">finds.utils.pyR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.finder.html">finds.utils.finder</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.utils.plots</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.ColorMap"><code class="docutils literal notranslate"><span class="pre">ColorMap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_bands"><code class="docutils literal notranslate"><span class="pre">plot_bands()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_bar"><code class="docutils literal notranslate"><span class="pre">plot_bar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_date"><code class="docutils literal notranslate"><span class="pre">plot_date()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_fitted"><code class="docutils literal notranslate"><span class="pre">plot_fitted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_groupbar"><code class="docutils literal notranslate"><span class="pre">plot_groupbar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_hist"><code class="docutils literal notranslate"><span class="pre">plot_hist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_leverage"><code class="docutils literal notranslate"><span class="pre">plot_leverage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_qq"><code class="docutils literal notranslate"><span class="pre">plot_qq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_scale"><code class="docutils literal notranslate"><span class="pre">plot_scale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_scatter"><code class="docutils literal notranslate"><span class="pre">plot_scatter()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.plot_time"><code class="docutils literal notranslate"><span class="pre">plot_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.set_xticks"><code class="docutils literal notranslate"><span class="pre">set_xticks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.plots.subplots"><code class="docutils literal notranslate"><span class="pre">subplots()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.utils.html">finds.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.utils.html">finds.utils</a></li>
+      <li class="breadcrumb-item active">finds.utils.plots</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.utils.plots.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.utils.plots">
+<span id="finds-utils-plots"></span><h1>finds.utils.plots<a class="headerlink" href="#module-finds.utils.plots" title="Permalink to this heading"></a></h1>
+<p>Convenience functions for data plotting</p>
+<ul class="simple">
+<li><p>chart types: date axis, time axis, confidence bands, bar, hist, scatter</p></li>
+<li><p>regression diagnostics</p></li>
+</ul>
+<p>Copyright 2023, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.ColorMap">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">ColorMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'brg'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#ColorMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.ColorMap" title="Permalink to this definition"></a></dt>
+<dd><p>Return sampled colors from spectrum of a color map
+:param n: number of discrete colors
+:param colormap: matplotlib colormaps, e.g. tab20, viridis, Blues, cool</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>n x 4 2D-array of RGBA values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_bands">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_bands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.96</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_bands"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_bands" title="Permalink to this definition"></a></dt>
+<dd><p>Line plot a series with confidence bands</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> – Mean values to plot</p></li>
+<li><p><strong>stderr</strong> – Stderr values to plot confidence bands</p></li>
+<li><p><strong>width</strong> – Multipler on stderr for confidence bands</p></li>
+<li><p><strong>c</strong> – Color to fill bands</p></li>
+<li><p><strong>x</strong> – X-axis values</p></li>
+<li><p><strong>ylabel</strong> – Axis labels</p></li>
+<li><p><strong>xlabel</strong> – Axis labels</p></li>
+<li><p><strong>legend</strong> – List of legend labels</p></li>
+<li><p><strong>loc</strong> – Location to display legend</p></li>
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+<li><p><strong>title</strong> – Main title string</p></li>
+<li><p><strong>hline</strong> – List of y-axis values to plot horizontal lines</p></li>
+<li><p><strong>vline</strong> – List of x-axis values to plot vertical lines</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_bar">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_bar" title="Permalink to this definition"></a></dt>
+<dd><p>Bar plot with annotated points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – DataFrame of y-values, observations in rows, variables in columns</p></li>
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>labels</strong> – List of labels to annotate</p></li>
+<li><p><strong>labelsize</strong> – Font size of annotation labels text</p></li>
+<li><p><strong>rotation</strong> – Rotate annotation labels text</p></li>
+<li><p><strong>xlabel</strong> – Axis labels</p></li>
+<li><p><strong>ylabel</strong> – Axis labels</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+<li><p><strong>alpha</strong> – Transparency of bars</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+<li><p><strong>legend</strong> – List of legend names</p></li>
+<li><p><strong>loc</strong> – Location for legend</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_date">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">99999999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yscale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vlines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vspans</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'upper</span> <span class="pre">left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'upper</span> <span class="pre">right'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_date" title="Permalink to this definition"></a></dt>
+<dd><p>Line plot with int date on x-axis, and primary and secondary y frames</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y1</strong> – Plot on primary y-axis</p></li>
+<li><p><strong>y2</strong> – Plot on secondary y-axis</p></li>
+<li><p><strong>ax</strong> – Matplotlib axes object from plt.subplots() or plt.gca()</p></li>
+<li><p><strong>cn</strong> – Starting CN color to cycle through</p></li>
+<li><p><strong>marker</strong> – Marker style, None to cycle (default ‘’ means no marker)</p></li>
+<li><p><strong>xmin</strong> – Minimum of x-axis date range</p></li>
+<li><p><strong>xmax</strong> – Maximum of x-axis date range (default is auto)</p></li>
+<li><p><strong>nbins</strong> – Number of bins for xticks placement (default 0 is auto)</p></li>
+<li><p><strong>rotation</strong> – Rotation of x-axis ticks</p></li>
+<li><p><strong>hlines</strong> – Y-axis points where to place horizontal lines</p></li>
+<li><p><strong>vlines</strong> – X-axis points where to place vertical lines</p></li>
+<li><p><strong>vspans</strong> – Vertical regions to highlight</p></li>
+<li><p><strong>xlabel</strong> – X-axis label</p></li>
+<li><p><strong>ylabel1</strong> – Y-axis labels</p></li>
+<li><p><strong>ylabel2</strong> – Y-axis labels</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+<li><p><strong>points</strong> – Points and labels to annotate</p></li>
+<li><p><strong>title</strong> – Main title</p></li>
+<li><p><strong>legend1</strong> – Lists of legend labels</p></li>
+<li><p><strong>legend2</strong> – Lists of legend labels</p></li>
+<li><p><strong>loc1</strong> – Locations to place legends</p></li>
+<li><p><strong>loc2</strong> – Locations to place legends</p></li>
+<li><p><strong>ls</strong> – Linestyle</p></li>
+<li><p><strong>ms</strong> – Marker size</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_fitted">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_fitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Residuals</span> <span class="pre">vs</span> <span class="pre">Fitted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strftime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%Y-%m-%d'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_fitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_fitted" title="Permalink to this definition"></a></dt>
+<dd><p>Plot residuals and identify outliers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>fitted</strong> – Fitted Series</p></li>
+<li><p><strong>residual</strong> – Residual Series</p></li>
+<li><p><strong>n</strong> – Number of outlier points in each end to identify</p></li>
+<li><p><strong>strftime</strong> – string to format time display</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_groupbar">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_groupbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_groupbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_groupbar" title="Permalink to this definition"></a></dt>
+<dd><p>Plot a grouped bar chart</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – DataFrame to plot</p></li>
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>labels</strong> – optional DataFrame of annotations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_hist">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins:</span> <span class="pre">~typing.List[float]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdf:</span> <span class="pre">~typing.Callable</span> <span class="pre">|</span> <span class="pre">~typing.List</span> <span class="pre">|</span> <span class="pre">~typing.Dict</span> <span class="pre">=</span> <span class="pre">&lt;bound</span> <span class="pre">method</span> <span class="pre">rv_continuous.pdf</span> <span class="pre">of</span> <span class="pre">&lt;scipy.stats._continuous_distns.norm_gen</span> <span class="pre">object&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax:</span> <span class="pre">~typing.Any</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'density'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_hist" title="Permalink to this definition"></a></dt>
+<dd><p>Histogram bar plot with a benchmark probability density</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>bins</strong> – List of bin values</p></li>
+<li><p><strong>hist</strong> – Plots histogram</p></li>
+<li><p><strong>kde</strong> – Plots kernel density curve</p></li>
+<li><p><strong>pdf</strong> – Benchmark probability density</p></li>
+<li><p><strong>ylabel</strong> – Axis labels</p></li>
+<li><p><strong>xlabel</strong> – Axis labels</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_leverage">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_leverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ddof</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Residuals</span> <span class="pre">vs</span> <span class="pre">Leverage'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strftime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y-%m-%d'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_leverage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_leverage" title="Permalink to this definition"></a></dt>
+<dd><p>Plot leverage and identify influential points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resid</strong> – Residual Series</p></li>
+<li><p><strong>hat</strong> – Hat values</p></li>
+<li><p><strong>dist</strong> – Distance values</p></li>
+<li><p><strong>ddof</strong> – Degrees of freedom of model</p></li>
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+<li><p><strong>strftime</strong> – string to format time display</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_qq">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_qq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Normal</span> <span class="pre">Q-Q'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.807</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strftime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%Y-%m-%d'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_qq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_qq" title="Permalink to this definition"></a></dt>
+<dd><p>QQ Plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resid</strong> – Residual Series</p></li>
+<li><p><strong>strftime</strong> – string to format time display</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+<li><p><strong>z</strong> – Z-value to identify outliers</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_scale">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Scale-Location'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strftime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'%Y-%m-%d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_scale" title="Permalink to this definition"></a></dt>
+<dd><p>Plot scale of residuals with outliers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitted</strong> – Fitted Series</p></li>
+<li><p><strong>resid</strong> – Residual Series</p></li>
+<li><p><strong>ax</strong> – Axis object</p></li>
+<li><p><strong>title</strong> – Main title text</p></li>
+<li><p><strong>alpha</strong> – Transparency of points</p></li>
+<li><p><strong>n</strong> – number of outliers in each end to identify</p></li>
+<li><p><strong>strftime</strong> – string to format time display</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_scatter">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_scatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_scatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_scatter" title="Permalink to this definition"></a></dt>
+<dd><p>Scatter plot, optionally with abline slope and point labels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – Series to plot on horizontal axis</p></li>
+<li><p><strong>y</strong> – Series to plot on horizontal axis</p></li>
+<li><p><strong>labels</strong> – List of annotations for points</p></li>
+<li><p><strong>ax</strong> – Matplotlib axes object, from plt.subplots() or plt.gca()</p></li>
+<li><p><strong>xlabel</strong> – Horizontal axis label</p></li>
+<li><p><strong>ylabel</strong> – Vertical axis label</p></li>
+<li><p><strong>title</strong> – Title of plot</p></li>
+<li><p><strong>abline</strong> – To plot abline or 45-degree line. If none, do not plot slope</p></li>
+<li><p><strong>labels</strong> – List of 3-tuples (text, x, y) to annotate</p></li>
+<li><p><strong>alpha</strong> – transparency of scatter points</p></li>
+<li><p><strong>edgecolor</strong> – edge color of scatter points</p></li>
+<li><p><strong>marker</strong> – marker type of scatter points</p></li>
+<li><p><strong>s</strong> – Marker area size</p></li>
+<li><p><strong>cmap</strong> – Color map to use for scatter points</p></li>
+<li><p><strong>abline</strong> – True for fitted slope, False for 45-degree line, None is no plot</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+<li><p><strong>title</strong> – Main title string</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.plot_time">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">plot_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">09:30:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Timestamp</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Timestamp('1900-01-01</span> <span class="pre">16:00:00')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#plot_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.plot_time" title="Permalink to this definition"></a></dt>
+<dd><p>Plot lines with Timestamp time on x-axis; primary and secondary y-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y1</strong> – DataFrame to plot on left axis</p></li>
+<li><p><strong>y2</strong> – DataFrame (or None) to plot on right axis</p></li>
+<li><p><strong>ax</strong> – Axes object to plot in</p></li>
+<li><p><strong>xmin</strong> – Left-most x-axis time, None to include all</p></li>
+<li><p><strong>xmax</strong> – Right-most x-axis time, None to include all</p></li>
+<li><p><strong>marker</strong> – Style of marker to plot</p></li>
+<li><p><strong>fontsize</strong> – Font size of tick labels</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.set_xticks">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">set_xticks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nskip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/plots.html#set_xticks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.set_xticks" title="Permalink to this definition"></a></dt>
+<dd><p>Set locations for xticks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> – Matplotlib axes object from plt.subplots() or plt.gca()</p></li>
+<li><p><strong>nbins</strong> – Number of bins for major ticks, or</p></li>
+<li><p><strong>nskip</strong> – Number of ticks to skip (ignore if nbins &gt; 0)</p></li>
+<li><p><strong>**kwargs</strong> – Arguments for tick_params(), e.g. labelsize, colors, rotation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.utils.plots.subplots">
+<span class="sig-prename descclassname"><span class="pre">finds.utils.plots.</span></span><span class="sig-name descname"><span class="pre">subplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfigs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/utils/plots.html#subplots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.plots.subplots" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper over plt.subplots to create subplots across multiple figures</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nfigs</strong> – Number of figures</p></li>
+<li><p><strong>ncols</strong> – Number of columns per figure</p></li>
+<li><p><strong>nrows</strong> – Number of rows per figure</p></li>
+<li><p><strong>squeeze</strong> – ignored, will always return 1D flattened list of axes unless only 1</p></li>
+<li><p><strong>**kwargs</strong> – other keyword arguments passed on to plt.subplots</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (List of figures, List of axes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.utils.finder.html" class="btn btn-neutral float-left" title="finds.utils.finder" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.utils.utils.html" class="btn btn-neutral float-right" title="finds.utils.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

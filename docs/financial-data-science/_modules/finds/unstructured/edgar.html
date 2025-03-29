@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.unstructured.edgar &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.unstructured.edgar</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.unstructured.edgar</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class and methods to retrieve and manipulate EDGAR text data</span>
+
+<span class="sd">- SEC Edgar: 10-K, 10-Q, 8-K</span>
+<span class="sd">- MD&amp;A and Business Descriptions items</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">lxml</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">gzip</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">finds.readers.readers</span> <span class="kn">import</span> <span class="n">requests_get</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">_VERBOSE</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Edgar"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar">[docs]</a><span class="k">class</span> <span class="nc">Edgar</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class to retrieve and pre-process Edgar website documents</span>
+
+<span class="sd">        &lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">        - e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</span>
+
+<span class="sd">    10-K and 10-Q zipped archive</span>
+<span class="sd">    - 10X/YYYY,zip</span>
+
+<span class="sd">    10-K and 10-Q local file (zip -q -r 2019.zip 2019)</span>
+<span class="sd">    - 10X/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">    10-K and 10-Q detail folder</span>
+<span class="sd">    - 10X/detail/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">    8-K local file</span>
+<span class="sd">    - 10X/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">    8-K detail folder</span>
+<span class="sd">    - 10X/8-K/detail/YYYY/YYYYMMDD/</span>
+
+<span class="sd">    10-K MDA local text file</span>
+<span class="sd">    - 10X/10-K/mda10K/PERMNO/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">    10-K MDA zipped archive (zip -q -r mda10K.zip mda10K)</span>
+<span class="sd">    - 10X/10-K/mda10K.zip</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">edgar_url</span> <span class="o">=</span> <span class="s1">&#39;https://www.sec.gov/Archives/&#39;</span>
+    <span class="n">ticker_url</span> <span class="o">=</span> <span class="s1">&#39;https://www.sec.gov/include/ticker.txt&#39;</span>
+
+    <span class="c1"># list of forms_: EDGAR_Forms_v2.1.py from ND-SRAF / McDonald 201606</span>
+    <span class="n">_f10_K</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-K&#39;</span><span class="p">,</span> <span class="s1">&#39;10-K405&#39;</span><span class="p">,</span> <span class="s1">&#39;10KSB&#39;</span><span class="p">,</span> <span class="s1">&#39;10-KSB&#39;</span><span class="p">,</span> <span class="s1">&#39;10KSB40&#39;</span><span class="p">]</span>
+    <span class="n">_f10_KA</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-K/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10-K405/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10KSB/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10-KSB/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10KSB40/A&#39;</span><span class="p">]</span>
+    <span class="n">_f10_KT</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-KT&#39;</span><span class="p">,</span> <span class="s1">&#39;10KT405&#39;</span><span class="p">,</span> <span class="s1">&#39;10-KT/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10KT405/A&#39;</span><span class="p">]</span>
+    <span class="n">_f10_Q</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-Q&#39;</span><span class="p">,</span> <span class="s1">&#39;10QSB&#39;</span><span class="p">,</span> <span class="s1">&#39;10-QSB&#39;</span><span class="p">]</span>
+    <span class="n">_f10_QA</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-Q/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10QSB/A&#39;</span><span class="p">,</span> <span class="s1">&#39;10-QSB/A&#39;</span><span class="p">]</span>
+    <span class="n">_f10_QT</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;10-QT&#39;</span><span class="p">,</span> <span class="s1">&#39;10-QT/A&#39;</span><span class="p">]</span>
+    <span class="n">_forms</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;10-K&#39;</span> <span class="p">:</span> <span class="n">_f10_K</span> <span class="o">+</span> <span class="n">_f10_KA</span> <span class="o">+</span> <span class="n">_f10_KT</span><span class="p">,</span>
+              <span class="s1">&#39;10-Q&#39;</span> <span class="p">:</span> <span class="n">_f10_Q</span> <span class="o">+</span> <span class="n">_f10_QA</span> <span class="o">+</span> <span class="n">_f10_QT</span><span class="p">,</span>
+              <span class="s1">&#39;8-K&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]}</span>
+
+
+    <span class="c1">#############################################################</span>
+    <span class="c1">#</span>
+    <span class="c1"># Static methods to fetch documents from SEC Edgar website</span>
+    <span class="c1">#    </span>
+    <span class="c1">#############################################################</span>
+
+<div class="viewcode-block" id="Edgar.parse_pathname"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.parse_pathname">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Extract meta info and locations from edgar pathname</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pathname: Main pathname from Edgar index file</span>
+<span class="sd">            filename: Suffix to append to resource location and return</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Prepend resource location to filename, if desired to download;</span>
+<span class="sd">            else dictionary of the meta and location info</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        https://www.sec.gov/Archives/edgar/data/51143/0000051143-13-000007.txt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">pathname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">adsh</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">items</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">adsh</span><span class="p">)</span>
+        <span class="n">indexname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">items</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;-index.html&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>   <span class="c1"># if suffix filename, then append to resource location</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;root&#39;</span><span class="p">:</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">edgar_url</span><span class="p">,</span>
+                <span class="s1">&#39;adsh&#39;</span><span class="p">:</span> <span class="n">adsh</span><span class="p">,</span>
+                <span class="s1">&#39;indexname&#39;</span><span class="p">:</span> <span class="n">indexname</span><span class="p">,</span>   <span class="c1"># filename of detail</span>
+                <span class="s1">&#39;resource&#39;</span> <span class="p">:</span> <span class="n">resource</span><span class="p">}</span>    <span class="c1"># prefix for filings filenames</span></div>
+
+
+<div class="viewcode-block" id="Edgar.fetch_tickers"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.fetch_tickers">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_tickers</span><span class="p">(</span><span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch tickers-to-cik lookup from SEC web page as a pandas Series&quot;&quot;&quot;</span>
+        <span class="n">tickers</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">Edgar</span><span class="o">.</span><span class="n">ticker_url</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)],</span>
+                       <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ticker&#39;</span><span class="p">,</span><span class="s1">&#39;cik&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ticker&#39;</span><span class="p">)[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Edgar.fetch_index"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.fetch_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_index</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">quarter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch edgar daily index or full index, or all daily dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            date: Retrieve daily index for this date (unless 0)</span>
+<span class="sd">            year, quarter: Retrieve full-index for this year/quarter (unless 0)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict of filings meta data from daily or full index, or daily dates</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">            If no arguments, retrieve all dates by walking daily index tree</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">year</span> <span class="ow">and</span> <span class="n">quarter</span><span class="p">:</span>    <span class="c1"># get full-index by year/quarter</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;https://www.sec.gov/Archives/edgar/full-index/&#39;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span>
+                               <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span>
+                               <span class="s1">&#39;QTR&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">quarter</span><span class="p">),</span>
+                               <span class="s2">&quot;master.idx&quot;</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+                             <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">,</span>
+                             <span class="n">quoting</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin-1&#39;</span><span class="p">,</span> 
+                             <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1">#skiprows=7,</span>
+                             <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">,</span>
+                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;form&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;pathname&#39;</span><span class="p">])</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;pathname&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;form&#39;</span><span class="p">,</span> <span class="s1">&#39;cik&#39;</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">date</span><span class="p">:</span>   <span class="c1"># get daily-index</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;https://www.sec.gov/Archives/edgar/daily-index/&#39;</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(((</span><span class="n">date</span> <span class="o">//</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span>
+                               <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="o">//</span><span class="mi">10000</span><span class="p">),</span>
+                               <span class="s1">&#39;QTR&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">),</span>
+                               <span class="sa">f</span><span class="s2">&quot;master.</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">.idx.gz&quot;</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">((</span><span class="n">date</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="n">date</span> <span class="o">%</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span>
+                                   <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="o">//</span><span class="mi">10000</span><span class="p">),</span>
+                                   <span class="s1">&#39;QTR&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">q</span><span class="p">),</span>
+                                   <span class="sa">f</span><span class="s2">&quot;master.</span><span class="si">{</span><span class="n">d</span><span class="si">:</span><span class="s2">06d</span><span class="si">}</span><span class="s2">.idx&quot;</span><span class="p">)</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+                             <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span>
+                             <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">,</span>
+                             <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">,</span>
+                             <span class="n">quoting</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> 
+                             <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="c1">#skiprows=7,</span>
+                             <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;form&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;pathname&#39;</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()]</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;helper to retrieve url directory listing&quot;&quot;&quot;</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span>
+                                        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                                        <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))[</span><span class="s1">&#39;directory&#39;</span><span class="p">][</span><span class="s1">&#39;item&#39;</span><span class="p">]</span>
+            
+        <span class="c1"># called with no arguments =&gt; fetch category tree for daily dates</span>
+        <span class="n">leaf</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">ynodes</span> <span class="o">=</span> <span class="n">get_nodes</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;index.json&quot;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ynode</span> <span class="ow">in</span> <span class="n">ynodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ynode</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;dir&#39;</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">ynode</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">])</span>
+                <span class="n">qnodes</span> <span class="o">=</span> <span class="n">get_nodes</span><span class="p">(</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;index.json&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">qnode</span> <span class="ow">in</span> <span class="n">qnodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">qnode</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;dir&#39;</span><span class="p">:</span>
+                        <span class="n">sub</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="n">qnode</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span>
+                        <span class="n">nodes</span> <span class="o">=</span> <span class="n">get_nodes</span><span class="p">(</span><span class="n">sub</span> <span class="o">+</span> <span class="s1">&#39;index.json&#39;</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
+                                <span class="n">s</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span>
+                                    <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;company&#39;</span>
+                                    <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;idx&#39;</span><span class="p">):</span>
+                                    <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> 
+                                    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">129999</span><span class="p">:</span>  <span class="c1"># 070194-&gt;940701</span>
+                                        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span><span class="o">%</span><span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="mi">10000</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span><span class="o">//</span><span class="mi">100</span><span class="p">)</span> 
+                                    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">129999</span><span class="p">:</span> <span class="c1"># 091231-&gt;20011231</span>
+                                        <span class="n">d</span> <span class="o">+=</span> <span class="mi">20000000</span>  
+                                    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">999999</span><span class="p">:</span> <span class="c1"># 970102-&gt;19970102</span>
+                                        <span class="n">d</span> <span class="o">+=</span> <span class="mi">19000000</span>  
+                                    <span class="n">leaf</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span> <span class="o">+</span> <span class="n">node</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">leaf</span></div>
+    
+<div class="viewcode-block" id="Edgar.fetch_detail"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.fetch_detail">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_detail</span><span class="p">(</span><span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch from HTML filename, containing table of document hyperlinks</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            pathname: Relative pathname to fetch</span>
+<span class="sd">            root: Root prefix of url</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span> <span class="ow">or</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">edgar_url</span><span class="p">,</span>
+                           <span class="n">Edgar</span><span class="o">.</span><span class="n">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="p">)[</span><span class="s1">&#39;indexname&#39;</span><span class="p">])</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span></div>
+
+<div class="viewcode-block" id="Edgar.fetch_filing"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.fetch_filing">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fetch_filing</span><span class="p">(</span><span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                     <span class="n">features</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;lxml&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch and parse filing text from url pathname or local html file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pathname: Relative pathname to fetch</span>
+<span class="sd">            root: Root prefix of url or local directory</span>
+<span class="sd">            features: Parser to use e.g. lxml, lxml-xml, html.parser</span>
+<span class="sd">            form: Additional parsing to remove preamble for form=&#39;8-K&#39;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Text of body, parsed per Loughran and McDonald &quot;Stage One&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Retrieve html from local file or url</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">root</span> <span class="ow">or</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">edgar_url</span>        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">pathname</span><span class="p">),</span>
+                             <span class="n">delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                             <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">pathname</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">)</span> <span class="c1">#lxml-xml lxml html.parser</span>
+        <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;soup: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">text</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># remove inline xbrl&#39;s</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;ix:\S*&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;xbrli:\S*&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)]:</span>
+            <span class="n">tags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    <span class="c1"># regex format for soup.find_all</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span> <span class="n">tag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+
+        <span class="c1"># remove tables, where #alphas is less than 90% of digits+alphas</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">([</span><span class="s1">&#39;table&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+            <span class="n">numalpha</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
+            <span class="n">numdigit</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
+            <span class="n">hasitem</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;item.[.]?[.]?7&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">hasitem</span> <span class="ow">and</span> <span class="n">numalpha</span> <span class="o">&lt;</span> <span class="mf">0.9</span><span class="o">*</span><span class="p">(</span><span class="n">numdigit</span><span class="o">+</span><span class="n">numalpha</span><span class="p">):</span>
+                <span class="n">tag</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">tags</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;i&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="n">tags</span><span class="p">):</span>
+                <span class="n">tag</span><span class="o">.</span><span class="n">replace_with_children</span><span class="p">()</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;table: </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)),</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;emerging growth company[\w\W]*? of the Exchange Act&#39;</span><span class="p">,</span>
+                          <span class="n">text</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">end</span><span class="p">():]</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;form8k: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># clean-up line breaks</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFKD&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># Normalize</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[ ]+\n&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n[ ]+&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n+&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+        <span class="c1"># Completed Stage One</span>
+        <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;normalize: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="Edgar.extract_filenames"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.extract_filenames">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract_filenames</span><span class="p">(</span><span class="n">detail</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Extract ordered list of .htm and .txt filenames from filing detail</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            detail: Text of detail file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of html filenames found in the detail file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dflist</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
+        <span class="n">jdf</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">jrow</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">jcol</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">html_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">html_all</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">idf</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dflist</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">irow</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">icol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">jdf</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">icol</span><span class="p">]</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+                        <span class="n">jdf</span><span class="p">,</span> <span class="n">jrow</span><span class="p">,</span> <span class="n">jcol</span> <span class="o">=</span> <span class="n">idf</span><span class="p">,</span> <span class="n">irow</span><span class="p">,</span> <span class="n">icol</span>  <span class="c1"># likely row of form</span>
+                <span class="k">for</span> <span class="n">icol</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;.htm&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">icol</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> 
+                        <span class="ow">or</span> <span class="s2">&quot;.txt&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">icol</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+                        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">dflist</span><span class="p">[</span><span class="n">idf</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">irow</span><span class="p">,</span> <span class="n">icol</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="s1">&#39;.htm&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s1">&#39;.txt&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                                <span class="n">name</span> <span class="o">=</span> <span class="n">s</span>
+                        <span class="k">if</span> <span class="n">jdf</span> <span class="o">==</span> <span class="n">idf</span> <span class="ow">and</span> <span class="n">jrow</span> <span class="o">==</span> <span class="n">irow</span><span class="p">:</span>
+                            <span class="n">html_name</span> <span class="o">=</span> <span class="n">name</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">html_all</span> <span class="o">+=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(extract_filenames) [</span><span class="si">{</span><span class="n">jdf</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">jrow</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">jcol</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">html_all</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                   <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">html_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">html_all</span> <span class="k">if</span> <span class="n">html_name</span> <span class="k">else</span> <span class="n">html_all</span></div>
+
+
+<div class="viewcode-block" id="Edgar.extract_item"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.extract_item">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">extract_item</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extract mda or business description item from input text</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text: Full text of filing, from which to extract passage for item</span>
+<span class="sd">            item: Item to extract, in {&#39;mda10K&#39;, &#39;bus10K&#39;, &#39;mda10Q&#39;, &#39;qqr10K&#39;}</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        https://www.sec.gov/fast-answers/answersreada10khtm.html</span>
+<span class="sd">       </span>
+<span class="sd">        10-Q items:</span>
+
+<span class="sd">        PART I—FINANCIAL INFORMATION</span>
+<span class="sd">        Item 1. Financial Statements.</span>
+<span class="sd">        Item 2. Management’s Discussion and Analysis</span>
+<span class="sd">        Item 3. Quantitative and Qualitative Disclosures About Market Risk.</span>
+<span class="sd">        Item 4. Controls and Procedures.</span>
+
+<span class="sd">        PART II—OTHER INFORMATION</span>
+<span class="sd">        Item 1. Legal Proceedings.</span>
+<span class="sd">        Item 1A. Risk Factors.</span>
+<span class="sd">        Item 2. Unregistered Sales of Equity Securities and Use of Proceeds.</span>
+
+<span class="sd">        10-K items:</span>
+
+<span class="sd">        Part 1</span>
+<span class="sd">        Item 1 – Business</span>
+<span class="sd">        Item 1A – Risk Factors</span>
+<span class="sd">        Item 1B – Unresolved Staff Comments</span>
+<span class="sd">        Item 2 – Properties</span>
+<span class="sd">        Item 3 – Legal Proceedings</span>
+<span class="sd">        Item 4 – Mine Safety Disclosures</span>
+<span class="sd">        Part 2</span>
+<span class="sd">        Item 5 – Market</span>
+<span class="sd">        Item 6 – Consolidated Financial Data</span>
+<span class="sd">        Item 7 – Management&#39;s Discussion and Analysis of Financial Condition and Results of Operations</span>
+<span class="sd">        Item 7A – Quantitative and Qualitative Disclosures about Market Risks</span>
+<span class="sd">        Forward Looking Statements</span>
+<span class="sd">        Item 8 – Financial Statements</span>
+<span class="sd">        Item 9A. Controls and Procedures</span>
+<span class="sd">        Item 9B. Other Information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">parse_helper</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">marker</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Helper to find all potential items&quot;&quot;&quot;</span>
+            <span class="c1"># e.g. INTC uses text titles, not  &quot;ITEM&quot;, in their 10K:</span>
+            <span class="c1">#  &quot;DISCUSSION AND ANALYSIS&quot;</span>
+            <span class="c1"># &#39;\nQUANTITATIVE AND QUALITATIVE DISCLOSURE&#39;]</span>
+            <span class="c1"># Management&amp;#146;s Discussion and Analysis</span>
+
+            <span class="n">mda</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Define start and end sentinels for parsing</span>
+            <span class="n">item_beg</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s1">&#39;item_beg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">item_end</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s1">&#39;item_end&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">next_beg</span> <span class="o">=</span> <span class="n">marker</span><span class="p">[</span><span class="s1">&#39;next_beg&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># if ITEM 7A does not exist</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_beg</span> <span class="o">=</span> <span class="p">[]</span>             <span class="c1"># this may helps exception</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span>
+
+            <span class="k">for</span> <span class="n">item7</span> <span class="ow">in</span> <span class="n">item_beg</span><span class="p">:</span>   <span class="c1"># try to find begin</span>
+                <span class="n">begin</span> <span class="o">=</span> <span class="n">item7</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">if</span> <span class="n">begin</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;item begin?&#39;</span><span class="p">,</span> <span class="n">item7</span><span class="p">,</span> <span class="n">begin</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">begin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">begin</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>          <span class="c1"># found begin</span>
+                <span class="k">for</span> <span class="n">item7A</span> <span class="ow">in</span> <span class="n">item_end</span><span class="p">:</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">item7A</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">begin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">end</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">if</span> <span class="n">end</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                    <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;item end?&#39;</span><span class="p">,</span> <span class="n">item7A</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">end</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>        <span class="c1"># ITEM 7A end does not exist</span>
+                    <span class="k">for</span> <span class="n">item8</span> <span class="ow">in</span> <span class="n">next_beg</span><span class="p">:</span>    <span class="c1"># often get exception undefined</span>
+                        <span class="n">end</span> <span class="o">=</span> <span class="n">item8</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">begin</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">end</span> <span class="o">=</span> <span class="n">end</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">if</span> <span class="n">end</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                        <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;next begin?&#39;</span><span class="p">,</span> <span class="n">item8</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="k">break</span>
+                <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="n">begin</span><span class="p">:</span>       <span class="c1"># extract this found item</span>
+                    <span class="n">mda</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">begin</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(parse_helper) </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mda</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">mda</span><span class="p">,</span> <span class="n">end</span>
+
+        <span class="c1"># clean-up for item headers</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">I</span><span class="se">\n</span><span class="s1">TEM&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ITEM&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ITEM</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ITEM &#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ITEM  &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">ITEM &#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;$&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">%&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">markers</span> <span class="o">=</span> <span class="p">{</span>    <span class="c1"># secret sauce: plausible regex separating the sections</span>
+            <span class="s1">&#39;mda10K&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;item_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?7[^a-z]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;DISCUSSION AND ANALYSIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;item_end&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?7A&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?QUANTITATIVE AND QUALITATIVE DIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;next_beg&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?8&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)]},</span>
+            <span class="s1">&#39;qqr10K&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;item_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?7A&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?QUALITATIVE AND QUANTITATIVE DIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?QUANTITATIVE AND QUALITATIVE DIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;item_end&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?8&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?9&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;REPORT OF INDEPENDENT&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;OPINION ON THE FINANCIAL&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?III[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?3[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;next_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?8&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?9&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?III[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?3[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)]},</span>
+            <span class="s1">&#39;bus10K&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;item_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?1[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?I[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?1[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?BUSINESS.?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;SUMMARY OF BUSINESS\.?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;DESCRIPTION OF BUSINESS\.?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;BUSINESS SUMMARY\.?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;item_end&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?1A&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?1B&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;UNRESOLVED STAFF COMMENTS.?\s*?</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;next_beg&#39;</span> <span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?2[^0-9]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)]},</span>
+            <span class="s1">&#39;mda10Q&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;item_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;DISCUSSION AND ANALYSIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?I[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?1[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;item_end&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?I\s?T\s?E\s?M.?\s*?3&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;CONTROLS AND PROCEDURES&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?QUANTITATIVE AND QUALITATIVE DIS&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)],</span>
+                <span class="s1">&#39;next_beg&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?II[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">),</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">\s*?P\s?A\s?R\s?T.?\s*?2[^\w]+&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)]}}</span>
+        
+        <span class="n">start</span><span class="o">=</span><span class="mi">0</span>      <span class="c1"># get first passage</span>
+        <span class="n">mda</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">parse_helper</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mda</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">mda</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">parse_helper</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+
+        <span class="n">best</span> <span class="o">=</span> <span class="n">mda</span>   <span class="c1"># return longest passage</span>
+        <span class="k">while</span> <span class="n">mda</span> <span class="ow">and</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">+=</span> <span class="n">end</span>
+            <span class="n">mda</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">parse_helper</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">markers</span><span class="p">[</span><span class="n">item</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mda</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">mda</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">best</span><span class="p">):</span>
+                <span class="n">best</span> <span class="o">=</span> <span class="n">mda</span>
+        <span class="k">return</span> <span class="n">best</span></div>
+
+
+    <span class="c1">#############################</span>
+    <span class="c1">#</span>
+    <span class="c1"># Load from SEC Edgar Website</span>
+    <span class="c1">#</span>
+    <span class="c1">#############################</span>
+<div class="viewcode-block" id="Edgar.get_detail_filings"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.get_detail_filings">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_detail_filings</span><span class="p">(</span><span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Fetch detail and concatenated filings given edgar pathname</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pathname: Edgar pathname of filing</span>
+<span class="sd">            form: Special parsing to exclude preamble if form in &#39;8-K&#39;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of detail and concatenated filings text</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - Fetch detail text and extract filenames, with assumed primary first</span>
+<span class="sd">        - If first filename is htm or is form8k, then fetch all concatenate</span>
+<span class="sd">        - Else only read first (txt) file.  </span>
+<span class="sd">        - If still fail then fetch from pathname</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get detail page</span>
+        <span class="n">detail</span><span class="p">,</span> <span class="n">lines</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">detail</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_detail</span><span class="p">(</span><span class="n">pathname</span><span class="o">=</span><span class="n">pathname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">detail</span><span class="p">:</span>   <span class="c1"># filing detail page missing!</span>
+            <span class="n">filenames</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">extract_filenames</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>  <span class="c1"># retrieve filings</span>
+            <span class="k">if</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s2">&quot;.htm&quot;</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">Edgar</span><span class="o">.</span><span class="n">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span> <span class="k">if</span> <span class="s2">&quot;.htm&quot;</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_filing</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+                                   <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="n">filenames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_filing</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_filing</span><span class="p">(</span><span class="n">pathname</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s2">&quot;***MISSING DETAIL***&quot;</span><span class="p">,</span> <span class="n">pathname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">detail</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span></div>
+
+    <span class="c1">###################################</span>
+    <span class="c1">#</span>
+    <span class="c1"># Write Locally</span>
+    <span class="c1">#</span>
+    <span class="c1">###################################</span>
+
+<div class="viewcode-block" id="Edgar.to_localdir"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.to_localdir">[docs]</a>    <span class="k">def</span> <span class="nf">to_localdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">permno</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+       <span class="sd">&quot;&quot;&quot;Construct local dir name prefix for local archive</span>
+<span class="sd">       </span>
+<span class="sd">       Args:</span>
+<span class="sd">           form: &#39;10K&#39; or &#39;10Q&#39; for items; &#39;&#39; for 10K/10Q filings</span>
+<span class="sd">           item: &#39;detail&#39; or &#39;mda10K&#39; or &#39;bus10K&#39;, or &#39;qqr10K&#39;</span>
+<span class="sd">           date: Year or date; 0 for mda10K/bus10K/qqr10K</span>
+<span class="sd">           permno: For mda10K/bus10K/qqr10K only</span>
+
+<span class="sd">       Returns:</span>
+<span class="sd">           Local folder name to store the filing or item</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+       <span class="n">s</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">savedir</span><span class="p">,</span>
+                        <span class="n">form</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> 
+                        <span class="nb">str</span><span class="p">(</span><span class="n">permno</span><span class="p">),</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">date</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span> <span class="k">if</span> <span class="n">date</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">if</span> <span class="n">date</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    <span class="c1"># make directory if not exist</span>
+       <span class="k">return</span> <span class="n">s</span>        </div>
+
+<div class="viewcode-block" id="Edgar.to_localname"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.to_localname">[docs]</a>    <span class="k">def</span> <span class="nf">to_localname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cik</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct local filename from components and filing pathname</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            date: Filing date</span>
+<span class="sd">            form: Type of form</span>
+<span class="sd">            cik: Company identifier</span>
+<span class="sd">            pathname: Edgar file pathname -- only need the last suffix, e.g.</span>
+<span class="sd">                      edgar/data/1000045/0000950170-22-000940.txt</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Local filename (per Loughran-McDonald) to store associated filing.</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+
+<span class="sd">        - e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">),</span>
+                         <span class="n">form</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/A&#39;</span><span class="p">,</span> <span class="s1">&#39;-A&#39;</span><span class="p">),</span>
+                         <span class="s2">&quot;edgar_data&quot;</span><span class="p">,</span>
+                         <span class="nb">str</span><span class="p">(</span><span class="n">cik</span><span class="p">),</span>
+                         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">pathname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span></div>
+
+<div class="viewcode-block" id="Edgar.save_detail"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.save_detail">[docs]</a>    <span class="k">def</span> <span class="nf">save_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cik</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save text of detail file to a local filename</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        ~10X/detail/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        ~10X/8-K/detail/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        &lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_localdir</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;8-K&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">form</span> <span class="ow">in</span>
+                                                        <span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]),</span>
+                                          <span class="n">item</span><span class="o">=</span><span class="s1">&#39;detail&#39;</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">to_localname</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                           <span class="n">cik</span><span class="o">=</span><span class="n">cik</span><span class="p">,</span>
+                                           <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                           <span class="n">pathname</span><span class="o">=</span><span class="n">pathname</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="Edgar.save_item"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.save_item">[docs]</a>    <span class="k">def</span> <span class="nf">save_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">permno</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save text of filing to a local filename</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        ~10X/10-K/mda10K/PERMNO/&lt;localname&gt;</span>
+
+<span class="sd">        ~10X/10-K/bus10K/PERMNO/&lt;localname&gt;</span>
+
+<span class="sd">        &lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_localdir</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">permno</span><span class="o">=</span><span class="n">permno</span><span class="p">),</span>
+                         <span class="n">pathname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+            
+<div class="viewcode-block" id="Edgar.save_filing"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.save_filing">[docs]</a>    <span class="k">def</span> <span class="nf">save_filing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">cik</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Save text of filing to a local filename</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        ~10X/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        ~10X/8-K/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        &lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_localdir</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="s1">&#39;8-K&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">form</span> <span class="ow">in</span>
+                                                        <span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]),</span>
+                                          <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">to_localname</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                                           <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">,</span>
+                                           <span class="n">cik</span><span class="o">=</span><span class="n">cik</span><span class="p">,</span>
+                                           <span class="n">pathname</span><span class="o">=</span><span class="n">pathname</span><span class="p">))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+            
+
+    <span class="c1">###################################</span>
+    <span class="c1">#</span>
+    <span class="c1"># Read Locally</span>
+    <span class="c1">#</span>
+    <span class="c1">###################################</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savedir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">zipped</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;To access (zipped or unzipped) Edgar cloned archives</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            savedir: Root folder where archives saved locally</span>
+<span class="sd">            zipped: Whether to use zipped or unzipped version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">savedir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">savedir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zipped</span> <span class="o">=</span> <span class="n">zipped</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+    <span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="Edgar.open"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> 
+             <span class="n">permno</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Opens local (zipped or folder) archive and return list of documents</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            date: Year or daily date </span>
+<span class="sd">            item: Item in {&#39;mda10K, &#39;detail&#39;, &#39;bus10K&#39;, &#39;qqr10K}</span>
+<span class="sd">            form: Filing type in {&#39;10-K&#39;, &#39;10-Q&#39;, &#39;8-K&#39;}</span>
+<span class="sd">            permno: Identifier of security to retrieve</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List filenames in selected archive</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - local file names are per Loughran-McDonald convention:</span>
+
+<span class="sd">          &lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</span>
+<span class="sd">             e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</span>
+
+<span class="sd">        - filings text:</span>
+
+<span class="sd">          - 10K/10Q documents are in: ~10X/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+<span class="sd">          - 8K documents are in: ~10X/8-K/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        - index details of filings:</span>
+
+<span class="sd">          - 10K/10Q detail are in: ~10X/detail/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+<span class="sd">          - 8K detail are in: ~10X/8-K/detail/YYYY/YYYYMMDD/&lt;localname&gt;</span>
+
+<span class="sd">        - extracted items by permno are in: ~/FORM/ITEM/PERMNO/</span>
+
+<span class="sd">          - 10-K mda are in: ~10X/10-K/mda10K/PERMNO/</span>
+<span class="sd">          - 10-K bus are in: ~10X/10-K/bus10K/PERMNO/</span>
+
+<span class="sd">        - zipped archives created with: zip -q -r 2021.zip 2019</span>
+
+<span class="sd">          - 2021.zip contains the year&#39;s 10-K and 10-Q filings</span>
+<span class="sd">          - 10-K/detail/2021.zip contains the index details of those 10-X&#39;s.</span>
+<span class="sd">          - 10-K/mda10K.zip contains extracted MD&amp;A sections from 10-K&#39;s</span>
+<span class="sd">          - 10-K/bus10K.zip contains extracted Business Description sections</span>
+<span class="sd">          - 8-K/2021.zip contains the year&#39;s 8-K filings</span>
+<span class="sd">          - 8-K/detail/2021.zip contains the index details of those 8-K&#39;s</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">def</span> <span class="nf">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Helper to deconstruct components from archive file name&quot;&quot;&quot;</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="n">pathname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>         <span class="c1"># components separated by &#39;_&#39;</span>
+            <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># split last substring on &#39;/&#39;</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;cik&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span>
+                    <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-A&#39;</span><span class="p">,</span> <span class="s1">&#39;/A&#39;</span><span class="p">),</span> <span class="c1"># cannot have &#39;/&#39;</span>
+                    <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="s1">&#39;pathname&#39;</span><span class="p">:</span> <span class="n">pathname</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   <span class="c1"># only one archive open at a time per instance</span>
+
+        <span class="n">date</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="k">if</span> <span class="n">date</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">localpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">savedir</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="p">[</span><span class="n">form</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">date</span><span class="p">[:</span><span class="mi">4</span><span class="p">]]:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="p">:</span>
+                <span class="n">localpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">localpath</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zipped</span><span class="p">:</span>  <span class="c1"># if zipped archive, have to retrieve its namelist()</span>
+            <span class="n">localpath</span> <span class="o">=</span> <span class="n">localpath</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span>
+            <span class="n">recs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">localpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">archive</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pathname</span> <span class="ow">in</span> <span class="n">archive</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">pathname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="o">=</span><span class="n">pathname</span><span class="p">))</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">recs</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;pathname&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;form&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;cik&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">and</span> <span class="n">form</span> <span class="ow">and</span> <span class="n">form</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="s1">&#39;8-K&#39;</span><span class="p">]:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+                                        <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">permno</span><span class="p">:</span>  <span class="c1"># select by permno</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="nb">str</span><span class="p">(</span><span class="n">permno</span><span class="p">)]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">permno</span><span class="o">=</span><span class="n">permno</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>       <span class="c1"># select all, so explicitly assign permno col</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys_</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zipped</span> <span class="o">=</span> <span class="n">localpath</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">localpath</span><span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># else list files in folder</span>
+            <span class="k">def</span> <span class="nf">list_dir</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;helper to list potential document filenames in folder&quot;&quot;&quot;</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)):</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">savedir</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;pathname&#39;</span><span class="p">:</span> <span class="n">a</span><span class="p">}</span> <span class="k">if</span> <span class="s1">&#39;_&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">a</span> <span class="k">else</span> 
+                             <span class="n">parse_pathname</span><span class="p">(</span><span class="n">pathname</span><span class="o">=</span><span class="n">a</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">r</span>
+
+            <span class="k">if</span> <span class="n">date</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>    <span class="c1"># 4) date is year =&gt; not leaf</span>
+                    <span class="n">dates</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">localpath</span><span class="p">,</span> <span class="n">date</span> <span class="o">+</span> <span class="s1">&#39;[01]???&#39;</span><span class="p">))</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">list_dir</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">],</span>
+                                   <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>                <span class="c1"># 5) date is specific 8-digit date =&gt; leaf</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">localpath</span><span class="p">,</span> <span class="n">date</span><span class="p">))</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">list_dir</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">q</span><span class="p">],</span>
+                                   <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">permno</span><span class="p">:</span>   <span class="c1"># select by permno</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">localpath</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">permno</span><span class="p">)))</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">list_dir</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">q</span><span class="p">],</span>
+                                   <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>               
+                <span class="k">else</span><span class="p">:</span>        <span class="c1"># select all permnos</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">localpath</span><span class="p">,</span> <span class="s1">&#39;[0-9]????&#39;</span><span class="p">))</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">list_dir</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>\
+                                    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">permno</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">q</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys_</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive</span> <span class="o">=</span> <span class="n">localpath</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys_</span></div>
+
+<div class="viewcode-block" id="Edgar.close"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close the archive&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">archive</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Edgar.__getitem__"><a class="viewcode-back" href="../../../finds.unstructured.edgar.html#finds.unstructured.edgar.Edgar.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieves text of document file by pathname from archive&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zipped</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">pathname</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">savedir</span><span class="p">,</span> <span class="n">pathname</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">savedir</span><span class="p">,</span> <span class="n">pathname</span><span class="p">))</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">text</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span>
+    <span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span><span class="p">,</span> <span class="n">PSTAT</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+    <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+    <span class="kn">import</span> <span class="nn">math</span>
+
+    <span class="k">def</span> <span class="nf">_test_web</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Access Edgar Webside</span>
+
+<span class="sd">        master = Edgar.fetch_index(year=2023, quarter=1)</span>
+<span class="sd">        - https://www.sec.gov/Archives/edgar/full-index/2023/QTR1/master.idx</span>
+<span class="sd">        &gt;&gt;&gt; {&#39;cik&#39;: 1000045,</span>
+<span class="sd">        &gt;&gt;&gt;  &#39;name&#39;: &#39;NICHOLAS FINANCIAL INC&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;  &#39;form&#39;: &#39;10-Q&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;  &#39;date&#39;: 20230214,</span>
+<span class="sd">        &gt;&gt;&gt;  &#39;pathname&#39;: &#39;edgar/data/1000045/0000950170-23-002704.txt&#39;}</span>
+
+<span class="sd">        Edgar.get_detail_filings(r[&#39;pathname&#39;])</span>
+<span class="sd">        - retrieve detail and filings text files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Read index of filings in a quarter</span>
+        <span class="n">master</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_index</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2023</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># retrieve its detail and actual filing text</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">master</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">detail</span><span class="p">,</span> <span class="n">filing</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">get_detail_filings</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">])</span>
+
+    
+    <span class="k">def</span> <span class="nf">_save_10X</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Sample code to load from Edgar web site and store locally</span>
+
+<span class="sd">        ed.save_detail(text, form, date, cik, pathname)</span>
+<span class="sd">        - save detail text in local file</span>
+
+<span class="sd">        ed.save_filing(text, form, date, cik, pathname)</span>
+<span class="sd">        - save filing textin local file</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_year</span><span class="p">,</span> <span class="n">start_quarter</span> <span class="o">=</span> <span class="mi">2024</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="n">end_year</span><span class="p">,</span> <span class="n">end_quarter</span> <span class="o">=</span> <span class="mi">2024</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="n">yq</span> <span class="o">=</span> <span class="p">[(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="o">+</span><span class="mf">.25</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">y</span><span class="p">))</span><span class="o">*</span><span class="mi">4</span><span class="p">))</span>
+              <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_year</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_quarter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">.25</span><span class="p">,</span>
+                                 <span class="n">end_year</span> <span class="o">+</span> <span class="n">end_quarter</span> <span class="o">*</span> <span class="mf">.25</span><span class="p">,</span>
+                                 <span class="mf">0.25</span><span class="p">)]</span>
+        <span class="n">restart</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;quarter&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="s1">&#39;filenum&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="n">ed</span> <span class="o">=</span> <span class="n">Edgar</span><span class="p">(</span><span class="n">savedir</span><span class="o">=</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;10X&#39;</span><span class="p">],</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;10-K&#39;</span><span class="p">,</span> <span class="s1">&#39;10-Q&#39;</span><span class="p">,</span> <span class="s1">&#39;8-K&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">_forms</span><span class="p">[</span><span class="n">c</span><span class="p">]]</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">quarter</span> <span class="ow">in</span> <span class="n">yq</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="n">restart</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">quarter</span> <span class="o">&gt;=</span> <span class="n">restart</span><span class="p">[</span><span class="s1">&#39;quarter&#39;</span><span class="p">]:</span>
+                <span class="n">restart</span><span class="p">[</span><span class="s1">&#39;quarter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">fetch_index</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">year</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">filenum</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">filenum</span> <span class="o">&gt;=</span> <span class="n">restart</span><span class="p">[</span><span class="s1">&#39;filenum&#39;</span><span class="p">]:</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">filenum</span><span class="p">]</span>
+                        <span class="n">restart</span><span class="p">[</span><span class="s1">&#39;filenum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+                            <span class="n">det</span><span class="p">,</span> <span class="n">fil</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">get_detail_filings</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">])</span>
+                            <span class="k">if</span> <span class="n">det</span><span class="p">:</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">save_detail</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">det</span><span class="p">,</span> <span class="o">**</span><span class="n">r</span><span class="p">)</span>
+                                <span class="n">ed</span><span class="o">.</span><span class="n">save_filing</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">fil</span><span class="p">,</span> <span class="o">**</span><span class="n">r</span><span class="p">)</span>
+                                <span class="n">_print</span><span class="p">(</span><span class="s2">&quot;--- Saved Filing ---&quot;</span><span class="p">,</span> <span class="n">filenum</span><span class="p">,</span>
+                                       <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span> <span class="o">*</span><span class="n">r</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    
+    <span class="k">def</span> <span class="nf">_extract_items</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;Sample code to extract mda10K and bus10K, and store locally</span>
+
+<span class="sd">        ed = Edgar(savedir, zipped=True)</span>
+<span class="sd">        - open archive may be local files or zipped archive</span>
+
+<span class="sd">        rows = ed.open(date=2022)</span>
+<span class="sd">        - each row has keys [&#39;cik&#39;, &#39;form&#39;, &#39;date, &#39;pathname&#39;]</span>
+
+<span class="sd">        Edgar.extract_item(filing, item=&#39;mda10K&#39;)</span>
+<span class="sd">        - extract item text from filing text</span>
+
+<span class="sd">        ed.save_item(text, form=&#39;10-K&#39;, permno, item=&#39;mda10K&#39;, pathname)</span>
+<span class="sd">        - save text in local file</span>
+
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">ed</span> <span class="o">=</span> <span class="n">Edgar</span><span class="p">(</span><span class="n">savedir</span><span class="o">=</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;10X&#39;</span><span class="p">],</span> <span class="n">zipped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">])</span>
+        <span class="n">bday</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">pstat</span> <span class="o">=</span> <span class="n">PSTAT</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bday</span><span class="p">)</span>
+        <span class="n">to_permno</span> <span class="o">=</span> <span class="n">pstat</span><span class="o">.</span><span class="n">build_lookup</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="s1">&#39;lpermno&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">&#39;cik&#39;</span><span class="p">)</span>
+
+        <span class="n">years</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">2023</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> 
+        <span class="c1">#items = {&#39;10-K&#39;: [&#39;qqr10K&#39;]}   # &#39;10-Q&#39;: [&#39;mda10Q&#39;]}</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;10-K&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;bus10K&#39;</span><span class="p">,</span> <span class="s1">&#39;mda10K&#39;</span><span class="p">,</span> <span class="s1">&#39;qqr10K&#39;</span><span class="p">]}</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">years</span><span class="p">:</span> 
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">ed</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">year</span><span class="p">)</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)):</span>
+                <span class="n">permno</span> <span class="o">=</span> <span class="n">to_permno</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;cik&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">items</span> <span class="ow">and</span> <span class="n">permno</span><span class="p">:</span>
+                    <span class="n">filing</span> <span class="o">=</span> <span class="n">ed</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">]]</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">]]:</span>
+                        <span class="n">extract</span> <span class="o">=</span> <span class="n">Edgar</span><span class="o">.</span><span class="n">extract_item</span><span class="p">(</span><span class="n">filing</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+                        <span class="n">ed</span><span class="o">.</span><span class="n">save_item</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">extract</span><span class="p">,</span>
+                                     <span class="n">form</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;form&#39;</span><span class="p">],</span>
+                                     <span class="n">permno</span><span class="o">=</span><span class="n">permno</span><span class="p">,</span>
+                                     <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
+                                     <span class="n">pathname</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;pathname&#39;</span><span class="p">])</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">year</span><span class="p">,</span>
+                             <span class="s1">&#39;permno&#39;</span><span class="p">:</span> <span class="n">permno</span><span class="p">,</span>
+                             <span class="s1">&#39;item&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">,</span>
+                             <span class="s1">&#39;text_c&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">filing</span><span class="p">),</span>
+                             <span class="s1">&#39;item_c&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">extract</span><span class="p">),</span>
+                             <span class="s1">&#39;text_w&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">filing</span><span class="o">.</span><span class="n">split</span><span class="p">()),</span>
+                             <span class="s1">&#39;item_w&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">extract</span><span class="o">.</span><span class="n">split</span><span class="p">())}</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.signals &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.signals</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.signals</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Signals implements structured dataset interface for derived signal values</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Float</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">as_dtypes</span>
+<span class="kn">from</span> <span class="nn">.stocks</span> <span class="kn">import</span> <span class="n">Stocks</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Signals"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals">[docs]</a><span class="k">class</span> <span class="nc">Signals</span><span class="p">(</span><span class="n">Stocks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide structured stocks data interface to derived signal values </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sql: Connection to SQL database</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initalize a connection to derived Signals values datasets&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sql</span><span class="o">=</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tables</span><span class="o">=</span><span class="p">{},</span> <span class="n">identifier</span><span class="o">=</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> 
+                         <span class="n">name</span><span class="o">=</span><span class="s1">&#39;signals&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Signals.__call__"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> 
+                 <span class="n">rebaldate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return cross-section of signal values available as of a date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label: Name of signal to retrieve</span>
+<span class="sd">            date : As of this date back through (non-inclusive) start date</span>
+<span class="sd">            start : Non-inclusive start of date range; -1 means exact date</span>
+<span class="sd">            rebaldate: Name of rebalance date column</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame of signal values prevailing as of input date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">label</span><span class="p">],</span>
+                <span class="n">date_field</span><span class="o">=</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Signals.table_key"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.table_key">[docs]</a>    <span class="k">def</span> <span class="nf">table_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Helper method generates a table key name for the input label&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;__&#39;</span> <span class="o">+</span> <span class="n">label</span>     <span class="c1"># prefix with &quot;__&quot;</span></div>
+
+<div class="viewcode-block" id="Signals.__getitem__"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Overrides parent class method to get Table schema of label&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_key</span><span class="p">(</span><span class="n">label</span><span class="p">),</span>
+                              <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                              <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;rebaldate&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                              <span class="n">Column</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Float</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Signals.summary"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Perform a &#39;proc summary&#39; by rebaldate on a signal&#39;s values&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_key</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">label</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;rebaldate&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Signals.write"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+              <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+              <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+              <span class="n">rebaldate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">,</span>
+              <span class="n">permno</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Saves a new sql table from dataframe of signal values</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: Signal values, with columns [&#39;permno&#39;, &#39;rebaldate&#39;, label]</span>
+<span class="sd">            label: Signal name of column and table (prefixed &#39;__&#39;)</span>
+<span class="sd">            overwrite: If False, append to table ignoring dups. Else recreate</span>
+<span class="sd">            rebaldate: Column name of rebalance dates in input dataframe</span>
+<span class="sd">            permno: Column name of permno identifiers in input dataframe</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Number of rows saved</span>
+
+<span class="sd">        Notes:</span>
+
+<span class="sd">        - first removes dup keys, then drops null rows before saving to table</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="n">permno</span><span class="p">,</span> <span class="n">rebaldate</span><span class="p">,</span> <span class="n">label</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># &#39;permno&#39; may be both index level or column label</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">permno</span><span class="p">:</span> <span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="n">rebaldate</span><span class="p">:</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">})</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">as_dtypes</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">v</span><span class="o">.</span><span class="n">type</span>
+                                       <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">])</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>        <span class="c1"># NaN&#39;s last</span>
+        <span class="k">if</span> <span class="n">overwrite</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="n">checkfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="n">checkfirst</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#self.sql.create_all()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">index_label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s2">&quot;(signals_write)&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Signals.read"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.Signals.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">where</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Read signal values from sql and return as data frame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label : Name of signal</span>
+<span class="sd">            where : Where clause for sql select</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame of query with columns = [&#39;permno&#39;, &#39;rebaldate&#39;, label]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">where</span><span class="p">:</span>
+            <span class="n">where</span> <span class="o">=</span> <span class="s1">&#39;WHERE&#39;</span> <span class="o">+</span> <span class="n">where</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_key</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT permno, rebaldate, </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> FROM </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">where</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;permno&#39;</span><span class="p">,</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="SignalsFrame"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.SignalsFrame">[docs]</a><span class="k">class</span> <span class="nc">SignalsFrame</span><span class="p">(</span><span class="n">Signals</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cache dataframe of signals values, provide Signals-like interface</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df : DataFrame input with permno and rebaldate as columns</span>
+<span class="sd">        identifer : column name of permno identifiers</span>
+<span class="sd">        rebaldate : column name of rebalance dates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">,</span>
+                 <span class="n">rebaldate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rebaldate&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize instance from input dataframe&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rebaldate</span> <span class="o">=</span> <span class="n">rebaldate</span>
+
+<div class="viewcode-block" id="SignalsFrame.__call__"><a class="viewcode-back" href="../../../finds.structured.signals.html#finds.structured.signals.SignalsFrame.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select from rebaldates that fall between start and date, keep latest</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            label: Name of column to return</span>
+<span class="sd">            date: As of this date back through (non-inclusive) start date</span>
+<span class="sd">            start: Non-inclusive start date. Set to 0 for all, -1 for exact </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">date</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rebaldate</span><span class="p">]</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+                           <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rebaldate</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">start</span><span class="p">),</span>
+                           <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebaldate</span><span class="p">,</span> <span class="n">label</span><span class="p">]]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebaldate</span><span class="p">],</span> <span class="n">na_position</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

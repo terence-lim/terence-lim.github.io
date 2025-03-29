@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.utils.gdrive &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.utils.pyR" href="finds.utils.pyR.html" />
+    <link rel="prev" title="finds.utils.store" href="finds.utils.store.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.utils.html">finds.utils</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.store.html">finds.utils.store</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.utils.gdrive</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.utils.gdrive.GDrive"><code class="docutils literal notranslate"><span class="pre">GDrive</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.cd"><code class="docutils literal notranslate"><span class="pre">GDrive.cd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.chmod"><code class="docutils literal notranslate"><span class="pre">GDrive.chmod()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.delete"><code class="docutils literal notranslate"><span class="pre">GDrive.delete()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.dir"><code class="docutils literal notranslate"><span class="pre">GDrive.dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.fetchall"><code class="docutils literal notranslate"><span class="pre">GDrive.fetchall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.fetchone"><code class="docutils literal notranslate"><span class="pre">GDrive.fetchone()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.get"><code class="docutils literal notranslate"><span class="pre">GDrive.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.ls"><code class="docutils literal notranslate"><span class="pre">GDrive.ls()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.md"><code class="docutils literal notranslate"><span class="pre">GDrive.md()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.mkdir"><code class="docutils literal notranslate"><span class="pre">GDrive.mkdir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.put"><code class="docutils literal notranslate"><span class="pre">GDrive.put()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.rm"><code class="docutils literal notranslate"><span class="pre">GDrive.rm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.utils.gdrive.GDrive.rmdir"><code class="docutils literal notranslate"><span class="pre">GDrive.rmdir()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.pyR.html">finds.utils.pyR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.finder.html">finds.utils.finder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.plots.html">finds.utils.plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.utils.utils.html">finds.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.utils.html">finds.utils</a></li>
+      <li class="breadcrumb-item active">finds.utils.gdrive</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.utils.gdrive.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.utils.gdrive">
+<span id="finds-utils-gdrive"></span><h1>finds.utils.gdrive<a class="headerlink" href="#module-finds.utils.gdrive" title="Permalink to this heading"></a></h1>
+<p>Convenience class methods to use google drive apis</p>
+<ul class="simple">
+<li><p>google REST api’s</p></li>
+</ul>
+<p>#pip install google-api-python-client</p>
+<p>Author: Terence Lim
+License: MIT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.utils.gdrive.</span></span><span class="sig-name descname"><span class="pre">GDrive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'token.pkl'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class provides basic interface to essential google drive api’s</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>to_url</strong> (<em>str formatter</em>) – prepend to shared google drive file_id to construct url for download</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p># init() prompts for googleapi authorization, which is stored in a tokenfile
+#   in current folder so that not prompted in subsequent executions
+g = GDrive()</p>
+<p>_ = g.ls()                   # display list of folders and files (and types)</p>
+<p># NOTE: in all methods, set silent=True to turn off raise exceptions
+#   and return None on error (letting caller handle errors gracefully)
+items = g.ls(silent=True)  # returns files+folders and their fields</p>
+<p>g.cd()                       # returns remote current working directory
+g.mkdir(‘/new_folder’)       # create new folder with absolute path name
+g.cd(‘new_folder’)           # change remote cwd
+g.mkdir(‘another_folder’)    # create new folder in remote cwd
+g.put(‘local.txt’, ‘another_folder/newfile.txt’)   # upload, relative path
+g.put(‘local.txt’, ‘/new_folder’)    # upload, absolute path, infer filename
+g.put(‘local.txt’)                   # upload to remote cwd, infer filename
+g.get(‘/new_folder/local.txt’, ‘localfile.txt’)   # upload, absolute path
+g.get(‘another_folder/newfile.txt’)  # upload, relative path, infer filename
+g.rm(‘/new_folder/local.txt’)        # remove, absolute path
+g.rm(‘another_folder/newfile.txt’)   # remove, relative path
+g.rmdir(‘another_folder’)            # remove folder from remote cwd
+g.rmdir(‘/new_folder’)               # remove folder with absolute path name</p>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="https://developers.google.com/drive/api/v3/quickstart/python">https://developers.google.com/drive/api/v3/quickstart/python</a>
+to turn on the Drive API.  In resulting dialog click DOWNLOAD CLIENT
+CONFIGURATION and save the file credentials.json to your working directory.</p>
+<p>Initially, the class will attempt to open browser to prompt for
+authorization (information is stored in tokenfile, so subsequent executions
+will not prompt).  If this fails, copy the URL from the console and manually
+open it in your browser.</p>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<p>pip install –upgrade         google-api-python-client google-auth-httplib2 google-auth-oauthlib</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.cd">
+<span class="sig-name descname"><span class="pre">cd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.cd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.cd" title="Permalink to this definition"></a></dt>
+<dd><p>Change remote working directory</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.chmod">
+<span class="sig-name descname"><span class="pre">chmod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'list'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'reader'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.chmod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.chmod" title="Permalink to this definition"></a></dt>
+<dd><p>List, delete or create sharing permissions for a remote file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – name of remote file to change permissions of</p></li>
+<li><p><strong>action</strong> (<em>str in {'list'</em><em> (</em><em>default</em><em>)</em><em>, </em><em>'create'</em><em>, </em><em>'delete'}</em>) – permissions action to execute</p></li>
+<li><p><strong>role</strong> (<em>str in {'reader'</em><em> (</em><em>default</em><em>)</em><em>, </em><em>'writer'</em><em>, </em><em>'owner'</em><em>, </em><em>'commenter'}</em>) – role to permit</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – number of permissions listed or deleted, or shareable link created</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int or str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.delete" title="Permalink to this definition"></a></dt>
+<dd><p>Remove remote file, bypassing trash bin</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.dir">
+<span class="sig-name descname"><span class="pre">dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.dir" title="Permalink to this definition"></a></dt>
+<dd><p>Return list of files in remote folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.fetchall">
+<span class="sig-name descname"><span class="pre">fetchall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&quot;'root'</span> <span class="pre">in</span> <span class="pre">parents&quot;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'ownedByMe':</span> <span class="pre">True,</span> <span class="pre">'trashed':</span> <span class="pre">False}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['id',</span> <span class="pre">'name',</span> <span class="pre">'parents',</span> <span class="pre">'mimeType']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.fetchall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.fetchall" title="Permalink to this definition"></a></dt>
+<dd><p>Helper method to fetch list of all files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<em>str</em><em>, </em><em>default &quot;'root' in parents&quot;</em><em> (</em><em>select files in top-level folder</em><em>)</em>) – Search query string with which to call service.files().list()</p></li>
+<li><p><strong>filters</strong> (<em>list</em><em> of </em><em>dict</em><em>, </em><em>default is {'ownedByMe': True</em><em>, </em><em>'trashed':False}</em>) – Files metadata properties to filter on, see
+<a class="reference external" href="https://developers.google.com/drive/api/v3/reference/files">https://developers.google.com/drive/api/v3/reference/files</a></p></li>
+<li><p><strong>fields</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>default is</em><em> [</em><em>'id'</em><em>,</em><em>'name'</em><em>,</em><em>'parents'</em><em>,</em><em>'mimeType'</em><em>]</em>) – Specific fields of files to return, see
+<a class="reference external" href="https://developers.google.com/drive/api/v3/fields-parameter">https://developers.google.com/drive/api/v3/fields-parameter</a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>result</strong> – dicts of specified fields for list of files that pass filter</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dicts</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="https://developers.google.com/drive/api/v3/search-files">https://developers.google.com/drive/api/v3/search-files</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.fetchone">
+<span class="sig-name descname"><span class="pre">fetchone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.fetchone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.fetchone" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch metadata for one file given its path name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – remote path name</p></li>
+<li><p><strong>field</strong> (<em>str in {'id'</em><em>, </em><em>'name'</em><em>, </em><em>'mimeType'</em><em>, </em><em>'parents'}</em><em>, </em><em>default is None</em>) – specific metadata field to return.  None to return all fields</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>match</strong> – value or dict of metadata values of matched file. None if not found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>value, or dict of values, or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.get" title="Permalink to this definition"></a></dt>
+<dd><p>Download a remote file to local filename</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – relative or absolute path name of remote file</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>default is ''</em>) – Output filename.  If blank: infer basename, save in curr local dir</p></li>
+<li><p><strong>silent</strong> (<em>bool</em><em>, </em><em>default False</em>) – if True, print file statistics if successful, raise exception if not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>total_file_size</strong> – or None if unsuccessful and silent</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>see <a class="reference external" href="https://developers.google.com/drive/api/v3/manage-downloads">https://developers.google.com/drive/api/v3/manage-downloads</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.ls">
+<span class="sig-name descname"><span class="pre">ls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.ls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.ls" title="Permalink to this definition"></a></dt>
+<dd><p>Return list of files in remote folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.md">
+<span class="sig-name descname"><span class="pre">md</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.md"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.md" title="Permalink to this definition"></a></dt>
+<dd><p>Create remote folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.mkdir">
+<span class="sig-name descname"><span class="pre">mkdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.mkdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.mkdir" title="Permalink to this definition"></a></dt>
+<dd><p>Create remote folder</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.put">
+<span class="sig-name descname"><span class="pre">put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.put" title="Permalink to this definition"></a></dt>
+<dd><p>Upload a local filename to remote folder file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Input local filename</p></li>
+<li><p><strong>path</strong> (<em>str</em><em>, </em><em>default is ''</em>) – Absolute or relative output filename or folder (basename inferred
+from local filename).  If blank: upload to current remote folder</p></li>
+<li><p><strong>silent</strong> (<em>bool</em><em>, </em><em>default False</em>) – if False, print file statistics if successful</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>total_file_size</strong> – or None if unsuccessful and silent flag is set to True</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>see <a class="reference external" href="https://developers.google.com/drive/api/v3/manage-uploads">https://developers.google.com/drive/api/v3/manage-uploads</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.rm">
+<span class="sig-name descname"><span class="pre">rm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.rm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.rm" title="Permalink to this definition"></a></dt>
+<dd><p>Remove remote file, bypassing trash bin</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.utils.gdrive.GDrive.rmdir">
+<span class="sig-name descname"><span class="pre">rmdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/utils/gdrive.html#GDrive.rmdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.utils.gdrive.GDrive.rmdir" title="Permalink to this definition"></a></dt>
+<dd><p>Remove remote folder and all its contents, bypassing trash bin</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.utils.store.html" class="btn btn-neutral float-left" title="finds.utils.store" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.utils.pyR.html" class="btn btn-neutral float-right" title="finds.utils.pyR" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.backtesting.riskpremium &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.backtesting.riskpremium</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.backtesting.riskpremium</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Evaluate risk premiums from cross-sectional regressions</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">dates</span> <span class="k">as</span> <span class="n">mdates</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">finds.structured.stocks</span> <span class="kn">import</span> <span class="n">Stocks</span>
+<span class="kn">from</span> <span class="nn">finds.structured.benchmarks</span> <span class="kn">import</span> <span class="n">Benchmarks</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.utils.plots</span> <span class="kn">import</span> <span class="n">plot_date</span>
+<span class="kn">from</span> <span class="nn">finds.recipes.econs</span> <span class="kn">import</span> <span class="n">least_squares</span>
+<span class="kn">from</span> <span class="nn">.backtesting</span> <span class="kn">import</span> <span class="n">compound_ret</span>
+
+<div class="viewcode-block" id="RiskPremium"><a class="viewcode-back" href="../../../finds.backtesting.riskpremium.html#finds.backtesting.riskpremium.RiskPremium">[docs]</a><span class="k">class</span> <span class="nc">RiskPremium</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Compute and test of factor loading risk premiums</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sql: Connection to user database to store results</span>
+<span class="sd">      bench: Benchmark dataset of market and indexreturns</span>
+<span class="sd">      rf: Name of riskfree rate from bench database</span>
+<span class="sd">      end: Last date of price and returns data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">bench</span><span class="p">:</span> <span class="n">Benchmarks</span><span class="p">,</span> <span class="n">rf</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize for testing factor loading premiums&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bench</span> <span class="o">=</span> <span class="n">bench</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rf</span> <span class="o">=</span> <span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">([</span><span class="n">rf</span><span class="p">],</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)[</span><span class="n">rf</span><span class="p">]</span>
+        <span class="n">rf</span> <span class="o">=</span> <span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">([</span><span class="n">rf</span> <span class="o">+</span> <span class="s2">&quot;(mo)&quot;</span><span class="p">],</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>  <span class="c1"># monthly riskfree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">monthly_</span> <span class="o">=</span> <span class="p">{(</span><span class="n">bench</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">begmo</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">bench</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">endmo</span><span class="p">(</span><span class="n">d</span><span class="p">)):</span>
+                         <span class="nb">float</span><span class="p">(</span><span class="n">rf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">rf</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_</span> <span class="o">=</span> <span class="n">end</span>
+
+<div class="viewcode-block" id="RiskPremium.__call__"><a class="viewcode-back" href="../../../finds.backtesting.riskpremium.html#finds.backtesting.riskpremium.RiskPremium.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stocks</span><span class="p">:</span> <span class="n">Stocks</span><span class="p">,</span> <span class="n">loadings</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">],</span>
+                 <span class="n">weights</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">standardize</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Estimate factor risk premiums with cross-sectional FM regressions</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          stocks: Stocks&#39; returns data</span>
+<span class="sd">          loadings: dict keyed by rebalance date of loadings DataFrames</span>
+<span class="sd">          standardize: List of columns to demean and rescale (eql-wtd std = 1)</span>
+<span class="sd">          weights: List of weights for weighted least squares and demean</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Series of means and stderrs of FM cross-sectional regression</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pordates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">loadings</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">holdrets</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">date_tuples</span><span class="p">(</span><span class="n">pordates</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pordate</span><span class="p">,</span> <span class="n">holdrets</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pordates</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">holdrets</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">holdrets</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monthly_</span><span class="p">:</span> 
+                <span class="n">rf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monthly_</span><span class="p">[</span><span class="n">holdrets</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rf</span> <span class="o">=</span> <span class="n">compound_ret</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf</span><span class="p">,</span> <span class="n">holdrets</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">loadings</span><span class="p">[</span><span class="n">pordate</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">weights</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">weights</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">weights</span><span class="p">])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">standardize</span><span class="p">:</span> <span class="c1"># weighted mean &lt;- 0, equal wtd stdev &lt;- 1</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stocks</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="o">*</span><span class="n">holdrets</span><span class="p">)</span> <span class="o">-</span> <span class="n">rf</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">least_squares</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">],</span> <span class="n">add_constant</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">holdrets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+                        <span class="s1">&#39;stderr&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">sem</span><span class="p">(),</span>
+                        <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span>
+                        <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RiskPremium.fit"><a class="viewcode-back" href="../../../finds.backtesting.riskpremium.html#finds.backtesting.riskpremium.RiskPremium.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchnames</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Compute risk premiums and benchmark correlations&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">corr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>\
+                   <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;Factor Returns&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>\
+                   <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;Correlation of Factor Returns:&#39;</span><span class="p">,</span>
+                                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">benchnames</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">benchnames</span><span class="p">,</span> <span class="s1">&#39;ret&#39;</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">compound_ret</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">holdrets</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">benchnames</span><span class="p">},</span>
+                          <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+                                  <span class="s1">&#39;stderr&#39;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">sem</span><span class="p">(),</span>
+                                  <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">std</span><span class="p">(),</span>
+                                  <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)})</span>\
+                       <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;Benchmarks&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">corr</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="p">)</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">benchnames</span><span class="p">,</span> <span class="n">benchnames</span><span class="p">]</span>\
+                       <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;Correlation of Benchmarks&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">benchnames</span><span class="p">]</span>\
+                       <span class="o">.</span><span class="n">rename_axis</span><span class="p">(</span><span class="s1">&#39;Correlation of Factor Returns&#39;</span>
+                                    <span class="s1">&#39; and Benchmarks&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
+<div class="viewcode-block" id="RiskPremium.plot"><a class="viewcode-back" href="../../../finds.backtesting.riskpremium.html#finds.backtesting.riskpremium.RiskPremium.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+             <span class="n">figsize</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Plot computed time series of factor returns&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">factors</span><span class="p">:</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span><span class="n">factors</span><span class="p">]</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">(</span><span class="n">factors</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="s1">&#39;ret&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">factors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">compound_ret</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">v</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">holdrets</span><span class="p">),</span>
+                              <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                              <span class="n">name</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">factors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">factors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nrow</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">factors</span><span class="p">))))</span>
+        <span class="n">ncol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span> <span class="o">/</span> <span class="n">nrow</span><span class="p">))</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span>
+                                 <span class="n">squeeze</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">axes</span><span class="p">),</span> <span class="n">factors</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+                <span class="n">plot_date</span><span class="p">(</span><span class="n">y1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span>
+                          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
+                          <span class="n">y2</span><span class="o">=</span><span class="n">b</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span>
+                          <span class="n">legend2</span><span class="o">=</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                          <span class="n">cn</span><span class="o">=</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> 
+                          <span class="n">loc1</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span>
+                          <span class="n">loc2</span><span class="o">=</span><span class="s1">&#39;lower right&#39;</span><span class="p">,</span>
+                          <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span>
+                          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plot_date</span><span class="p">(</span><span class="n">y1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">perf</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span>
+                          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                          <span class="n">cn</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                          <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">,</span>
+                          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">env.conf</span> <span class="kn">import</span> <span class="n">credentials</span>
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

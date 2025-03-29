@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.structured.stocks &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.structured.stocks</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.structured.stocks</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Stocks subclass for defining stocks datasets</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api.types</span> <span class="kn">import</span> <span class="n">is_list_like</span><span class="p">,</span> <span class="n">is_integer_dtype</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.database.redisdb</span> <span class="kn">import</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">.structured</span> <span class="kn">import</span> <span class="n">Structured</span>
+<span class="kn">from</span> <span class="nn">.busday</span> <span class="kn">import</span> <span class="n">BusDay</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="Stocks"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks">[docs]</a><span class="k">class</span> <span class="nc">Stocks</span><span class="p">(</span><span class="n">Structured</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide interface to structured stock price datasets&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> 
+                 <span class="n">bd</span><span class="p">:</span> <span class="n">BusDay</span><span class="p">,</span> 
+                 <span class="n">tables</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Table</span><span class="p">],</span> 
+                 <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                 <span class="n">rdb</span><span class="p">:</span> <span class="n">RedisDB</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">):</span>   
+        <span class="sd">&quot;&quot;&quot;Initialize a connection to Stocks structured datasets&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">tables</span><span class="p">,</span> <span class="n">identifier</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                         <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Stocks.get_series"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">permnos</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span> 
+                   <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> 
+                   <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                   <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">19000000</span><span class="p">,</span> 
+                   <span class="n">end</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">29001231</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return time series of a field for multiple permnos as DataFrame</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          permnos: Identifiers to filter</span>
+<span class="sd">          dataset: Name of dataset to retrieve from, default `daily`</span>
+<span class="sd">          field: Name of column to extract, e.g. &#39;ret&#39;</span>
+<span class="sd">          beg: Inclusive start date (YYYYMMDD)</span>
+<span class="sd">          end: Inclusive end date (YYYYMMDD)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame indexed by date with permnos in columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permnos</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">permnos</span> <span class="o">=</span> <span class="p">[</span><span class="n">permnos</span><span class="p">]</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{date_field}</span><span class="s2">, </span><span class="si">{permno}</span><span class="s2">, </span><span class="si">{field}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;  FROM </span><span class="si">{table}</span><span class="s2">&quot;</span>
+             <span class="s2">&quot;  WHERE </span><span class="si">{date_field}</span><span class="s2"> &gt;= </span><span class="si">{beg}</span><span class="s2"> AND </span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{end}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;    AND </span><span class="si">{permno}</span><span class="s2"> IN (&#39;</span><span class="si">{permnos}</span><span class="s2">&#39;)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">permno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                 <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                 <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">beg</span><span class="p">),</span>
+                 <span class="n">end</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">),</span>
+                 <span class="n">permnos</span><span class="o">=</span><span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">permnos</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>\
+                       <span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                              <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> 
+                              <span class="n">values</span><span class="o">=</span><span class="n">field</span><span class="p">)[</span><span class="n">permnos</span><span class="p">]</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            q = (&quot;SELECT {date_field}, {field}&quot;</span>
+<span class="sd">                 &quot;  FROM {table}&quot;</span>
+<span class="sd">                 &quot;  WHERE {date_field} &gt;= {beg} AND {date_field} &lt;= {end} &quot;</span>
+<span class="sd">                 &quot;    AND {permno} = &#39;{permnos}&#39;&quot;).format(</span>
+<span class="sd">                     permno=self.identifier,</span>
+<span class="sd">                     field=field,</span>
+<span class="sd">                     date_field=date_field,</span>
+<span class="sd">                     table=self[dataset].key,</span>
+<span class="sd">                     beg=int(beg),</span>
+<span class="sd">                     end=int(end),</span>
+<span class="sd">                     permnos=permnos)</span>
+<span class="sd">            self._print(&#39;(get_series single)&#39;, q)</span>
+<span class="sd">            return self.sql.read_dataframe(q).set_index(date_field)[field]\</span>
+<span class="sd">                                             .sort_index().rename(permnos)</span>
+<span class="sd">        else:</span>
+<span class="sd">            q = (&quot;SELECT {date_field}, {permno}, {field} &quot;</span>
+<span class="sd">                 &quot;  FROM {table}&quot;</span>
+<span class="sd">                 &quot;  WHERE {date_field}&gt;={beg} AND {date_field}&lt;={end}&quot;).format(</span>
+<span class="sd">                     permno=self.identifier,</span>
+<span class="sd">                     field=field,</span>
+<span class="sd">                     date_field=date_field,</span>
+<span class="sd">                     table=self[dataset].key,</span>
+<span class="sd">                     beg=int(beg),</span>
+<span class="sd">                     end=int(end))</span>
+<span class="sd">            #self._print(&#39;(get_series many)&#39;, q)</span>
+<span class="sd">            return self.sql.read_dataframe(q)\</span>
+<span class="sd">                           .pivot(index=&#39;date&#39;, </span>
+<span class="sd">                                  columns=self.identifier, </span>
+<span class="sd">                                  values=field)[permnos].sort_index()</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Stocks.get_ret"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_ret">[docs]</a>    <span class="k">def</span> <span class="nf">get_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span>
+                <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rw&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compounded returns between beg and end dates of all stocks</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: Inclusive start date (YYYYMMDD)</span>
+<span class="sd">          end: Inclusive end date (YYYYMMDD)</span>
+<span class="sd">          dataset: Name of dataset to retrieve, default is `daily`</span>
+<span class="sd">          field: Name of returns field</span>
+<span class="sd">          date_field: Name of date field</span>
+<span class="sd">          cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Series:</span>
+<span class="sd">          DataFrame with prod(min_count=1) of returns in column `ret`, </span>
+<span class="sd">          with rows indexed by permno</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">field</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">beg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">end</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rkey</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_ret load)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rkey</span><span class="p">)[</span><span class="n">field</span><span class="p">]</span>    <span class="c1"># use cache</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{field}</span><span class="s2">, </span><span class="si">{identifier}</span><span class="s2"> FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot; WHERE date &gt;= </span><span class="si">{beg}</span><span class="s2"> AND date &lt;= </span><span class="si">{end}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                 <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span>
+                 <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_ret)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>
+
+        <span class="c1"># compute compounded returns</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="n">beg</span> <span class="o">!=</span> <span class="n">end</span><span class="p">:</span>  <span class="c1"># if write cache</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_ret dump)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rkey</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Stocks.get_compounded"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_compounded">[docs]</a>    <span class="k">def</span> <span class="nf">get_compounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">periods</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> 
+                       <span class="n">permnos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                       <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span>
+                       <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compound returns within list of periods, for given permnos</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          periods: Tuples of inclusive begin and end dates of returns period</span>
+<span class="sd">          permnos: List of permnos</span>
+<span class="sd">          cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame of compounded returns in rows, for permnos in cols</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># accumulate horizontally, then finally transpose</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">permnos</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">periods</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">[</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span> <span class="n">cache_mode</span><span class="o">=</span><span class="n">cache_mode</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Stocks.cache_ret"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.cache_ret">[docs]</a>    <span class="k">def</span> <span class="nf">cache_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> 
+                  <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> 
+                  <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> 
+                  <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pre-generate compounded returns for redis store&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{field}</span><span class="s2">, </span><span class="si">{identifier}</span><span class="s2">, </span><span class="si">{date_field}</span><span class="s2"> FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot; WHERE </span><span class="si">{date_field}</span><span class="s2"> &gt;= </span><span class="si">{beg}</span><span class="s2"> &quot;</span>
+             <span class="s2">&quot;   AND </span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{end}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                 <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                 <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="n">end</span><span class="o">=</span><span class="n">dates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(cache_ret)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">rets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span>
+        <span class="n">rets</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="k">for</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">:</span>
+            <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">field</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">beg</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">end</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">replace</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rkey</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(cache_ret exists)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">rets</span><span class="p">[</span><span class="n">rets</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">beg</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">rets</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">end</span><span class="p">)]</span>\
+                 <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;date&#39;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(cache_ret dump)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">,</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rkey</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="Stocks.get_window"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_window">[docs]</a>    <span class="k">def</span> <span class="nf">get_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
+                   <span class="n">permnos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> 
+                   <span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> 
+                   <span class="n">left</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                   <span class="n">right</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                   <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span>  <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span>
+                   <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                   <span class="n">avg</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve field values for permnos in window centered around dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          field: Name of field to retrieve</span>
+<span class="sd">          permnos: List of identifiers to retrieve</span>
+<span class="sd">          date_field: Name of date field in database</span>
+<span class="sd">          dates : List of corresponding dates of center of event window</span>
+<span class="sd">          left : Relative (inclusive) offset of start of event window</span>
+<span class="sd">          right : Relative (inclusive) offset of end of event window</span>
+<span class="sd">          dataset: Name of dataset, default &#39;daily&#39;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame columns [0:(right-left)] of field values in event window</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+        <span class="n">permnos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">permnos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">avg</span><span class="p">:</span>
+            <span class="c1"># Generate and save dates to sql temp</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span>
+                            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">right</span><span class="p">),</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">:</span> <span class="n">permnos</span><span class="p">},</span>
+                           <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                                    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+                                    <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;n&#39;</span><span class="p">,</span>
+                                    <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_integer_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE INDEX a on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="si">}</span><span class="s2">,a,b)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE INDEX b on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="si">}</span><span class="s2">,b,a)&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+            <span class="c1"># join on (permno, date) and retrieve from target table</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{temp}</span><span class="s2">.n, &quot;</span>
+                 <span class="s2">&quot; AVG(</span><span class="si">{field}</span><span class="s2">) as </span><span class="si">{field}</span><span class="s2"> FROM </span><span class="si">{temp}</span><span class="s2"> LEFT JOIN </span><span class="si">{table}</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot; ON </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> = </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot; WHERE </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> &gt;= </span><span class="si">{temp}</span><span class="s2">.a &quot;</span>
+                 <span class="s2">&quot; AND </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{temp}</span><span class="s2">.b&quot;</span>
+                 <span class="s2">&quot; GROUP BY </span><span class="si">{temp}</span><span class="s2">.n&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                     <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                     <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                     <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">])</span>\
+                                           <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;permno&#39;</span><span class="p">:</span> <span class="n">permnos</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">dates</span><span class="p">},</span>
+                               <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)))</span>\
+                        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Generate and save dates to sql temp</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;day&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">)]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">),</span> 
+                           <span class="n">columns</span><span class="o">=</span><span class="n">cols</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span> <span class="o">=</span> <span class="n">permnos</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Loop over each date, and join as columns of result</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;permno&#39;</span><span class="p">:</span> <span class="n">permnos</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">dates</span><span class="p">})</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                <span class="c1"># create index on date to speed up join with target table</span>
+                <span class="k">if</span> <span class="n">is_integer_dtype</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;CREATE INDEX </span><span class="si">{col}</span><span class="s2"> on </span><span class="si">{temp}</span><span class="s2"> (</span><span class="si">{ident}</span><span class="s2">, </span><span class="si">{col}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span> <span class="n">ident</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+                <span class="c1"># join on (permno, date) and retrieve from target table</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2">, </span><span class="si">{field}</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot; FROM </span><span class="si">{temp}</span><span class="s2"> LEFT JOIN </span><span class="si">{table}</span><span class="s2">&quot;</span>
+                     <span class="s2">&quot; ON </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> = </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> &quot;</span>
+                     <span class="s2">&quot;  AND </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> = </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{col}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                         <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                         <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                         <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                         <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                         <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                         <span class="n">col</span><span class="o">=</span><span class="n">col</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="c1"># left join, so assume same order</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;drop table if exists &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;day&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">c</span>
+                          <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Stocks.get_many"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_many">[docs]</a>    <span class="k">def</span> <span class="nf">get_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">permnos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span> 
+                 <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                 <span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> 
+                 <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> 
+                 <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                 <span class="n">exact</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve multiple fields for lists of permnos and dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          permnos: List of identifiers to retrieve</span>
+<span class="sd">          dates: List of corresponding dates of center of event window</span>
+<span class="sd">          field: Names of fields to retrieve</span>
+<span class="sd">          dataset: Name of dataset, default &#39;daily&#39;</span>
+<span class="sd">          date_field: Name of date field in database, default &#39;date&#39;</span>
+<span class="sd">          exact: Whether require exact date match, or allow most recent</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame with permno, date, and retrieved fields across columns</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="s2">&quot;`, `&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                                <span class="n">df</span><span class="o">=</span><span class="n">DataFrame</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">permnos</span><span class="p">),</span>
+                                              <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">dates</span><span class="p">)},</span>
+                                             <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">permnos</span><span class="p">))),</span>
+                                <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;_seq&#39;</span><span class="p">,</span>
+                                <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exact</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{temp}</span><span class="s2">._seq, </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2">, &quot;</span>
+                 <span class="s2">&quot;  </span><span class="si">{temp}</span><span class="s2">.date AS date, `</span><span class="si">{field}</span><span class="s2">` &quot;</span>
+                 <span class="s2">&quot;  FROM </span><span class="si">{temp}</span><span class="s2"> LEFT JOIN </span><span class="si">{table}</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;    ON </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> = </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;    AND </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> = </span><span class="si">{temp}</span><span class="s2">.date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                     <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                     <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                     <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_seq&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{temp}</span><span class="s2">._seq, </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2">, &quot;</span>
+                 <span class="s2">&quot;  </span><span class="si">{temp}</span><span class="s2">.date AS date, `</span><span class="si">{field}</span><span class="s2">` &quot;</span>
+                 <span class="s2">&quot;  FROM </span><span class="si">{temp}</span><span class="s2"> LEFT JOIN </span><span class="si">{table}</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;    ON </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> = </span><span class="si">{temp}</span><span class="s2">.</span><span class="si">{identifier}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;    AND </span><span class="si">{table}</span><span class="s2">.</span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{temp}</span><span class="s2">.date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">,</span>
+                     <span class="n">identifier</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                     <span class="n">field</span><span class="o">=</span><span class="n">field</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                     <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;_seq&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">],</span> <span class="n">na_position</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;_seq&#39;</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;_seq&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;drop table if exists &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">_t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="Stocks.get_section"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                    <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> 
+                    <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return a cross-section of values of fields as of a single date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          fields: list of columns to return</span>
+<span class="sd">          date: Desired date in YYYYMMDD format</span>
+<span class="sd">          date_field: Name of date column in the table, default &#39;date&#39;</span>
+<span class="sd">          dataset: Dataset to extract from, default &#39;daily&#39;</span>
+<span class="sd">          start: Non-inclusive date of starting range; if -1 then exact date</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Most recent row within date range, indexed by permno</span>
+
+<span class="sd">        Note:</span>
+
+<span class="sd">        - If start is not -1, then the latest prevailing record for each</span>
+<span class="sd">          between (non-inclusive) start and (inclusive) date is returned</span>
+
+<span class="sd">        Examples:</span>
+
+<span class="sd">        &gt;&gt;&gt; t = crsp.get_section(&#39;shares&#39;, [&#39;shrenddt&#39;,&#39;shrout&#39;], &#39;shrsdt&#39;, dt)</span>
+<span class="sd">        &gt;&gt;&gt; u = crsp.get_section(&#39;names&#39;, [&#39;comnam&#39;], &#39;date&#39;, dt-10000)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">is_list_like</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{fields}</span><span class="s2"> FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot; WHERE </span><span class="si">{date_field}</span><span class="s2"> = </span><span class="si">{date}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">),</span>
+                     <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                     <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{fields}</span><span class="s2"> FROM </span><span class="si">{table}</span><span class="s2"> JOIN&quot;</span>
+                 <span class="s2">&quot;  (SELECT </span><span class="si">{permno}</span><span class="s2">, MAX(</span><span class="si">{date_field}</span><span class="s2">) AS </span><span class="si">{date_field}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;   FROM </span><span class="si">{table}</span><span class="s2"> &quot;</span>
+                 <span class="s2">&quot;     WHERE </span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{date}</span><span class="s2"> AND </span><span class="si">{date_field}</span><span class="s2"> &gt; </span><span class="si">{start}</span><span class="s2">&quot;</span>
+                 <span class="s2">&quot;     GROUP BY </span><span class="si">{permno}</span><span class="s2">) as a &quot;</span>
+                 <span class="s2">&quot;  USING (</span><span class="si">{permno}</span><span class="s2">, </span><span class="si">{date_field}</span><span class="s2">)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">),</span>
+                     <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                     <span class="n">permno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
+                     <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                     <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span>
+                     <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_section)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Stocks.get_range"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.Stocks.get_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+                  <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                  <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;daily&#39;</span><span class="p">,</span> 
+                  <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span> 
+                  <span class="n">cache_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rw&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return field values within a date range</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          fields: Names of columns to return (and optionally rename as)</span>
+<span class="sd">          beg: Inclusive start date in YYYYMMDD format</span>
+<span class="sd">          end: Inclusive end date in YYYYMMDD format</span>
+<span class="sd">          dataset: Name of dataset to extract from, default &#39;daily&#39;</span>
+<span class="sd">          date_field: Name of date column in the table, default &#39;date&#39;</span>
+<span class="sd">          cache_mode: &#39;r&#39; to try read from cache first, &#39;w&#39; to write to cache</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          DataFrame multi-indexed by permno, date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">rename</span> <span class="o">=</span> <span class="n">fields</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rename</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">]</span>
+
+        <span class="n">rkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">beg</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span> <span class="ow">and</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">rkey</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_range load)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rkey</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT </span><span class="si">{fields}</span><span class="s2">, </span><span class="si">{date_field}</span><span class="s2"> FROM </span><span class="si">{table}</span><span class="s2"> WHERE &quot;</span>
+             <span class="s2">&quot; </span><span class="si">{date_field}</span><span class="s2"> &gt;= </span><span class="si">{beg}</span><span class="s2"> AND </span><span class="si">{date_field}</span><span class="s2"> &lt;= </span><span class="si">{end}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">),</span>
+                 <span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">date_field</span><span class="o">=</span><span class="n">date_field</span><span class="p">,</span>
+                 <span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span>
+                 <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_range)&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">date_field</span><span class="p">])</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">rename</span><span class="p">)</span> <span class="k">if</span> <span class="n">rename</span> <span class="k">else</span> <span class="n">r</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="n">cache_mode</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_print</span><span class="p">(</span><span class="s1">&#39;(get_range dump)&#39;</span><span class="p">,</span> <span class="n">rkey</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rdb</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">rkey</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div></div>
+
+
+<div class="viewcode-block" id="StocksBuffer"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksBuffer">[docs]</a><span class="k">class</span> <span class="nc">StocksBuffer</span><span class="p">(</span><span class="n">Stocks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cache daily returns into memory, and provide Stocks-like interface&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">stocks</span><span class="p">:</span> <span class="n">Stocks</span><span class="p">,</span> 
+                 <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                 <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create object and load returns into its cache</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          stocks: Stocks structured data object to access stock returns data</span>
+<span class="sd">          beg: Earliest date of daily stock returns to pre-load</span>
+<span class="sd">          end: Latest date of daily stock returns to pre-load</span>
+<span class="sd">          fields: Column names of returns fields, e.g. [&#39;ret&#39;, &#39;retx&#39;, &#39;prc&#39;]</span>
+<span class="sd">          dataset: Name of dataset to extract from, e.g. &#39;daily&#39;, &#39;monthly&#39;</span>
+<span class="sd">          date_field: Name of date field, default &#39;date&#39;</span>
+<span class="sd">          identifier: Field name of stocks identifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date_field</span> <span class="o">=</span> <span class="n">date_field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bd</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">bd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stocks</span> <span class="o">=</span> <span class="n">stocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SELECT </span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">date_field</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;  FROM </span><span class="si">{</span><span class="n">stocks</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+             <span class="sa">f</span><span class="s2">&quot;  WHERE </span><span class="si">{</span><span class="n">date_field</span><span class="si">}</span><span class="s2">&gt;=</span><span class="si">{</span><span class="n">beg</span><span class="si">}</span><span class="s2"> AND </span><span class="si">{</span><span class="n">date_field</span><span class="si">}</span><span class="s2">&lt;=</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">rets</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>\
+                              <span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">date_field</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rets</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_VERBOSE</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;empty results from stocks.StocksBuffer:&#39;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StocksBuffer.get_section"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksBuffer.get_section">[docs]</a>    <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> 
+                    <span class="n">date</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> 
+                    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                    <span class="n">date_field</span><span class="p">:</span> <span class="nb">str</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return a cross-section of values of fields as of a single date</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          dataset: Dataset to extract from</span>
+<span class="sd">          fields: list of columns to return</span>
+<span class="sd">          date_field: Name of date column in the table</span>
+<span class="sd">          date: Desired date in YYYYMMDD format</span>
+<span class="sd">          start: Non-inclusive date of starting range (ignored)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          Most recent row within date range, indexed by permno</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">date_field</span> <span class="o">=</span> <span class="n">date_field</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_field</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span>
+        <span class="k">assert</span> <span class="n">dataset</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;buffered dataset was </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rets</span><span class="p">[</span><span class="n">date_field</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">date</span><span class="p">)]</span>\
+                 <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">date_field</span><span class="p">])</span>\
+                 <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)[</span><span class="n">fields</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StocksBuffer.get_ret"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksBuffer.get_ret">[docs]</a>    <span class="k">def</span> <span class="nf">get_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return compounded stock returns between beg and end dates</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          beg: Begin date to compound returns</span>
+<span class="sd">          end: End date (inclusive) to compound returns</span>
+<span class="sd">          field: Name of returns field in dataset, in {&#39;ret&#39;, &#39;retx&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">date_field</span><span class="p">]</span><span class="o">.</span><span class="n">between</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span>
+                           <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">field</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">field</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">identifier</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="StocksFrame"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame">[docs]</a><span class="k">class</span> <span class="nc">StocksFrame</span><span class="p">(</span><span class="n">Stocks</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mimic Stocks object given an input DataFrame of returns</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">      df: DataFrame of returns with date in index and permno in columns</span>
+<span class="sd">      rsuffix: replicate output columns and append rsuffix to column name</span>
+<span class="sd">      identifier: name of identifier column</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Limited interface to manipulate DataFrame of asset returns as </span>
+<span class="sd">      Stocks-like. Use when sql and BusDay not available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StocksFrame.bd"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.bd">[docs]</a>    <span class="k">class</span> <span class="nc">bd</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Class to mimic basic behavior of BusDay object&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StocksFrame.bd.begmo"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.bd.begmo">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">begmo</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;Returns same date&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">date</span></div>
+
+<div class="viewcode-block" id="StocksFrame.bd.endmo"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.bd.endmo">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">endmo</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;Returns same date&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="n">date</span></div>
+
+<div class="viewcode-block" id="StocksFrame.bd.date_tuples"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.bd.date_tuples">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">date_tuples</span><span class="p">(</span><span class="n">dates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+            <span class="sd">&quot;&quot;&quot;Returns adjacent dates as the holding date tuples&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">dates</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span></div></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
+                 <span class="n">rsuffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> 
+                 <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;permno&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rsuffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">rsuffix</span><span class="o">=</span><span class="n">rsuffix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+
+<div class="viewcode-block" id="StocksFrame.get_series"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.get_series">[docs]</a>    <span class="k">def</span> <span class="nf">get_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permnos</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">],</span>
+                   <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the series for target permnos&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">permnos</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="StocksFrame.get_ret"><a class="viewcode-back" href="../../../finds.structured.stocks.html#finds.structured.stocks.StocksFrame.get_ret">[docs]</a>    <span class="k">def</span> <span class="nf">get_ret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compounded returns between beg and end (inclusive) dates&quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">beg</span><span class="p">)</span> <span class="o">&amp;</span>
+                                      <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">)]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">prod</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">]</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

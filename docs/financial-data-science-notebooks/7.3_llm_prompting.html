@@ -1,0 +1,1747 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Prompting &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '7.3_llm_prompting';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Agents" href="7.4_llm_agents.html" />
+    <link rel="prev" title="Fine-tuning" href="7.2_llm_finetuning.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F7.3_llm_prompting.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/7.3_llm_prompting.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Prompting</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sentiment-analysis">Sentiment analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#financial-news-sentiment">Financial news sentiment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#google-gemma-3-model">Google Gemma 3 model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structured-dialogue">Structured dialogue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prompt-engineering">Prompt engineering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#structured-outputs">Structured outputs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-prompt">Zero-shot prompt</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#in-context-learning">In-context learning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="prompting">
+<h1>Prompting<a class="headerlink" href="#prompting" title="Permalink to this heading">#</a></h1>
+<p><em>The important thing is not to stop questioning. Curiosity has its own reason for existing</em> - Albert Einstein</p>
+<p>We explore how different prompting strategies influence the performance of large language models (LLMs) on the task of financial sentiment classification. We examine <strong>zero-shot</strong>, <strong>few-shot</strong>, and <strong>chain-of-thought (CoT)</strong> prompting techniques using Google’s open-source Gemma-3 model deployed locally with Ollama.  Careful design of prompts and enforcement of specific output formats improve the interpretability and reliability of LLM outputs. We also probe the model’s vision and multi-lingual capabilities, by prompting it to analyze a chart image and respond in different languages.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">ollama</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">paths</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="sentiment-analysis">
+<h2>Sentiment analysis<a class="headerlink" href="#sentiment-analysis" title="Permalink to this heading">#</a></h2>
+<p>Sentiment analysis has evolved significantly from its early reliance on lexicon-based methods, which used hand-crafted dictionaries to score sentiment. Supervised machine learning models brought improvements by learning from labeled examples. With the rise of deep learning, especially recurrent neural networks (RNNs), models gained the ability to capture contextual information and temporal dependencies in text. Transformer-based models, particularly large pre-trained language models, now dominate the field. These models can be fine-tuned or prompted to perform complex and domain-specific tasks with high accuracy and fluency.</p>
+<section id="financial-news-sentiment">
+<h3>Financial news sentiment<a class="headerlink" href="#financial-news-sentiment" title="Permalink to this heading">#</a></h3>
+<p>We use a labeled dataset compiled by Malo et al. (2014) containing financial news headlines annotated for sentiment from a retail investor’s perspective. This dataset is hosted on <strong>Kaggle</strong>, a popular platform for sharing machine learning challenges and datasets.</p>
+<p><a class="reference external" href="https://www.kaggle.com/datasets/ankurzing/sentiment-analysis-for-financial-news">https://www.kaggle.com/datasets/ankurzing/sentiment-analysis-for-financial-news</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loads financial news headline data labeled with sentiment (positive, neutral, negative)</span>
+<span class="n">news</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;all-data.csv&#39;</span><span class="p">,</span>
+                   <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentiment&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">],</span>
+                   <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+                   <span class="n">encoding_errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+<span class="n">news</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentiment</th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>neutral</td>
+      <td>According to Gran , the company has no plans t...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>neutral</td>
+      <td>Technopolis plans to develop in stages an area...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>negative</td>
+      <td>The international electronic industry company ...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>positive</td>
+      <td>With the new production plant the company woul...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>positive</td>
+      <td>According to the company 's updated strategy f...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>4841</th>
+      <td>negative</td>
+      <td>LONDON MarketWatch -- Share prices ended lower...</td>
+    </tr>
+    <tr>
+      <th>4842</th>
+      <td>neutral</td>
+      <td>Rinkuskiai 's beer sales fell by 6.5 per cent ...</td>
+    </tr>
+    <tr>
+      <th>4843</th>
+      <td>negative</td>
+      <td>Operating profit fell to EUR 35.4 mn from EUR ...</td>
+    </tr>
+    <tr>
+      <th>4844</th>
+      <td>negative</td>
+      <td>Net sales of the Paper segment decreased to EU...</td>
+    </tr>
+    <tr>
+      <th>4845</th>
+      <td>negative</td>
+      <td>Sales in Finland decreased by 10.5 % in Januar...</td>
+    </tr>
+  </tbody>
+</table>
+<p>4846 rows × 2 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hold out 15 examples in the &quot;training set&quot; that are not used for evaluation</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">news</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">],</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                                                    <span class="n">stratify</span><span class="o">=</span><span class="n">news</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sentiment</th>
+      <th>text</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2044</th>
+      <td>neutral</td>
+      <td>The estimated turnover of the new company is L...</td>
+    </tr>
+    <tr>
+      <th>3066</th>
+      <td>neutral</td>
+      <td>On 25 August 2009 , Sampo 's stake in Nordea w...</td>
+    </tr>
+    <tr>
+      <th>331</th>
+      <td>positive</td>
+      <td>Finnish investment group Panostaja Oyj said it...</td>
+    </tr>
+    <tr>
+      <th>1228</th>
+      <td>positive</td>
+      <td>Furthermore , our fully electrically driven cr...</td>
+    </tr>
+    <tr>
+      <th>3049</th>
+      <td>neutral</td>
+      <td>No decision on such sale of the now issued or ...</td>
+    </tr>
+    <tr>
+      <th>165</th>
+      <td>positive</td>
+      <td>Both operating profit and net sales for the ni...</td>
+    </tr>
+    <tr>
+      <th>4803</th>
+      <td>negative</td>
+      <td>UPM-Kymmene Corp. , the world 's largest maker...</td>
+    </tr>
+    <tr>
+      <th>3381</th>
+      <td>neutral</td>
+      <td>The total value of the order , placed by Aspo ...</td>
+    </tr>
+    <tr>
+      <th>1450</th>
+      <td>neutral</td>
+      <td>Uponor maintains its full-year guidance for 20...</td>
+    </tr>
+    <tr>
+      <th>3484</th>
+      <td>neutral</td>
+      <td>`` These developments partly reflect the gover...</td>
+    </tr>
+    <tr>
+      <th>1588</th>
+      <td>positive</td>
+      <td>Renzo Piano 's building design will be a wonde...</td>
+    </tr>
+    <tr>
+      <th>2330</th>
+      <td>neutral</td>
+      <td>Finnish L&amp;T Recoil , a company specialising in...</td>
+    </tr>
+    <tr>
+      <th>2572</th>
+      <td>neutral</td>
+      <td>Stora Enso , a global paper , packaging and wo...</td>
+    </tr>
+    <tr>
+      <th>3887</th>
+      <td>neutral</td>
+      <td>The plant is scheduled for completion in late ...</td>
+    </tr>
+    <tr>
+      <th>1714</th>
+      <td>negative</td>
+      <td>TeliaSonera 's underlying results however incl...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="s1">&#39;neutral&#39;</span><span class="p">,</span> <span class="s1">&#39;positive&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="google-gemma-3-model">
+<h2>Google Gemma 3 model<a class="headerlink" href="#google-gemma-3-model" title="Permalink to this heading">#</a></h2>
+<p>Google’s <strong>Gemma 3</strong> is a collection of lightweight, open models designed for deployment across platforms from mobile devices to workstations. Key technical features include:</p>
+<ul class="simple">
+<li><p>Available in four configurations: 1B, 4B, 12B, and 27B parameters</p></li>
+<li><p>Multimodal capabilities: The 4B, 12B, and 27B models support both text and image inputs, while the 1B model is optimized for text-only applications.</p></li>
+<li><p>The 1B model supports a 32K-token context window, while the larger models (4B and above) provide a 128K-token context window.</p></li>
+<li><p>Multilingual support out-of-the-box for over 35 languages.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model name for Gemma-3-4B model in Ollama</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;gemma3:12b&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="structured-dialogue">
+<h2>Structured dialogue<a class="headerlink" href="#structured-dialogue" title="Permalink to this heading">#</a></h2>
+<section id="prompt-engineering">
+<h3>Prompt engineering<a class="headerlink" href="#prompt-engineering" title="Permalink to this heading">#</a></h3>
+<p>Instead of explicit training, the model relies on its pre-trained knowledge to interpret and respond to a task based purely on how the prompt is phrased. Rather than modifying the model itself, prompt engineering uses careful wording to guide the model’s behavior. Prompts should clearly explain the task and may specify the expected output format (e.g. JSON) for easier parsing. A well-crafted prompt can significantly improve performance, especially in zero- or few-shot settings.</p>
+<p>To improve prompt results, start by assigning an identity to the LLM and sharing relevant background: this helps tailor the tone, detail, and relevance of the response. Be clear about the format you want, such as prose instead of bullet points, tables for comparisons, or timelines when useful. Mention how you’ll use the output (e.g., for a class, presentation, or blog post) to influence tone and content. Specify the style or tone you prefer, like persuasive or direct, and clarify whether you’re aiming for an essay or a casual post. When asking for rewrites, use specific instructions like “streamline” or “embellish” to guide the changes. Use the LLM to check for missing ideas in your writing, and be iterative with your questions to get more focused answers. For long articles, ask for summaries with a word or time limit. If you’re editing your own work, ask to preserve your tone. In technical fields, instruct the model not to simplify or substitute specialized terms. You can also request focused insights or key takeaways. Lastly, to guard against hallucinations, ask for the model’s confidence or sources.</p>
+<p>While earlier models required extensive trial and error to find effective prompts, modern instruction-tuned LLMs like DeepSeek-R1 and GPT-4o understand natural language instructions more reliably, reducing the need for manual prompt tuning.</p>
+</section>
+<section id="structured-outputs">
+<h3>Structured outputs<a class="headerlink" href="#structured-outputs" title="Permalink to this heading">#</a></h3>
+<p>LLMs naturally generate free-form text, which can be unpredictable and hard to parse. Structured outputs, such as JSON, enable downstream integration and ensure consistency. Methods for achieving structured output include:</p>
+<ul class="simple">
+<li><p>In-context demonstrations of expected format.</p></li>
+<li><p>Function calling / tool use, where the LLM generates function calls.</p></li>
+<li><p>Constrained decoding, which enforces valid output formats but requires custom decoders or grammars.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extracts a structured JSON response from the LLM&#39;s output</span>
+<span class="k">def</span> <span class="nf">parse_json</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">padding</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">+=</span> <span class="s1">&#39;}&#39;</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">s</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">+=</span> <span class="s1">&#39;]&#39;</span>
+        <span class="k">return</span> <span class="n">t</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;```json&quot;</span><span class="p">,</span> <span class="s2">&quot;```&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">padding</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">):</span><span class="n">s</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="s2">&quot;sentiment&quot;</span> <span class="ow">in</span> <span class="n">out</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sentiment&quot;</span><span class="p">:</span> <span class="s2">&quot;neutral&quot;</span><span class="p">,</span> <span class="s2">&quot;reasoning&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="zero-shot-prompt">
+<h3>Zero-shot prompt<a class="headerlink" href="#zero-shot-prompt" title="Permalink to this heading">#</a></h3>
+<p>Zero-shot prompting allows an LLM to perform a task without ay task-specific tuning or examples: just a single instruction and input. The model relies entirely on its pretraining to infer the desired output.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simple, instruction-only prompt asking for a single-word sentiment label in JSON format</span>
+<span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">In one word only, provide the sentiment of the following text as either &quot;positive&quot; or &quot;neutral&quot; or &quot;negative&quot;.</span>
+<span class="s2">Do not provide any other answer.</span>
+<span class="s2">Provide your output in json format.</span>
+<span class="s2">Text: &#39;&#39;&#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39;&#39;&#39;</span>
+<span class="s2">sentiment:&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_prompt</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>In one word only, provide the sentiment of the following text as either &quot;positive&quot; or &quot;neutral&quot; or &quot;negative&quot;.
+Do not provide any other answer.
+Provide your output in json format.
+Text: &#39;&#39;&#39;According to Gran , the company has no plans to move all production to Russia , although that is where the company is growing .&#39;&#39;&#39;
+sentiment:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sends prompt to LLaMA3 via Ollama, with temperature=0 for deterministic output</span>
+<span class="n">pred0</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">sentiment</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sentiment</span><span class="si">=}</span><span class="s2">: </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+    <span class="n">pred0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">response</span><span class="p">)[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 1/4831 [00:04&lt;6:00:00,  4.47s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;neutral&#39;: ```json
+{
+  &quot;sentiment&quot;: &quot;positive&quot;
+}
+```
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 2/4831 [00:04&lt;2:52:27,  2.14s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;neutral&#39;: ```json
+{
+  &quot;sentiment&quot;: &quot;neutral&quot;
+}
+```
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 4/4831 [00:05&lt;1:11:40,  1.12it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;negative&#39;: ```json
+{
+  &quot;sentiment&quot;: &quot;negative&quot;
+}
+```
+
+sentiment=&#39;positive&#39;: neutral
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 5/4831 [00:06&lt;1:00:23,  1.33it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;positive&#39;: ```json
+{
+  &quot;sentiment&quot;: &quot;positive&quot;
+}
+```
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4831/4831 [33:40&lt;00:00,  2.39it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluate predictions</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred0</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred0</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred0</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred0</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred0</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred0</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="s1">&#39;Predicted&#39;</span><span class="p">],</span> <span class="n">targets</span><span class="p">]),</span>
+          <span class="n">index</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>    <span class="c1"># display confusion matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.799
+              precision    recall  f1-score   support
+
+    negative       0.77      0.82      0.79       602
+     neutral       0.84      0.82      0.83      2870
+    positive       0.73      0.73      0.73      1359
+
+    accuracy                           0.80      4831
+   macro avg       0.78      0.79      0.79      4831
+weighted avg       0.80      0.80      0.80      4831
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">Predicted</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>negative</th>
+      <th>neutral</th>
+      <th>positive</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>negative</th>
+      <td>493</td>
+      <td>108</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>neutral</th>
+      <td>136</td>
+      <td>2367</td>
+      <td>367</td>
+    </tr>
+    <tr>
+      <th>positive</th>
+      <td>12</td>
+      <td>349</td>
+      <td>998</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="in-context-learning">
+<h3>In-context learning<a class="headerlink" href="#in-context-learning" title="Permalink to this heading">#</a></h3>
+<p><strong>Few-shot prompting</strong>, or <strong>In-Context Learning (ICL)</strong>, enhances performance by including labeled examples directly in the prompt. Instead of fine-tuning (and altering the pretrained neural network weights of) the model with new training examples, the model figures out how to perform well on that task simply by taking a few task-specific examples as input.</p>
+<p>Even when examples are randomly selected, few-shot prompts often outperform zero-shot, as the examples provide additional context. However, the exact choice and order of examples can affect accuracy and variance in responses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creates 15 prompt examples from training set</span>
+<span class="n">few_shots</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Text: &#39;&#39;&#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n</span><span class="s2">Sentiment: </span><span class="si">{</span><span class="n">sentiment</span><span class="si">}</span><span class="s2">&quot;</span>
+             <span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">sentiment</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)]</span>
+
+<span class="c1"># Concatenates few-shot examples before posing a new query</span>
+<span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">few_shots</span><span class="o">=</span><span class="n">few_shots</span><span class="p">):</span>
+    <span class="n">examples</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">few_shots</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Here are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">few_shots</span><span class="p">)</span><span class="si">}</span><span class="s2"> examples of providing the sentiment based on the given text.</span>
+
+<span class="si">{</span><span class="n">examples</span><span class="si">}</span><span class="s2"></span>
+
+<span class="s2">In one word only, provide the sentiment of the following text as either &quot;positive&quot; or &quot;neutral&quot; or &quot;negative&quot;.</span>
+<span class="s2">Do not provide any other answer.</span>
+<span class="s2">Text: &#39;&#39;&#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&#39;&#39;&#39;</span>
+<span class="s2">sentiment:&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">generate_prompt</span><span class="p">(</span><span class="n">news</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Here are 15 examples of providing the sentiment based on the given text.
+
+Text: &#39;&#39;&#39;The estimated turnover of the new company is LVL 2,5 million EEK 40 million .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;On 25 August 2009 , Sampo &#39;s stake in Nordea was 19.45 % .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;Finnish investment group Panostaja Oyj said its net profit went up to 8.6 mln euro $ 11.4 mln in fiscal 2005-06 , ended October 31 , 2006 , from 2.8 mln euro $ 3.7 mln in the same period of fiscal 2004-05 .&#39;&#39;&#39;
+Sentiment: positive
+
+Text: &#39;&#39;&#39;Furthermore , our fully electrically driven cranes are environmentally friendly .&#39;&#39;&#39;
+Sentiment: positive
+
+Text: &#39;&#39;&#39;No decision on such sale of the now issued or existing treasury shares to YA Global has been made yet .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;Both operating profit and net sales for the nine-month period increased , respectively by 26.6 % and 3.4 % , as compared to the corresponding period in 2006 .&#39;&#39;&#39;
+Sentiment: positive
+
+Text: &#39;&#39;&#39;UPM-Kymmene Corp. , the world &#39;s largest maker of magazine paper , on Tuesday reported a 19-percent profit drop as lower paper prices , higher costs and a strong euro hurt revenue .&#39;&#39;&#39;
+Sentiment: negative
+
+Text: &#39;&#39;&#39;The total value of the order , placed by Aspo &#39; marine transportation subsidiary ESL Shipping Oy , is EUR 60 million ( USD 77.5 m ) .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;Uponor maintains its full-year guidance for 2010 .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;`` These developments partly reflect the government &#39;s higher activity in the field of dividend policy . &#39;&#39;&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;Renzo Piano &#39;s building design will be a wonderful addition to London &#39;s skyline , &#39;&#39; says Noud Veeger , EVP and Area Director for Central and North Europe at KONE .&#39;&#39;&#39;
+Sentiment: positive
+
+Text: &#39;&#39;&#39;Finnish L&amp;T Recoil , a company specialising in used oil regeneration , is building a facility in Hamina in Finland in 2008 .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;Stora Enso , a global paper , packaging and wood products company , and Neste Oil , a Finnish company engaged in the refining and marketing of oil , have inaugurated the demonstration plant at Varkaus , Finland for biomass to liquids production utilizing forestry residues .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;The plant is scheduled for completion in late February 2007 with hand over of some areas in January Two other suppliers of Nokia - Aspocomp Group Oyj and Perlos - have announced their plans to establish plants within the Nokia complex Together , they will invest Rs 365 crore .&#39;&#39;&#39;
+Sentiment: neutral
+
+Text: &#39;&#39;&#39;TeliaSonera &#39;s underlying results however included 457 mln skr in positive one-offs , hence the adjusted underlying EBITDA actually amounts to 7.309 bln skr , clearly below expectations , analysts said .&#39;&#39;&#39;
+Sentiment: negative
+
+In one word only, provide the sentiment of the following text as either &quot;positive&quot; or &quot;neutral&quot; or &quot;negative&quot;.
+Do not provide any other answer.
+Text: &#39;&#39;&#39;According to Gran , the company has no plans to move all production to Russia , although that is where the company is growing .&#39;&#39;&#39;
+sentiment:
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sends prompt demonstrating the desired response</span>
+<span class="n">pred1</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">sentiment</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sentiment</span><span class="si">=}</span><span class="s2">: </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+    <span class="n">pred1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/4831 [00:00&lt;?, ?it/s]
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 2/4831 [00:00&lt;27:25,  2.93it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;neutral&#39;: positive
+
+sentiment=&#39;neutral&#39;: neutral
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 4/4831 [00:01&lt;15:20,  5.25it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;negative&#39;: negative
+
+sentiment=&#39;positive&#39;: neutral
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0%|          | 6/4831 [00:01&lt;11:30,  6.99it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sentiment=&#39;positive&#39;: neutral
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4831/4831 [09:20&lt;00:00,  8.61it/s]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluate predictions</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred1</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred1</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred1</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred1</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred1</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred1</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="s1">&#39;Predicted&#39;</span><span class="p">],</span> <span class="n">targets</span><span class="p">]),</span>
+          <span class="n">index</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>    <span class="c1"># display confusion matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.814
+              precision    recall  f1-score   support
+
+    negative       0.80      0.94      0.86       602
+     neutral       0.84      0.85      0.85      2870
+    positive       0.76      0.67      0.71      1359
+
+    accuracy                           0.81      4831
+   macro avg       0.80      0.82      0.81      4831
+weighted avg       0.81      0.81      0.81      4831
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">Predicted</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>negative</th>
+      <th>neutral</th>
+      <th>positive</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>negative</th>
+      <td>564</td>
+      <td>37</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>neutral</th>
+      <td>126</td>
+      <td>2451</td>
+      <td>293</td>
+    </tr>
+    <tr>
+      <th>positive</th>
+      <td>14</td>
+      <td>428</td>
+      <td>917</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="chain-of-thought-cot-prompting">
+<h3>Chain-of-thought (CoT) prompting<a class="headerlink" href="#chain-of-thought-cot-prompting" title="Permalink to this heading">#</a></h3>
+<p><strong>Chain-of-thought (CoT)</strong> prompting encourages LLMs to reason step-by-step before making a final prediction. Instead of jumping to answers, LLMs can be prompted to explain their reasoning step by step. Introduced by Wei et al. (2022), CoT can be paired with few-shot prompts to improve performance on tasks requiring logical inference. By generating intermediate reasoning, the model delays its decision-making, reducing errors and hallucinations.</p>
+<p>Extensions include:</p>
+<ul class="simple">
+<li><p>Self-Consistency: Voting over multiple CoT outputs.</p></li>
+<li><p>Tree of Thoughts (ToT): Exploring multiple reasoning paths.</p></li>
+<li><p>ReAct: Combining reasoning with tool use.</p></li>
+<li><p>Reflexion: Prompting the model to critique and revise its own answers.</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Expands prompt to include step-by-step instructions: extract terms, identify sentiment cues, provide reasoning</span>
+<span class="k">def</span> <span class="nf">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">few_shots</span><span class="o">=</span><span class="n">few_shots</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Evaluate the financial news by identifying the cause (e.g., earnings report, economic policy, </span>
+<span class="sd">market reaction) and its effect on investor sentiment. If the cause indicates positive impact </span>
+<span class="sd">on stock prices or economy, classify it as &quot;positive&quot;. If it suggests decline or uncertainty, </span>
+<span class="sd">classify it as &quot;negative&quot;. &#39;&#39;&#39;</span>
+    <span class="n">examples</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">few_shots</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Here are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">few_shots</span><span class="p">)</span><span class="si">}</span><span class="s2"> examples of providing the sentiment based on the given text.</span>
+
+<span class="si">{</span><span class="n">examples</span><span class="si">}</span><span class="s2">.</span>
+
+<span class="s2">Analyze the financial news headline in a step-by-step manner. </span>
+<span class="s2">First, identify key financial terms (e.g., profit, loss, growth, decline).</span>
+<span class="s2">Second, extract phrases indicating sentiment (e.g., &#39;strong earnings,&#39; &#39;market turmoil&#39;). </span>
+<span class="s2">Finally, provide a reasoned conclusion and assess whether the sentiment </span>
+<span class="s2">is &quot;positive&quot;, &quot;negative&quot;, or &quot;neutral&quot; from the perspective of retail investors.</span>
+<span class="s2">If you cannot assess the sentiment, then classify it &quot;neutral&quot;. </span>
+<span class="s2">Provide your sentiment label and reasoning in json format. </span>
+<span class="s2">Do not provide any other answer.</span>
+<span class="s2">Text: </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># CoT prompt to induce intermediate reasoning steps</span>
+<span class="n">pred2</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">sentiment</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y_test</span><span class="p">)):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">generate_prompt</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;temperature&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">})</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Labeled </span><span class="si">{</span><span class="n">sentiment</span><span class="si">=}</span><span class="s2">.  RESPONSE=&quot;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">pred2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parse_json</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">response</span><span class="p">)[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4831/4831 [25:46&lt;00:00,  3.12it/s] 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Evaluate prediction</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred2</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred2</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred2</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred2</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">pred2</span><span class="p">)],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">pred2</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">targets</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([[</span><span class="s1">&#39;Predicted&#39;</span><span class="p">],</span> <span class="n">targets</span><span class="p">]),</span>
+          <span class="n">index</span><span class="o">=</span><span class="n">targets</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>    <span class="c1"># display confusion matrix</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.413
+              precision    recall  f1-score   support
+
+    negative       0.11      0.11      0.11        73
+     neutral       0.55      0.60      0.57       355
+    positive       0.19      0.15      0.17       168
+
+    accuracy                           0.41       596
+   macro avg       0.28      0.29      0.28       596
+weighted avg       0.39      0.41      0.40       596
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" halign="left">Predicted</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>negative</th>
+      <th>neutral</th>
+      <th>positive</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>negative</th>
+      <td>8</td>
+      <td>52</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>neutral</th>
+      <td>48</td>
+      <td>213</td>
+      <td>94</td>
+    </tr>
+    <tr>
+      <th>positive</th>
+      <td>19</td>
+      <td>124</td>
+      <td>25</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="vision-language">
+<h2>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h2>
+<p>Analyze a chart image, specifically Figure 4 from Malo et al (2014)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load and display a test image</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">image_filename</span> <span class="o">=</span> <span class="s2">&quot;assets/MSDTRPL_EC013-H-2020-1602198302.webp&quot;</span>
+<span class="n">image_filename</span> <span class="o">=</span> <span class="s2">&quot;assets/malo-fig4.png&quot;</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_filename</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(np.float64(-0.5), np.float64(497.5), np.float64(486.5), np.float64(-0.5))
+</pre></div>
+</div>
+<img alt="_images/6bf701f29e9288ecc3da8a8382a986b0d1c62cd4e0033c573a789c4e831ebd8e.png" src="_images/6bf701f29e9288ecc3da8a8382a986b0d1c62cd4e0033c573a789c4e831ebd8e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+	<span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	<span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+		<span class="p">{</span>
+			<span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+			<span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Describe this image:&#39;</span><span class="p">,</span>
+			<span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">image_filename</span><span class="p">]</span>
+		<span class="p">}</span>
+	<span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Here&#39;s a description of the image you sent:
+
+**Type of Chart:**
+
+The image displays a histogram.
+
+**Data Represented:**
+
+The histogram shows the distribution of &quot;sequence lengths&quot; (likely
+referring to the length of entity sequences) from a financial phrase
+bank consisting of 5000 sentences. The sequence lengths are
+represented before pruning.
+
+**Axes:**
+
+*   **X-axis (Horizontal):** Represents &quot;Sequence Length,&quot; ranging
+from 2 to 12, with integer values.
+*   **Y-axis (Vertical):** Represents &quot;Density,&quot; ranging from 0 to
+0.20.
+
+**Key Observations:**
+
+*   The distribution is somewhat skewed, with a peak around a sequence
+length of 6 or 7.
+*   There&#39;s a noticeable number of sequences with lengths between 6
+and 10.
+*   The density decreases as the sequence length moves away from the
+peak.
+
+**Overall Impression:**
+
+The histogram provides a visual summary of how long the entity
+sequences are, before any pruning or filtering is applied. It suggests
+that most sequences are relatively short (between 2 and 10 units), but
+there&#39;s also a presence of longer sequences.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="multi-lingual">
+<h2>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h2>
+<p>Translate to Mandarin and french</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mandarin</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+	<span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	<span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+		<span class="p">{</span>
+			<span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+			<span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Please translate to mandarin: &#39;</span> <span class="o">+</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">],</span>
+		<span class="p">}</span>
+	<span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">mandarin</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Okay, here&#39;s a Mandarin translation, aiming for accuracy and clarity.
+I&#39;ve included explanations after each section to clarify choices and
+offer alternatives.  I&#39;ve also broken it down into sections mirroring
+the original.  **Please read the notes at the very end – they are
+crucial for understanding the nuances of the translation.**
+
+**1. Type of Chart:**
+
+* **Mandarin:**  这张图片显示的是一个直方图。 (Zhè zhāng túpiàn xiǎnshì de shì yī gè
+zhífāngtú.)
+* **Explanation:**
+    * `这张图片 (zhè zhāng túpiàn)`: &quot;This image&quot; - standard way to refer
+to an image.
+    * `显示 (xiǎnshì)`: &quot;Displays/Shows&quot; - a common and neutral verb.
+    * `直方图 (zhífāngtú)`: &quot;Histogram&quot; - the standard term.
+
+**2. Data Represented:**
+
+* **Mandarin:**  这个直方图展示了来自一个包含 5000
+句话的金融短语库中的“序列长度”的分布情况。序列长度是在修剪之前的数据。 (Zhège zhífāngtú zhǎnshì le láizì
+yī gè bāohán 5000 gè jùzi de jīnróng duǎnyǔ kù zhōng de “xùliè
+chángdù” de fēnbù qíngkuàng. Xùliè chángdù shì zài xiūjiǎn zhīqián de
+shùjù.)
+* **Explanation:**
+    * `展示 (zhǎnshì)`: &quot;Shows/Displays&quot; - used again for consistency.
+    * `来自 (láizì)`: &quot;From&quot; - indicates the source of the data.
+    * `包含 (bāohán)`: &quot;Containing/Consisting of&quot;
+    * `金融短语库 (jīnróng duǎnyǔ kù)`: &quot;Financial phrase bank&quot; - a direct
+translation.
+    * `句子 (jùzi)`: &quot;Sentences&quot;
+    * `“序列长度” (“xùliè chángdù”)`:  &quot;Sequence Length&quot; -  The quotation
+marks are important to indicate it&#39;s a specific term.  `序列 (xùliè)`
+means &quot;sequence&quot; and `长度 (chángdù)` means &quot;length.&quot;
+    * `分布情况 (fēnbù qíngkuàng)`: &quot;Distribution situation/pattern&quot; - a
+common way to describe a distribution.
+    * `修剪 (xiūjiǎn)`: &quot;Pruning&quot; - a good translation for the technical
+term.
+    * `之前 (zhīqián)`: &quot;Before&quot;
+
+**3. Axes:**
+
+* **Mandarin:**
+    * **X轴 (水平):** 代表“序列长度”，范围从 2 到 12，值为整数。 (X zhóu (shuǐpíng):
+Dàibiǎo “xùliè chángdù”, fànwéi cóng 2 dào 12, zhíwèi zhěngshù.)
+    * **Y轴 (垂直):** 代表“密度”，范围从 0 到 0.20。 (Y zhóu (chōngcù): Dàibiǎo
+“mìdù”, fànwéi cóng 0 dào 0.20.)
+* **Explanation:**
+    * `X轴 (shuǐpíng)`: &quot;X-axis (Horizontal)&quot; -  `轴 (zhóu)` means
+&quot;axis,&quot; and `水平 (shuǐpíng)` means &quot;horizontal.&quot;
+    * `Y轴 (chōngcù)`: &quot;Y-axis (Vertical)&quot; - `垂直 (chōngcù)` means
+&quot;vertical.&quot;
+    * `代表 (dàibiǎo)`: &quot;Represents&quot;
+    * `范围 (fànwéi)`: &quot;Range&quot;
+    * `值为整数 (zhíwèi zhěngshù)`: &quot;Values are integers&quot;
+
+**4. Key Observations:**
+
+* **Mandarin:**
+    *  分布情况有些倾斜，峰值出现在序列长度约为 6 或 7 左右。 (Fēnbù qíngkuàng yǒuxiē qīngxiá,
+fēngzhí chūxiàn zài xùliè chángdù suǒyú 6 huò 7 zuǒyòu.)
+    *  可以看到，在 6 到 10 之间的序列长度数量比较多。 (Kěyǐ kànjiàn, zài 6 dào 10 zhījiān
+de xùliè chángdù shùliàng bǐjiào duō.)
+    *  随着序列长度远离峰值，密度逐渐下降。 (Suízhe xùliè chángdù yuǎnlí fēngzhí, mìdù
+zhújiàn xiàjiàng.)
+* **Explanation:**
+    * `有些倾斜 (yǒuxiē qīngxiá)`: &quot;Somewhat skewed&quot; - a good translation
+for &quot;skewed.&quot;
+    * `峰值 (fēngzhí)`: &quot;Peak&quot;
+    * `出现在 (chūxiàn zài)`: &quot;Appears at&quot;
+    * `约为 (suǒyú)`: &quot;Approximately&quot;
+    * `左右 (zuǒyòu)`: &quot;Around/Approximately&quot; - softens the number.
+    * `可以看到 (kěyǐ kànjiàn)`: &quot;It can be seen that&quot;
+    * `数量比较多 (shùliàng bǐjiào duō)`: &quot;The number is relatively large&quot;
+    * `随着 (suízhe)`: &quot;As/With&quot;
+    * `远离 (yuǎnlí)`: &quot;Away from&quot;
+    * `逐渐下降 (zhújiàn xiàjiàng)`: &quot;Gradually decreases&quot;
+
+**5. Overall Impression:**
+
+* **Mandarin:**  这个直方图提供了关于实体序列长度的视觉总结，在应用任何修剪或过滤之前。它表明大多数序列相对较短（在 2 到
+10 个单位之间），但也存在较长的序列。 (Zhège zhífāngtú tígōng le guānyú shítǐ xùliè
+chángdù de shìjué zǒngjié, zài yìngyòng rènhé xiūjiǎn huò guòlǜ
+zhīqián. Tā biǎomíng dàdū zhī xùliè xiāngduì jiào duǎn (zài 2 dào 10
+gè dānwèi zhījiān), yě yǒng yǒu jiào cháng de xùliè.)
+* **Explanation:**
+    * `提供了 (tígōng le)`: &quot;Provides&quot;
+    * `视觉总结 (shìjué zǒngjié)`: &quot;Visual summary&quot;
+    * `应用 (yìngyòng)`: &quot;Apply&quot;
+    * `过滤 (guòlǜ)`: &quot;Filtering&quot;
+    * `相对较短 (xiāngduì jiào duǎn)`: &quot;Relatively short&quot;
+    * `单位 (dānwèi)`: &quot;Units&quot;
+    * `但也存在 (yě yǒng yǒu)`: &quot;But there also exists&quot;
+
+
+
+**IMPORTANT NOTES:**
+
+* **Technical Jargon:**  I&#39;m assuming a reasonably technical audience.
+If the audience is less familiar with data analysis terms, some
+phrases might need simplification.
+* **&quot;Entity Sequences&quot;:**  The translation of &quot;entity sequences&quot; is a
+bit tricky.  `实体序列 (shítǐ xùliè)` is a literal translation, but
+depending on the context, a more descriptive phrase might be better.
+* **Naturalness:** While I&#39;m aiming for accuracy, a native speaker
+might phrase some sentences slightly differently for a more natural
+flow.
+* **Context is Key:** The best translation always depends on the
+specific context and the intended audience.  If you can provide more
+context, I can refine the translation further.
+* **Simplified vs. Traditional Chinese:** This translation is in
+Simplified Chinese, which is most commonly used in mainland China. If
+you need Traditional Chinese, let me know.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">french</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+	<span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	<span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+		<span class="p">{</span>
+			<span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+			<span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Please translate to french: &#39;</span> <span class="o">+</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">],</span>
+		<span class="p">}</span>
+	<span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">french</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Okay, here&#39;s a French translation of the description, aiming for
+accuracy and clarity. I&#39;ve included a couple of options for certain
+phrases to give you some flexibility.  I&#39;ve also added notes after the
+translation to explain some choices.
+
+**Option 1 (More Formal):**
+
+&quot;Voici une description de l&#39;image que vous avez envoyée :
+
+**Type de graphique :**
+
+L&#39;image présente un histogramme.
+
+**Données représentées :**
+
+L&#39;histogramme illustre la distribution des &quot;longueurs de séquences&quot;
+(probablement faisant référence à la longueur des séquences d&#39;entités)
+provenant d&#39;une banque de phrases financières composée de 5000
+phrases. Les longueurs de séquences sont représentées avant élagage.
+
+**Axes :**
+
+*   **Axe des abscisses (horizontal) :** Représente la &quot;Longueur de
+séquence&quot;, variant de 2 à 12, avec des valeurs entières.
+*   **Axe des ordonnées (vertical) :** Représente la &quot;Densité&quot;,
+variant de 0 à 0,20.
+
+**Observations principales :**
+
+*   La distribution est légèrement asymétrique, avec un pic autour
+d&#39;une longueur de séquence de 6 ou 7.
+*   On observe un nombre notable de séquences dont la longueur se
+situe entre 6 et 10.
+*   La densité diminue à mesure que la longueur de la séquence
+s&#39;éloigne du pic.
+
+**Impression générale :**
+
+L&#39;histogramme fournit un résumé visuel de la longueur des séquences
+d&#39;entités, avant toute élagage ou filtrage. Il suggère que la plupart
+des séquences sont relativement courtes (entre 2 et 10 unités), mais
+qu&#39;il existe également des séquences plus longues.&quot;
+
+**Option 2 (Slightly Less Formal):**
+
+&quot;Voici une description de l&#39;image que vous avez envoyée :
+
+**Type de graphique :**
+
+L&#39;image montre un histogramme.
+
+**Données représentées :**
+
+L&#39;histogramme montre la distribution des &quot;longueurs de séquences&quot;
+(probablement la longueur des séquences d&#39;entités) provenant d&#39;une
+banque de phrases financières contenant 5000 phrases. Les longueurs de
+séquences sont affichées avant l&#39;élagage.
+
+**Axes :**
+
+*   **Axe horizontal (abscisses) :** Représente la &quot;Longueur de
+séquence&quot;, allant de 2 à 12, avec des valeurs entières.
+*   **Axe vertical (ordonnées) :** Représente la &quot;Densité&quot;, allant de
+0 à 0,20.
+
+**Observations principales :**
+
+*   La distribution est un peu asymétrique, avec un pic autour d&#39;une
+longueur de séquence de 6 ou 7.
+*   Il y a un nombre important de séquences dont la longueur se situe
+entre 6 et 10.
+*   La densité diminue à mesure que la longueur de la séquence
+s&#39;éloigne du pic.
+
+**Impression générale :**
+
+L&#39;histogramme donne un aperçu visuel de la longueur des séquences
+d&#39;entités, avant tout élagage ou filtrage. Il indique que la plupart
+des séquences sont relativement courtes (entre 2 et 10 unités), mais
+qu&#39;il y a aussi des séquences plus longues.&quot;
+
+**Notes on Choices &amp; Vocabulary:**
+
+*   **&quot;Histogramme&quot;**: This is the standard French translation of
+&quot;histogram.&quot;
+*   **&quot;Longueurs de séquences&quot;**:  This is a direct translation of
+&quot;sequence lengths.&quot;
+*   **&quot;Banque de phrases financières&quot;**:  &quot;Financial phrase bank&quot;
+translates well to this.
+*   **&quot;Élagage&quot;**: This is the best translation for &quot;pruning&quot; in this
+context. It implies removing or shortening sequences.
+*   **&quot;Asymétrique&quot;**:  This is the standard term for &quot;skewed&quot; in a
+statistical context.
+*   **&quot;Axe des abscisses/ordonnées&quot; vs. &quot;Axe horizontal/vertical&quot;**:
+The first is more technically correct, the second is more
+conversational. I&#39;ve included both options.
+*   **&quot;Fournit un résumé visuel&quot; vs. &quot;Donne un aperçu visuel&quot;**: Both
+are good translations of &quot;provides a visual summary.&quot;
+*   **&quot;Indique&quot; vs. &quot;Suggère&quot;**: Both are good translations of
+&quot;suggests.&quot; &quot;Indique&quot; is a bit stronger.
+*   **&quot;Contenant&quot; vs. &quot;composée de&quot;**: Both are good translations of
+&quot;consisting of&quot;. &quot;Contenant&quot; is slightly less formal.
+
+**Which option to choose?**
+
+*   **Option 1** is more suitable for a formal report or technical
+document.
+*   **Option 2** is more appropriate for a more casual explanation.
+
+I hope this helps! Let me know if you have any other questions.
+</pre></div>
+</div>
+</div>
+</div>
+<p>References:</p>
+<ul class="simple">
+<li><p>Malo, P., Sinha, A., Takala, P., Korhonen, P. and Wallenius, J. (2014): “Good debt or bad debt: Detecting semantic orientations in economic texts.” Journal of the American Society for Information Science and Technology.</p></li>
+<li><p>Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc Le and Denny Zhou, 2023, Chain-of-Thought Prompting Elicits Reasoning in Large Language Models, <a class="reference external" href="https://arxiv.org/abs/2201.11903">https://arxiv.org/abs/2201.11903</a></p></li>
+<li><p>Greg Durrett, 2023, “CS388 Natural Language Processing course materisl”, retrieved from <a class="reference external" href="https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html">https://www.cs.utexas.edu/~gdurrett/courses/online-course/materials.html</a></p></li>
+<li><p><a class="reference external" href="https://llama.meta.com/docs/how-to-guides/prompting/">https://llama.meta.com/docs/how-to-guides/prompting/</a></p></li>
+<li><p><a class="reference external" href="https://www.promptingguide.ai/techniques/cot">https://www.promptingguide.ai/techniques/cot</a></p></li>
+<li><p><a class="reference external" href="https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a">https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a</a></p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="7.2_llm_finetuning.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Fine-tuning</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="7.4_llm_agents.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Agents</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sentiment-analysis">Sentiment analysis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#financial-news-sentiment">Financial news sentiment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#google-gemma-3-model">Google Gemma 3 model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structured-dialogue">Structured dialogue</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prompt-engineering">Prompt engineering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#structured-outputs">Structured outputs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#zero-shot-prompt">Zero-shot prompt</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#in-context-learning">In-context learning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

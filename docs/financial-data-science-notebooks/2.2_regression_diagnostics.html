@@ -1,0 +1,1088 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Linear Regression Diagonostics &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '2.2_regression_diagnostics';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Time Series Analysis" href="2.3_time_series.html" />
+    <link rel="prev" title="Economic Indicators" href="2.1_economic_indicators.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F2.2_regression_diagnostics.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/2.2_regression_diagnostics.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Linear Regression Diagonostics</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-assumptions">Model assumptions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#heteroskedasity-and-hac-robust-errors">Heteroskedasity and HAC robust errors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multicollinearity-and-variance-inflation-factors">Multicollinearity and variance inflation factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#omitted-variables">Omitted variables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#residual-diagnostics">Residual diagnostics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#residuals-vs-fitted-plot">Residuals vs fitted plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normal-qq-plot">Normal QQ plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scale-location-plot">Scale-location plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-and-influential-points">Leverage and influential points</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="linear-regression-diagonostics">
+<h1>Linear Regression Diagonostics<a class="headerlink" href="#linear-regression-diagonostics" title="Permalink to this heading">#</a></h1>
+<p><em>In economics, the majority is always wrong</em> - John Kenneth Galbraith</p>
+<p>For a linear regression model to produce reliable and interpretable results, it must satisfy certain assumptions. Diagnosing potential issues such as heteroskedasticity, multicollinearity, omitted variables, and influential data points is important for model validity. We explore key diagnostic tests for linear regression, including methods for detecting violations of assumptions, evaluating the impact of outliers, and assessing model fit through residual plots. Additionally, we discuss techniques for robust standard errors when assumptions are violated, such as heteroskedasticity- and autocorrelation-consistent (HAC) estimators.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">patsy</span>
+<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.outliers_influence</span> <span class="kn">import</span> <span class="n">variance_inflation_factor</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Alfred</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">plot_fitted</span><span class="p">,</span> <span class="n">plot_leverage</span><span class="p">,</span> <span class="n">plot_scale</span><span class="p">,</span> <span class="n">plot_qq</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># matplotlib qt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For this analysis, we retrieve monthly Consumer Price Index (CPI) data as the dependent (endogenous) variable and Producer Price Index (PPI) data as the independent (exogenous) variable. The model uses the monthly differences of the logarithms of both series to account for changes over time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># difference of logs of CPI and PPI monthly series from FRED</span>
+<span class="n">series_id</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="s1">&#39;CPIAUCSL&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="mi">0</span>   <span class="c1">#19740101</span>
+<span class="n">exog_id</span> <span class="o">=</span> <span class="s1">&#39;WPSFD4131&#39;</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">alf</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="n">series_id</span><span class="p">,</span> <span class="n">exog_id</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeIndex</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>  <span class="c1"># model the changes in logs of the series</span>
+<span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="n">s</span><span class="p">:</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">[</span><span class="n">series_id</span><span class="p">,</span> <span class="n">exog_id</span><span class="p">]},</span>
+                    <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CPIAUCSL</th>
+      <td>Consumer Price Index for All Urban Consumers: ...</td>
+    </tr>
+    <tr>
+      <th>WPSFD4131</th>
+      <td>Producer Price Index by Commodity: Final Deman...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<section id="model-assumptions">
+<h2>Model assumptions<a class="headerlink" href="#model-assumptions" title="Permalink to this heading">#</a></h2>
+<p>A valid linear regression model must satisfy the following assumptions:</p>
+<ol class="arabic simple">
+<li><p><strong>Linearity</strong>: The expected value of <span class="math notranslate nohighlight">\( y_i \)</span> follows a linear function of the independent variables:<br />
+$<span class="math notranslate nohighlight">\(
+E[y_i] = b_0 + b_1 x_{i1} + ... + b_k x_{ik}
+\)</span>$</p></li>
+<li><p><strong>Exogeneity</strong>: The explanatory variables <span class="math notranslate nohighlight">\( \{x_{i1} ,...,x_{ik} \} \)</span> are non-stochastic and not correlated with the error term.</p></li>
+<li><p><strong>Homoscedasticity</strong>: The variance of the dependent variable remains constant:<br />
+$<span class="math notranslate nohighlight">\(
+Var(y_i) = \sigma^2
+\)</span>$</p></li>
+<li><p><strong>Independence</strong>: The observations <span class="math notranslate nohighlight">\( \{ y_i \} \)</span> are independent of each other.</p></li>
+<li><p><strong>Normality</strong>: The error terms follow a normal distribution.</p></li>
+</ol>
+<p>When assumptions 1-4 hold, the least squares estimator:</p>
+<ul class="simple">
+<li><p>Provides an <strong>unbiased</strong> estimate of the regression coefficients:<br />
+$<span class="math notranslate nohighlight">\(
+b = (X' X)^{-1} X' y
+\)</span>$</p></li>
+<li><p>Has a variance-covariance matrix:<br />
+$<span class="math notranslate nohighlight">\(
+Var(b) = \sigma^2 (X' X)^{-1}
+\)</span>$</p></li>
+<li><p>The standard error for each coefficient <span class="math notranslate nohighlight">\( b_j \)</span> is:<br />
+$<span class="math notranslate nohighlight">\(
+se(b_j) = \sigma \sqrt{(X' X)^{-1}_{[j+1,j+1]}}
+\)</span>$</p></li>
+</ul>
+<p>When all five assumptions hold, the least squares estimator follows a normal distribution, enabling valid statistical inference.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run Linear Regression (with exog and 2 lags)</span>
+<span class="n">dmf</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1"> ~ </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">.shift(1) + </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">.shift(2) + </span><span class="si">{</span><span class="n">exog_id</span><span class="si">}</span><span class="s1">.shift(1)&#39;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="n">dmf</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               CPIAUCSL   R-squared:                       0.453
+Model:                            OLS   Adj. R-squared:                  0.451
+Method:                 Least Squares   F-statistic:                     167.5
+Date:                Sun, 02 Mar 2025   Prob (F-statistic):           4.43e-79
+Time:                        22:25:01   Log-Likelihood:                 2815.2
+No. Observations:                 610   AIC:                            -5622.
+Df Residuals:                     606   BIC:                            -5605.
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+======================================================================================
+                         coef    std err          t      P&gt;|t|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.0009      0.000      6.276      0.000       0.001       0.001
+CPIAUCSL.shift(1)      0.5821      0.041     14.199      0.000       0.502       0.663
+CPIAUCSL.shift(2)     -0.0479      0.041     -1.174      0.241      -0.128       0.032
+WPSFD4131.shift(1)     0.2011      0.036      5.609      0.000       0.131       0.271
+==============================================================================
+Omnibus:                      116.912   Durbin-Watson:                   2.051
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              584.706
+Skew:                          -0.752   Prob(JB):                    1.08e-127
+Kurtosis:                       7.555   Cond. No.                         522.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</pre></div>
+</div>
+</div>
+</div>
+<section id="heteroskedasity-and-hac-robust-errors">
+<h3>Heteroskedasity and HAC robust errors<a class="headerlink" href="#heteroskedasity-and-hac-robust-errors" title="Permalink to this heading">#</a></h3>
+<p>If the variance of residuals is not constant (<strong>heteroskedasticity</strong>), the usual <strong>Ordinary Least Squares (OLS)</strong> standard error formula, <span class="math notranslate nohighlight">\( \sigma^2 (X' X)^{-1} \)</span>, no longer holds. While OLS coefficient estimates remain <strong>consistent</strong>, their standard errors may be misestimated. A more general form of the variance-covariance matrix is:</p>
+<div class="math notranslate nohighlight">
+\[
+(X' X)^{-1}(X' \Omega X)(X' X)^{-1}
+\]</div>
+<p>where different choices of <span class="math notranslate nohighlight">\( \Omega \)</span> provide <strong>robust standard error estimators</strong>.</p>
+<ul class="simple">
+<li><p><strong>White’s (1980) heteroskedasticity-consistent estimator</strong> (also known as the sandwich estimator) uses the diagonal of squared residuals.</p></li>
+<li><p>Alternative estimators account for leverage effects in the design matrix.</p></li>
+</ul>
+<p>If error terms exhibit <strong>serial correlation</strong>, standard heteroskedasticity-robust errors may still be misleading. <strong>Newey and West (1987)</strong> introduced the <strong>Heteroskedasticity and Autocorrelation Consistent (HAC)</strong> estimator, which applies a weighting scheme to correct for autocorrelation. The truncation parameter for lag selection is often chosen as:</p>
+<div class="math notranslate nohighlight">
+\[
+m = 0.75 T^{1/3}
+\]</div>
+<p>where autocorrelation coefficients are weighted as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+1 + 2 \sum_{j=1}^{m-1} \dfrac{m-j}{m} \hat{\rho_j}
+\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">robust</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_robustcov_results</span><span class="p">(</span><span class="n">cov_type</span><span class="o">=</span><span class="s1">&#39;HAC&#39;</span><span class="p">,</span> <span class="n">use_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxlags</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">robust</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               CPIAUCSL   R-squared:                       0.453
+Model:                            OLS   Adj. R-squared:                  0.451
+Method:                 Least Squares   F-statistic:                     108.8
+Date:                Sun, 02 Mar 2025   Prob (F-statistic):           2.25e-56
+Time:                        22:25:01   Log-Likelihood:                 2815.2
+No. Observations:                 610   AIC:                            -5622.
+Df Residuals:                     606   BIC:                            -5605.
+Df Model:                           3                                         
+Covariance Type:                  HAC                                         
+======================================================================================
+                         coef    std err          t      P&gt;|t|      [0.025      0.975]
+--------------------------------------------------------------------------------------
+Intercept              0.0009      0.000      5.779      0.000       0.001       0.001
+CPIAUCSL.shift(1)      0.5821      0.074      7.903      0.000       0.437       0.727
+CPIAUCSL.shift(2)     -0.0479      0.053     -0.902      0.367      -0.152       0.056
+WPSFD4131.shift(1)     0.2011      0.055      3.652      0.000       0.093       0.309
+==============================================================================
+Omnibus:                      116.912   Durbin-Watson:                   2.051
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              584.706
+Skew:                          -0.752   Prob(JB):                    1.08e-127
+Kurtosis:                       7.555   Cond. No.                         522.
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 0 lags and without small sample correction
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="multicollinearity-and-variance-inflation-factors">
+<h3>Multicollinearity and variance inflation factors<a class="headerlink" href="#multicollinearity-and-variance-inflation-factors" title="Permalink to this heading">#</a></h3>
+<p>Multicollinearity arises when explanatory variables are highly correlated, leading to unstable coefficient estimates. The <strong>Variance Inflation Factor (VIF)</strong> quantifies the degree of multicollinearity by measuring how much a predictor’s variance is inflated due to correlation with other predictors:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{VIF_i} = \dfrac{1}{1-R^2_i}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\( R^2_i \)</span> is obtained by regressing <span class="math notranslate nohighlight">\( X_i \)</span> on all other predictors.</p>
+<p>A VIF &gt; 5 or 10 suggests that the variable is highly collinear with other explanatory variables, potentially leading to large standard errors and unreliable estimates.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">patsy</span><span class="o">.</span><span class="n">dmatrices</span><span class="p">(</span><span class="n">dmf</span> <span class="o">+</span> <span class="s1">&#39; - 1&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>  <span class="c1"># exclude intercept term  </span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Variance Inflation Factors&quot;</span><span class="p">)</span>
+<span class="n">Series</span><span class="p">({</span><span class="n">X</span><span class="o">.</span><span class="n">design_info</span><span class="o">.</span><span class="n">column_names</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])},</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;VIF&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Variance Inflation Factors
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>VIF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CPIAUCSL.shift(1)</th>
+      <td>3.414717</td>
+    </tr>
+    <tr>
+      <th>CPIAUCSL.shift(2)</th>
+      <td>3.404137</td>
+    </tr>
+    <tr>
+      <th>WPSFD4131.shift(1)</th>
+      <td>2.285974</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="omitted-variables">
+<h3>Omitted variables<a class="headerlink" href="#omitted-variables" title="Permalink to this heading">#</a></h3>
+<p>Leaving out an important variable from the regression model can lead to biased estimates. The consequences are:</p>
+<ol class="arabic simple">
+<li><p><strong>Bias in Included Variables</strong>: If the omitted variable is correlated with included variables, their regression coefficients will capture some of its effect, leading to inconsistent estimates.</p></li>
+<li><p><strong>Inflated Residual Variance</strong>: The estimated residuals will include both true shocks and the effects of the omitted variable, reducing model accuracy.</p></li>
+</ol>
+<p>Conversely, including an extraneous (irrelevant) variable does not introduce bias but increases standard errors, making it harder to detect significant effects.</p>
+</section>
+</section>
+<section id="residual-diagnostics">
+<h2>Residual diagnostics<a class="headerlink" href="#residual-diagnostics" title="Permalink to this heading">#</a></h2>
+<p>Residual plots help evaluate model fit, identify outliers and detect potential specification issues.<br />
+An ideal model would have residuals that are not systematically related to any of the included explanatory variables. Standardized residuals may alternatively be used so that the magnitude of deviation is more apparent.</p>
+<section id="residuals-vs-fitted-plot">
+<h3>Residuals vs fitted plot<a class="headerlink" href="#residuals-vs-fitted-plot" title="Permalink to this heading">#</a></h3>
+<p>This plot assesses whether residuals exhibit nonlinear patterns. Ideally, residuals should be randomly scattered around zero, with no discernible trend. A systematic pattern suggests model misspecification or omitted variables.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot residuals and identify outliers</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">plot_fitted</span><span class="p">(</span><span class="n">fitted</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">fittedvalues</span><span class="p">,</span>
+                <span class="n">resid</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Residual Outliers&quot;</span><span class="p">)</span>
+<span class="n">z</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Residual Outliers
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>date</th>
+      <th>2022-07-31</th>
+      <th>2008-10-31</th>
+      <th>2008-11-30</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>outliers</th>
+      <td>-0.009815</td>
+      <td>-0.011066</td>
+      <td>-0.015599</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><img alt="_images/1379d5335e11a1e2697b57e99e55b467971ab57628083d18f3350ae1a8c4a14a.png" src="_images/1379d5335e11a1e2697b57e99e55b467971ab57628083d18f3350ae1a8c4a14a.png" />
+</div>
+</div>
+</section>
+<section id="normal-qq-plot">
+<h3>Normal QQ plot<a class="headerlink" href="#normal-qq-plot" title="Permalink to this heading">#</a></h3>
+<p>A <strong>quantile-quantile (Q-Q) plot</strong> compares residuals to a normal distribution. If residuals are normally distributed, data points should align along a 45-degree reference line. <strong>Outliers</strong> may appear as deviations from this line, indicating potential issues such as a heavy-tailed distribution.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plot_qq</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/terence/env3.11/lib/python3.11/site-packages/statsmodels/graphics/gofplots.py:1043: UserWarning: color is redundantly defined by the &#39;color&#39; keyword argument and the fmt string &quot;b&quot; (-&gt; color=(0.0, 0.0, 1.0, 1)). The keyword argument will take precedence.
+  ax.plot(x, y, fmt, **plot_style)
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>residuals</th>
+      <th>standardized</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2008-11-30</th>
+      <td>-0.015599</td>
+      <td>-6.511279</td>
+    </tr>
+    <tr>
+      <th>2008-10-31</th>
+      <td>-0.011066</td>
+      <td>-4.619178</td>
+    </tr>
+    <tr>
+      <th>2022-07-31</th>
+      <td>-0.009815</td>
+      <td>-4.097059</td>
+    </tr>
+    <tr>
+      <th>2006-09-30</th>
+      <td>-0.008903</td>
+      <td>-3.716483</td>
+    </tr>
+    <tr>
+      <th>2005-10-31</th>
+      <td>-0.007321</td>
+      <td>-3.056102</td>
+    </tr>
+    <tr>
+      <th>2013-03-31</th>
+      <td>-0.007108</td>
+      <td>-2.967065</td>
+    </tr>
+    <tr>
+      <th>2008-08-31</th>
+      <td>-0.007003</td>
+      <td>-2.923170</td>
+    </tr>
+    <tr>
+      <th>1980-07-31</th>
+      <td>-0.006997</td>
+      <td>-2.920733</td>
+    </tr>
+    <tr>
+      <th>2005-09-30</th>
+      <td>0.009362</td>
+      <td>3.907884</td>
+    </tr>
+  </tbody>
+</table>
+</div></div><img alt="_images/c99e99b7ba78b47a179d2fc7902861493a0dfdd8ae3ba76c32b02b9e488f4f95.png" src="_images/c99e99b7ba78b47a179d2fc7902861493a0dfdd8ae3ba76c32b02b9e488f4f95.png" />
+</div>
+</div>
+</section>
+<section id="scale-location-plot">
+<h3>Scale-location plot<a class="headerlink" href="#scale-location-plot" title="Permalink to this heading">#</a></h3>
+<p>This plot checks for homoscedasticity (constant variance). Residuals should be evenly spread across predictor values. A funnel-shaped pattern suggests heteroskedasticity, requiring robust standard errors.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plot_scale</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">fittedvalues</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([579, 414, 415])
+</pre></div>
+</div>
+<img alt="_images/553ca765b4752b1ea6ea1223e6f04aa5abc6ac071b760871012f33e53a5acf7b.png" src="_images/553ca765b4752b1ea6ea1223e6f04aa5abc6ac071b760871012f33e53a5acf7b.png" />
+</div>
+</div>
+</section>
+<section id="leverage-and-influential-points">
+<h3>Leverage and influential points<a class="headerlink" href="#leverage-and-influential-points" title="Permalink to this heading">#</a></h3>
+<p>Certain data points can disproportionately affect regression estimates. The projection matrix from the least squares estimator, also called the <strong>hat matrix</strong>, <span class="math notranslate nohighlight">\( H = X(X^T X)^{-1}X^T\)</span> identifies <strong>leverage points</strong>, where the diagonal element <span class="math notranslate nohighlight">\( h_{ii} \)</span> measures the influence of the <span class="math notranslate nohighlight">\( i \)</span>-th observation.</p>
+<p>A point may have <strong>high leverage</strong> but not necessarily influence the regression results significantly. <strong>Cook’s Distance</strong> measures influence based on both residual magnitude and leverage:</p>
+<div class="math notranslate nohighlight">
+\[
+D_i = \frac{1}{p} t_i^2 \frac{h_{ii}}{1 - h_{ii}}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\( p \)</span> is the number of regression parameters.</p></li>
+<li><p><span class="math notranslate nohighlight">\(t_i = \frac{\hat{\epsilon}_i}{\hat{\sigma} (1-h_{ii})}\)</span> is the <em>studentized residual</em>, which accounts for non-constant variance.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{\sigma} = \sqrt{\sum_{j=1}^n \hat{\epsilon}_j^2/n}\)</span>.</p></li>
+</ul>
+<p>D_i &gt; 1 $ suggests an influential point that may need further investigation.  The <strong>Residuals vs Leverage plot</strong> helps visualize these influential points.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">plot_leverage</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">resid</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">get_influence</span><span class="p">()</span><span class="o">.</span><span class="n">hat_matrix_diag</span><span class="p">,</span>
+              <span class="n">model</span><span class="o">.</span><span class="n">get_influence</span><span class="p">()</span><span class="o">.</span><span class="n">cooks_distance</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+              <span class="n">ddof</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>influential</th>
+      <th>cook's D</th>
+      <th>leverage</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div></div><img alt="_images/300a3b2918cf7287b9b3c1458be2aaa4f1263b253a9bf1af0e2dab7fc892bb6d.png" src="_images/300a3b2918cf7287b9b3c1458be2aaa4f1263b253a9bf1af0e2dab7fc892bb6d.png" />
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>White, Halbert (1980). “A Heteroskedasticity-Consistent Covariance Matrix Estimator and a Direct Test for Heteroskedasticity”. Econometrica. 48 (4): 817–838.</p>
+<p>Newey, Whitney K., and Kenneth D. West. 1987. “A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.” Econometrica 55: 703–8.</p>
+<p><a class="reference external" href="https://library.virginia.edu/data/articles/diagnostic-plots">https://library.virginia.edu/data/articles/diagnostic-plots</a></p>
+<p>FRM Part I Exam Book Quantitative Analysis Ch 9</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="2.1_economic_indicators.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Economic Indicators</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="2.3_time_series.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Time Series Analysis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-assumptions">Model assumptions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#heteroskedasity-and-hac-robust-errors">Heteroskedasity and HAC robust errors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multicollinearity-and-variance-inflation-factors">Multicollinearity and variance inflation factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#omitted-variables">Omitted variables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#residual-diagnostics">Residual diagnostics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#residuals-vs-fitted-plot">Residuals vs fitted plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#normal-qq-plot">Normal QQ plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scale-location-plot">Scale-location plot</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#leverage-and-influential-points">Leverage and influential points</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

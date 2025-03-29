@@ -1,0 +1,2888 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Stock Prices &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '1.1_stock_prices';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Jegadeesh-Titman Rolling Portfolios" href="1.2_jegadeesh_titman.html" />
+    <link rel="prev" title="FINANCIAL DATA SCIENCE" href="README.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F1.1_stock_prices.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/1.1_stock_prices.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Stock Prices</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finds-package">FinDS package</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sql">SQL</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#redis">Redis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-price-data">Stock price data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crsp-stocks">CRSP stocks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-splits-and-dividends">Stock splits and dividends</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#market-capitalization">Market capitalization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-delistings">Stock delistings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-stock-returns">Properties of stock returns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#long-run-market-averages">Long-run market averages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#statistical-moments">Statistical moments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correlations">Correlations</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="stock-prices">
+<h1>Stock Prices<a class="headerlink" href="#stock-prices" title="Permalink to this heading">#</a></h1>
+<p><em>In physics it takes three laws to explain 99% of the data; in finance it takes more than 99 laws to explain about 3%</em> - Andrew Lo</p>
+<p>Stock price data encompasses historical prices as well as corporate actions such as stock splits, dividends, and delistings. The CRSP database is a standard resource in academic research due to its comprehensive coverage of both active and delisted stocks, which supports unbiased and representative analysis. Efficient storage, retrieval, and processing of such structured financial data are enabled by tools such as SQL, SQLAlchemy, Redis, and Pandas. We examine statistical moments, assume log-normal distributions, and explore alternative correlation measures for modeling stock return behavior and dependencies.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+<span class="kn">from</span> <span class="nn">finds.structured</span> <span class="kn">import</span> <span class="n">BusDay</span><span class="p">,</span> <span class="n">CRSP</span><span class="p">,</span> <span class="n">CRSPBuffer</span><span class="p">,</span> <span class="n">Benchmarks</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">Finder</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">CRSP_DATE</span><span class="p">,</span> <span class="n">paths</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># %matplotlib qt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="finds-package">
+<h2>FinDS package<a class="headerlink" href="#finds-package" title="Permalink to this heading">#</a></h2>
+<p>Developed over a journey to support financial data science workflows, our <a class="reference external" href="https://github.com/terence-lim/financial-data-science"><em>FinDS</em> Python package</a> integrates:</p>
+<ul class="simple">
+<li><p>Use of database engines like SQL, Redis, and MongoDB to manage large structured and unstructured datasets</p></li>
+<li><p>Tools for accessing key financial datasets, including CRSP, Compustat, IBES, and TAQ</p></li>
+<li><p>Interfaces to public data sources such as FRED, SEC EDGAR, and the BEA</p></li>
+<li><p>Utilities for extracting data from academic and research websites</p></li>
+<li><p>Recipes for applying a range of statistical and machine learning methods, including network graphs, natural language processing and large language models.</p></li>
+</ul>
+<section id="sql">
+<h3>SQL<a class="headerlink" href="#sql" title="Permalink to this heading">#</a></h3>
+<p><strong>Structured Query Language (SQL)</strong> is a popular tool for storing and managing relational data organized into tables with columns (fields) and rows (records). Open-source systems like <strong>MySQL</strong> are widely used to implement relational databases, and Python libraries such as <strong>SQLAlchemy</strong> provide convenient interfaces for interacting with them. Additionally, the <strong>Pandas</strong> library allows users to run SQL queries and load the results directly into DataFrames for efficient analysis.</p>
+</section>
+<section id="redis">
+<h3>Redis<a class="headerlink" href="#redis" title="Permalink to this heading">#</a></h3>
+<p><strong>Redis</strong> is an open-source, in-memory data store commonly used as a caching layer. It helps improve performance by storing frequently accessed data in memory, thereby reducing the load on slower, primary databases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># open database connections</span>
+<span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">rdb</span> <span class="o">=</span> <span class="n">RedisDB</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;redis&#39;</span><span class="p">])</span>
+<span class="n">bd</span> <span class="o">=</span> <span class="n">BusDay</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">endweek</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">crsp</span> <span class="o">=</span> <span class="n">CRSP</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">rdb</span><span class="o">=</span><span class="n">rdb</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">bench</span> <span class="o">=</span> <span class="n">Benchmarks</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">bd</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+<span class="n">find</span> <span class="o">=</span> <span class="n">Finder</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;scratch&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="stock-price-data">
+<h2>Stock price data<a class="headerlink" href="#stock-price-data" title="Permalink to this heading">#</a></h2>
+<p>Besides the historical prices of stocks, their adjustments such as identifier changes, stock splits, dividends, mergers, and delistings must also be recorded to accurately analyze performance over time.</p>
+<section id="crsp-stocks">
+<h3>CRSP stocks<a class="headerlink" href="#crsp-stocks" title="Permalink to this heading">#</a></h3>
+<p>The Center for Research in Security Prices (CRSP) provides the most widely used data for academic research into US stocks. It includes both successful and unsuccessful entities, rather than just those that have “survived” over time. This helps avoid the pitfalls of focusing only on surviving entities which can lead to an overestimation of average performance and underestimation of risk. It also captures corporate actions by standardizing data on events such as name changes, distributions and delistings. This information is recorded and validated from official sources, integrated into its historical databases along with details like announcement and effective dates, adjustment factors, and impact on stock performance calculations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># describe the database schema of the CRP Stocks `names` table </span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="o">**</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;describe names&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Null</th>
+      <th>Key</th>
+      <th>Default</th>
+      <th>Extra</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>date</td>
+      <td>int</td>
+      <td>NO</td>
+      <td>PRI</td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>comnam</td>
+      <td>varchar(32)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ncusip</td>
+      <td>varchar(8)</td>
+      <td>YES</td>
+      <td>MUL</td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>shrcls</td>
+      <td>varchar(1)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ticker</td>
+      <td>varchar(5)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>permno</td>
+      <td>int</td>
+      <td>NO</td>
+      <td>PRI</td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>nameendt</td>
+      <td>int</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>shrcd</td>
+      <td>smallint</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>exchcd</td>
+      <td>smallint</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>siccd</td>
+      <td>smallint</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>tsymbol</td>
+      <td>varchar(7)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>naics</td>
+      <td>int</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>primexch</td>
+      <td>varchar(1)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>trdstat</td>
+      <td>varchar(1)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>secstat</td>
+      <td>varchar(4)</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>permco</td>
+      <td>int</td>
+      <td>YES</td>
+      <td></td>
+      <td>None</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>SQL <code class="docutils literal notranslate"><span class="pre">select</span></code> and <code class="docutils literal notranslate"><span class="pre">join</span></code> statements to retrieve Apple Computer’s identifiers and corporate actions, such as stock splits and dividends. Commonly used SQL commands listed at the end of this notebook.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># double up the % when passing sql command stringo to pandas</span>
+<span class="n">names_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="s2">&quot;select * from names where comnam like &#39;</span><span class="si">%%</span><span class="s2">APPLE COMPUTER</span><span class="si">%%</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">names_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>comnam</th>
+      <th>ncusip</th>
+      <th>shrcls</th>
+      <th>ticker</th>
+      <th>permno</th>
+      <th>nameendt</th>
+      <th>shrcd</th>
+      <th>exchcd</th>
+      <th>siccd</th>
+      <th>tsymbol</th>
+      <th>naics</th>
+      <th>primexch</th>
+      <th>trdstat</th>
+      <th>secstat</th>
+      <th>permco</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>19801212</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>03783310</td>
+      <td></td>
+      <td>AAPL</td>
+      <td>14593</td>
+      <td>19821031</td>
+      <td>11</td>
+      <td>3</td>
+      <td>3573</td>
+      <td></td>
+      <td>0</td>
+      <td>Q</td>
+      <td>A</td>
+      <td>R</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>19821101</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>03783310</td>
+      <td></td>
+      <td>AAPL</td>
+      <td>14593</td>
+      <td>20040609</td>
+      <td>11</td>
+      <td>3</td>
+      <td>3573</td>
+      <td>AAPL</td>
+      <td>0</td>
+      <td>Q</td>
+      <td>A</td>
+      <td>R</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>20040610</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>03783310</td>
+      <td></td>
+      <td>AAPL</td>
+      <td>14593</td>
+      <td>20070110</td>
+      <td>11</td>
+      <td>3</td>
+      <td>3573</td>
+      <td>AAPL</td>
+      <td>334111</td>
+      <td>Q</td>
+      <td>A</td>
+      <td>R</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># inner join of identifiers (names) and distributions (dist) tables</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">select distinct names.permno, divamt, facpr, exdt, comnam, ticker from names </span>
+<span class="s2">inner join dist</span>
+<span class="s2">on names.permno = dist.permno</span>
+<span class="s2">where names.comnam like &#39;</span><span class="si">%%</span><span class="s2">APPLE COMPUTER</span><span class="si">%%</span><span class="s2">&#39;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">dist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">dist_df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>permno</th>
+      <th>divamt</th>
+      <th>facpr</th>
+      <th>exdt</th>
+      <th>comnam</th>
+      <th>ticker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>14593</td>
+      <td>0.12</td>
+      <td>0.0</td>
+      <td>19870511</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>14593</td>
+      <td>0.06</td>
+      <td>0.0</td>
+      <td>19870810</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>14593</td>
+      <td>0.08</td>
+      <td>0.0</td>
+      <td>19871117</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>14593</td>
+      <td>0.08</td>
+      <td>0.0</td>
+      <td>19880212</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>14593</td>
+      <td>0.08</td>
+      <td>0.0</td>
+      <td>19880516</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>86</th>
+      <td>14593</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>19870616</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>87</th>
+      <td>14593</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>20000621</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>88</th>
+      <td>14593</td>
+      <td>0.00</td>
+      <td>1.0</td>
+      <td>20050228</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>89</th>
+      <td>14593</td>
+      <td>0.00</td>
+      <td>6.0</td>
+      <td>20140609</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>14593</td>
+      <td>0.00</td>
+      <td>3.0</td>
+      <td>20200831</td>
+      <td>APPLE COMPUTER INC</td>
+      <td>AAPL</td>
+    </tr>
+  </tbody>
+</table>
+<p>91 rows × 6 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="stock-splits-and-dividends">
+<h3>Stock splits and dividends<a class="headerlink" href="#stock-splits-and-dividends" title="Permalink to this heading">#</a></h3>
+<p>An investor’s total holding returns (<code class="docutils literal notranslate"><span class="pre">ret</span></code> in CRSP) include gains from appreciated stock prices (<code class="docutils literal notranslate"><span class="pre">prc</span></code>), adjusted for stock splits (<code class="docutils literal notranslate"><span class="pre">facpr</span></code>), plus ordinary cash dividends (<code class="docutils literal notranslate"><span class="pre">divamt</span></code>). Specifically, on ex-dates <span class="math notranslate nohighlight">\(t\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[ret_t = \dfrac{prc_t \ (1 + facpr_t) + div_t}{prc_{t-1}}\]</div>
+<p>The Factor to Adjust Price (<code class="docutils literal notranslate"><span class="pre">facpr</span></code>) values over time can be used to adjust prices for distributions such as stock dividends and splits so that stock prices before and after one or more distributions are comparable.  Historical cumulative adjust factors are computed by additing 1 to and then taking cumulative product from current to earlier time periods. This cumulative factor between two dates is divided into the earlier raw stock price to derive comparable split-adjusted prices. Hence to split-adjust CRSP raw prices</p>
+<ul class="simple">
+<li><p>apply cumulative factor to raw prices before corresponding ex-date</p></li>
+<li><p>back-fill to dates prior to ex-date</p></li>
+<li><p>default factor after latest ex-date is 1</p></li>
+</ul>
+<p><strong>yfinance</strong></p>
+<p>The yfinance Python library enables users to access current financial data from Yahoo Finance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">history</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Dividends&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Stock Splits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Open</th>
+      <th>High</th>
+      <th>Low</th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Dividends</th>
+      <th>Stock Splits</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1987-05-11 00:00:00-04:00</th>
+      <td>0.264817</td>
+      <td>0.273415</td>
+      <td>0.263957</td>
+      <td>0.264817</td>
+      <td>197276800</td>
+      <td>0.000536</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1987-06-16 00:00:00-04:00</th>
+      <td>0.285452</td>
+      <td>0.287171</td>
+      <td>0.261378</td>
+      <td>0.285452</td>
+      <td>342720000</td>
+      <td>0.000000</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>1987-08-10 00:00:00-04:00</th>
+      <td>0.332310</td>
+      <td>0.332310</td>
+      <td>0.315091</td>
+      <td>0.332310</td>
+      <td>77996800</td>
+      <td>0.000536</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1987-11-17 00:00:00-05:00</th>
+      <td>0.253658</td>
+      <td>0.255384</td>
+      <td>0.241579</td>
+      <td>0.241579</td>
+      <td>268800000</td>
+      <td>0.000714</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1988-02-12 00:00:00-05:00</th>
+      <td>0.280957</td>
+      <td>0.287009</td>
+      <td>0.280093</td>
+      <td>0.283551</td>
+      <td>137760000</td>
+      <td>0.000714</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2024-02-09 00:00:00-05:00</th>
+      <td>187.763406</td>
+      <td>189.097120</td>
+      <td>187.116467</td>
+      <td>187.962479</td>
+      <td>45155200</td>
+      <td>0.240000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2024-05-10 00:00:00-04:00</th>
+      <td>184.280653</td>
+      <td>184.470019</td>
+      <td>181.519943</td>
+      <td>182.436859</td>
+      <td>50759500</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2024-08-12 00:00:00-04:00</th>
+      <td>215.595507</td>
+      <td>219.027939</td>
+      <td>215.126538</td>
+      <td>217.052292</td>
+      <td>38028100</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2024-11-08 00:00:00-05:00</th>
+      <td>226.920500</td>
+      <td>228.408869</td>
+      <td>226.161340</td>
+      <td>226.710739</td>
+      <td>38328800</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2025-02-10 00:00:00-05:00</th>
+      <td>229.570007</td>
+      <td>230.589996</td>
+      <td>227.199997</td>
+      <td>227.649994</td>
+      <td>33115600</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>91 rows × 7 columns</p>
+</div></div></div>
+</div>
+<p>The daily <code class="docutils literal notranslate"><span class="pre">Close</span></code> prices from yFinance have been adjusted for stock splits and dividend payments. As a result, the plotted values directly represent cumulative total holding returns.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;APPL close prices from yfinance&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: title={&#39;center&#39;: &#39;APPL close prices from yfinance&#39;}, xlabel=&#39;Date&#39;&gt;
+</pre></div>
+</div>
+<img alt="_images/bf2a317d3f2fb7f1c3de31bb3517a769f27896601d4069733f764ecff4683cdf.png" src="_images/bf2a317d3f2fb7f1c3de31bb3517a769f27896601d4069733f764ecff4683cdf.png" />
+</div>
+</div>
+<p>To retrieve unadjusted historical prices accounting for stock splits and dividends, first apply the split factors to determine the original dividends per unadjusted share. The resulting values closely match the CRSP <code class="docutils literal notranslate"><span class="pre">divamt</span></code> figures, with minor differences likely due to cumulative numerical precision errors.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">split</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Stock Splits&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Stock Splits&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>       <span class="c1"># cumulate the split factors back in time</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;unadj_div&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Dividends&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">split</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c1"># apply the split factors to dividends</span>
+<span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))[(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;unadj_div&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Open</th>
+      <th>High</th>
+      <th>Low</th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Dividends</th>
+      <th>Stock Splits</th>
+      <th>unadj_div</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1987-05-11</th>
+      <td>0.264817</td>
+      <td>0.273415</td>
+      <td>0.263957</td>
+      <td>0.264817</td>
+      <td>197276800</td>
+      <td>0.000536</td>
+      <td>0.0</td>
+      <td>0.120064</td>
+    </tr>
+    <tr>
+      <th>1987-08-10</th>
+      <td>0.332310</td>
+      <td>0.332310</td>
+      <td>0.315091</td>
+      <td>0.332310</td>
+      <td>77996800</td>
+      <td>0.000536</td>
+      <td>0.0</td>
+      <td>0.060032</td>
+    </tr>
+    <tr>
+      <th>1987-11-17</th>
+      <td>0.253658</td>
+      <td>0.255384</td>
+      <td>0.241579</td>
+      <td>0.241579</td>
+      <td>268800000</td>
+      <td>0.000714</td>
+      <td>0.0</td>
+      <td>0.079968</td>
+    </tr>
+    <tr>
+      <th>1988-02-12</th>
+      <td>0.280957</td>
+      <td>0.287009</td>
+      <td>0.280093</td>
+      <td>0.283551</td>
+      <td>137760000</td>
+      <td>0.000714</td>
+      <td>0.0</td>
+      <td>0.079968</td>
+    </tr>
+    <tr>
+      <th>1988-05-16</th>
+      <td>0.280647</td>
+      <td>0.286711</td>
+      <td>0.277183</td>
+      <td>0.285845</td>
+      <td>74760000</td>
+      <td>0.000714</td>
+      <td>0.0</td>
+      <td>0.079968</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2024-02-09</th>
+      <td>187.763406</td>
+      <td>189.097120</td>
+      <td>187.116467</td>
+      <td>187.962479</td>
+      <td>45155200</td>
+      <td>0.240000</td>
+      <td>0.0</td>
+      <td>0.240000</td>
+    </tr>
+    <tr>
+      <th>2024-05-10</th>
+      <td>184.280653</td>
+      <td>184.470019</td>
+      <td>181.519943</td>
+      <td>182.436859</td>
+      <td>50759500</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+      <td>0.250000</td>
+    </tr>
+    <tr>
+      <th>2024-08-12</th>
+      <td>215.595507</td>
+      <td>219.027939</td>
+      <td>215.126538</td>
+      <td>217.052292</td>
+      <td>38028100</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+      <td>0.250000</td>
+    </tr>
+    <tr>
+      <th>2024-11-08</th>
+      <td>226.920500</td>
+      <td>228.408869</td>
+      <td>226.161340</td>
+      <td>226.710739</td>
+      <td>38328800</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+      <td>0.250000</td>
+    </tr>
+    <tr>
+      <th>2025-02-10</th>
+      <td>229.570007</td>
+      <td>230.589996</td>
+      <td>227.199997</td>
+      <td>227.649994</td>
+      <td>33115600</td>
+      <td>0.250000</td>
+      <td>0.0</td>
+      <td>0.250000</td>
+    </tr>
+  </tbody>
+</table>
+<p>86 rows × 8 columns</p>
+</div></div></div>
+</div>
+<p>Next, we work backward through time to reconstruct the original stock prices using daily holding returns and closing prices. Stock splits and dividends are accounted for on ex-dates by applying the rearranged formula:</p>
+<div class="math notranslate nohighlight">
+\[prc_{t-1} = \dfrac{(1+facpr_t) (prc_t + div_t)}{ret_t}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rets</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">prc</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">div</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">fac</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>     <span class="c1"># iterate over days in reverse</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;unadj_prc&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="p">(((</span><span class="n">fac</span> <span class="k">if</span> <span class="n">fac</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">prc</span><span class="p">)</span> <span class="o">+</span> <span class="n">div</span><span class="p">)</span> <span class="o">/</span> <span class="n">ret</span>
+    <span class="n">prc</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;unadj_prc&#39;</span><span class="p">]</span>
+    <span class="n">div</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;unadj_div&#39;</span><span class="p">]</span>
+    <span class="n">fac</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;Stock Splits&#39;</span><span class="p">]</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">rets</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+<span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Open</th>
+      <th>High</th>
+      <th>Low</th>
+      <th>Close</th>
+      <th>Volume</th>
+      <th>Dividends</th>
+      <th>Stock Splits</th>
+      <th>unadj_div</th>
+      <th>unadj_prc</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1980-12-12</th>
+      <td>0.098726</td>
+      <td>0.099155</td>
+      <td>0.098726</td>
+      <td>0.098726</td>
+      <td>469033600</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>28.757305</td>
+    </tr>
+    <tr>
+      <th>1980-12-15</th>
+      <td>0.094005</td>
+      <td>0.094005</td>
+      <td>0.093575</td>
+      <td>0.093575</td>
+      <td>175884800</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>27.257003</td>
+    </tr>
+    <tr>
+      <th>1980-12-16</th>
+      <td>0.087136</td>
+      <td>0.087136</td>
+      <td>0.086707</td>
+      <td>0.086707</td>
+      <td>105728000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>25.256412</td>
+    </tr>
+    <tr>
+      <th>1980-12-17</th>
+      <td>0.088853</td>
+      <td>0.089282</td>
+      <td>0.088853</td>
+      <td>0.088853</td>
+      <td>86441600</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>25.881523</td>
+    </tr>
+    <tr>
+      <th>1980-12-18</th>
+      <td>0.091429</td>
+      <td>0.091858</td>
+      <td>0.091429</td>
+      <td>0.091429</td>
+      <td>73449600</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>26.631895</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>2025-02-24</th>
+      <td>244.929993</td>
+      <td>248.860001</td>
+      <td>244.419998</td>
+      <td>247.100006</td>
+      <td>51326400</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>247.100006</td>
+    </tr>
+    <tr>
+      <th>2025-02-25</th>
+      <td>248.000000</td>
+      <td>250.000000</td>
+      <td>244.910004</td>
+      <td>247.039993</td>
+      <td>48013300</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>247.039993</td>
+    </tr>
+    <tr>
+      <th>2025-02-26</th>
+      <td>244.330002</td>
+      <td>244.979996</td>
+      <td>239.130005</td>
+      <td>240.360001</td>
+      <td>44433600</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>240.360001</td>
+    </tr>
+    <tr>
+      <th>2025-02-27</th>
+      <td>239.410004</td>
+      <td>242.460007</td>
+      <td>237.059998</td>
+      <td>237.300003</td>
+      <td>41153600</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>237.300003</td>
+    </tr>
+    <tr>
+      <th>2025-02-28</th>
+      <td>236.949997</td>
+      <td>242.089996</td>
+      <td>230.199997</td>
+      <td>241.839996</td>
+      <td>56796200</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>241.839996</td>
+    </tr>
+  </tbody>
+</table>
+<p>11144 rows × 9 columns</p>
+</div></div></div>
+</div>
+<p>The unadjusted price computer and the original closing prices from CRSP during the early days of AAPL stock are nearly identical, with only small differences due to cumulative numerical precision errors.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">price_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;select permno, date, abs(prc) from daily where permno=</span><span class="si">{</span><span class="n">names_df</span><span class="p">[</span><span class="s1">&#39;permno&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+<span class="n">price_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>permno</th>
+      <th>date</th>
+      <th>abs(prc)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>14593</td>
+      <td>19801212</td>
+      <td>28.8125</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>14593</td>
+      <td>19801215</td>
+      <td>27.3125</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>14593</td>
+      <td>19801216</td>
+      <td>25.3125</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>14593</td>
+      <td>19801217</td>
+      <td>25.9375</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>14593</td>
+      <td>19801218</td>
+      <td>26.6875</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>14593</td>
+      <td>19801219</td>
+      <td>28.3125</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>14593</td>
+      <td>19801222</td>
+      <td>29.6875</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>14593</td>
+      <td>19801223</td>
+      <td>30.9375</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>14593</td>
+      <td>19801224</td>
+      <td>32.5625</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>14593</td>
+      <td>19801226</td>
+      <td>35.5625</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="market-capitalization">
+<h3>Market capitalization<a class="headerlink" href="#market-capitalization" title="Permalink to this heading">#</a></h3>
+<p>Following Fama and French (1992), academic research typically focuses on U.S.-domiciled stocks, specifically those with a share code (<code class="docutils literal notranslate"><span class="pre">shrcd</span></code>) of 10 or 11, that are listed on major exchanges (exchange code (<code class="docutils literal notranslate"><span class="pre">exchcd</span></code>) of 1, 2, or 3).</p>
+<p>Stocks are often sorted into ten deciles based on market capitalization, with the smallest stocks placed in the 10th decile. These decile breakpoints are determined using only NYSE-listed stocks. For companies with multiple classes of securities, total market value is calculated by summing the market capitalization of all classes. Since CRSP reports shares outstanding (shrout) in thousands, all market capitalization values must be multiplied by 1,000 to reflect their actual size.</p>
+<p>Plot the number of stocks in and the market cap breakpoints of each size decile by year:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># retrieve universe of stocks annually from 1981</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="mi">19731231</span><span class="p">)</span>
+<span class="n">rebals</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">CRSP_DATE</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">univs</span> <span class="o">=</span> <span class="p">{</span><span class="n">rebal</span><span class="p">:</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">rebal</span><span class="p">)</span> <span class="k">for</span> <span class="n">rebal</span> <span class="ow">in</span> <span class="n">rebals</span><span class="p">}</span>
+<span class="n">num</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">date</span><span class="p">,</span> <span class="n">univ</span> <span class="ow">in</span> <span class="n">univs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">num</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="o">//</span><span class="mi">10000</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span><span class="n">decile</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="s1">&#39;decile&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">decile</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">decile</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)}</span>
+<span class="n">num</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot number of stocks in each size decile</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Number of stocks in universe by size decile&#39;</span><span class="p">)</span>
+<span class="n">num</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">.8</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="c1">#set_xtickbins(ax=ax, nbins=len(cap)//10)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Size Decile&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/fc2b92519a14b6c3b52f70df4dd719312d26dd2c0fc9772a209f29717a418cb6.png" src="_images/fc2b92519a14b6c3b52f70df4dd719312d26dd2c0fc9772a209f29717a418cb6.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># If a company has multiple share classes, sum up its total market capitalization </span>
+<span class="c1"># instead of separate capital values for each share class</span>
+<span class="n">names</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="s1">&#39;ALPHABET&#39;</span><span class="p">,</span> <span class="s1">&#39;comnam&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>
+<span class="n">names</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>comnam</th>
+      <th>ncusip</th>
+      <th>shrcls</th>
+      <th>ticker</th>
+      <th>nameendt</th>
+      <th>shrcd</th>
+      <th>exchcd</th>
+      <th>siccd</th>
+      <th>tsymbol</th>
+      <th>naics</th>
+      <th>primexch</th>
+      <th>trdstat</th>
+      <th>secstat</th>
+      <th>permco</th>
+    </tr>
+    <tr>
+      <th>permno</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>14542</th>
+      <td>20231013</td>
+      <td>ALPHABET INC</td>
+      <td>02079K10</td>
+      <td>C</td>
+      <td>GOOG</td>
+      <td>20241231</td>
+      <td>11</td>
+      <td>3</td>
+      <td>7375</td>
+      <td>GOOG</td>
+      <td>541511</td>
+      <td>Q</td>
+      <td>A</td>
+      <td>R</td>
+      <td>45483</td>
+    </tr>
+    <tr>
+      <th>90319</th>
+      <td>20231013</td>
+      <td>ALPHABET INC</td>
+      <td>02079K30</td>
+      <td>A</td>
+      <td>GOOGL</td>
+      <td>20241231</td>
+      <td>11</td>
+      <td>3</td>
+      <td>7375</td>
+      <td>GOOGL</td>
+      <td>541511</td>
+      <td>Q</td>
+      <td>A</td>
+      <td>R</td>
+      <td>45483</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">univ</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>  <span class="c1"># market caps of share class (cap) and total company (capco)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cap</th>
+      <th>capco</th>
+      <th>decile</th>
+      <th>nyse</th>
+      <th>siccd</th>
+      <th>prc</th>
+      <th>naics</th>
+    </tr>
+    <tr>
+      <th>permno</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>14542</th>
+      <td>1.053895e+09</td>
+      <td>2.159975e+09</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7375</td>
+      <td>190.44</td>
+      <td>541511</td>
+    </tr>
+    <tr>
+      <th>90319</th>
+      <td>1.106080e+09</td>
+      <td>2.159975e+09</td>
+      <td>1</td>
+      <td>False</td>
+      <td>7375</td>
+      <td>189.30</td>
+      <td>541511</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="stock-delistings">
+<h3>Stock delistings<a class="headerlink" href="#stock-delistings" title="Permalink to this heading">#</a></h3>
+<p>An important feature of the CRSP database is that it is free of survivorship-bias.  It includes the historical records of stocks that have delisted from trading on the exchanges.</p>
+<p>In CRSP Monthly, the Delisting Return is calculated from the last
+month ending price to the last daily trading price if no other
+delisting information is available. In this case the delisting
+payment date is the same as the delisting date.  If the return is
+calculated from a daily price, it is a partial-month return. The
+partial-month returns are not truly Delisting Returns since they do
+not represent values after delisting, but allow the researcher to
+make a more accurate estimate of the Delisting Returns.</p>
+<p>Following Bali, Engle, and Murray (2016) and Shumway (1997): we can
+construct returns adjusted for delistings, which result when a
+company is acquired, ceases operations, or fails to meet exchange
+listing requirements. The adjustment reflects the partial month of
+returns to investors who bought the stock in the month before the
+delisting. For certain delisting codes ([500, 520, 551..574, 580,
+584]) where the delisting return is missing, a delisting return of -30%
+is assumed which reflects the average recovery amount after delisting.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show sample of original CRSP Monthly ret and dlret before and after adjustment            </span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="s1">&#39;select * from monthly where dlstcd&gt;100 and date=20041130&#39;</span><span class="p">,</span> <span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ret&#39;</span><span class="p">:</span> <span class="s1">&#39;original_ret&#39;</span><span class="p">})</span>\
+  <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crsp</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="o">=</span><span class="mi">20041101</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">20041130</span><span class="p">),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>prc</th>
+      <th>original_ret</th>
+      <th>retx</th>
+      <th>dlstcd</th>
+      <th>dlret</th>
+      <th>ret</th>
+    </tr>
+    <tr>
+      <th>permno</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10275</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>584</td>
+      <td>-0.2703</td>
+      <td>-0.2703</td>
+    </tr>
+    <tr>
+      <th>10418</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>520</td>
+      <td>0.0509</td>
+      <td>0.0509</td>
+    </tr>
+    <tr>
+      <th>11194</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0066</td>
+      <td>0.0066</td>
+    </tr>
+    <tr>
+      <th>12010</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>587</td>
+      <td>0.0490</td>
+      <td>0.0490</td>
+    </tr>
+    <tr>
+      <th>20459</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>231</td>
+      <td>0.0724</td>
+      <td>0.0724</td>
+    </tr>
+    <tr>
+      <th>32897</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>584</td>
+      <td>-0.2357</td>
+      <td>-0.2357</td>
+    </tr>
+    <tr>
+      <th>55589</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>-0.0114</td>
+      <td>-0.0114</td>
+    </tr>
+    <tr>
+      <th>64290</th>
+      <td>20041130</td>
+      <td>13.70</td>
+      <td>0.0178</td>
+      <td>0.0178</td>
+      <td>233</td>
+      <td>0.0000</td>
+      <td>0.0178</td>
+    </tr>
+    <tr>
+      <th>67708</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0164</td>
+      <td>0.0164</td>
+    </tr>
+    <tr>
+      <th>69593</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>331</td>
+      <td>0.0998</td>
+      <td>0.0998</td>
+    </tr>
+    <tr>
+      <th>69681</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>584</td>
+      <td>-0.4853</td>
+      <td>-0.4853</td>
+    </tr>
+    <tr>
+      <th>70447</th>
+      <td>20041130</td>
+      <td>5.80</td>
+      <td>-0.2246</td>
+      <td>-0.2246</td>
+      <td>570</td>
+      <td>NaN</td>
+      <td>-0.4572</td>
+    </tr>
+    <tr>
+      <th>75606</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>520</td>
+      <td>-0.2466</td>
+      <td>-0.2466</td>
+    </tr>
+    <tr>
+      <th>75684</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0094</td>
+      <td>0.0094</td>
+    </tr>
+    <tr>
+      <th>76306</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>241</td>
+      <td>-0.0329</td>
+      <td>-0.0329</td>
+    </tr>
+    <tr>
+      <th>76691</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>582</td>
+      <td>0.0127</td>
+      <td>0.0127</td>
+    </tr>
+    <tr>
+      <th>77838</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>520</td>
+      <td>-0.0041</td>
+      <td>-0.0041</td>
+    </tr>
+    <tr>
+      <th>79149</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>574</td>
+      <td>-0.2088</td>
+      <td>-0.2088</td>
+    </tr>
+    <tr>
+      <th>79523</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0043</td>
+      <td>0.0043</td>
+    </tr>
+    <tr>
+      <th>80211</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>470</td>
+      <td>0.0186</td>
+      <td>0.0186</td>
+    </tr>
+    <tr>
+      <th>80714</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>332</td>
+      <td>0.0337</td>
+      <td>0.0337</td>
+    </tr>
+    <tr>
+      <th>82491</th>
+      <td>20041130</td>
+      <td>4.21</td>
+      <td>-0.0644</td>
+      <td>-0.0644</td>
+      <td>551</td>
+      <td>0.0689</td>
+      <td>0.0000</td>
+    </tr>
+    <tr>
+      <th>83583</th>
+      <td>20041130</td>
+      <td>125.10</td>
+      <td>0.2810</td>
+      <td>0.2810</td>
+      <td>241</td>
+      <td>0.0624</td>
+      <td>0.3608</td>
+    </tr>
+    <tr>
+      <th>83702</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>587</td>
+      <td>0.2667</td>
+      <td>0.2667</td>
+    </tr>
+    <tr>
+      <th>83995</th>
+      <td>20041130</td>
+      <td>26.58</td>
+      <td>0.2374</td>
+      <td>0.2374</td>
+      <td>231</td>
+      <td>0.0394</td>
+      <td>0.2861</td>
+    </tr>
+    <tr>
+      <th>84047</th>
+      <td>20041130</td>
+      <td>16.35</td>
+      <td>0.0467</td>
+      <td>0.0467</td>
+      <td>241</td>
+      <td>-0.2661</td>
+      <td>-0.2318</td>
+    </tr>
+    <tr>
+      <th>86123</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0059</td>
+      <td>0.0059</td>
+    </tr>
+    <tr>
+      <th>86307</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0223</td>
+      <td>0.0223</td>
+    </tr>
+    <tr>
+      <th>86388</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>584</td>
+      <td>-0.0337</td>
+      <td>-0.0337</td>
+    </tr>
+    <tr>
+      <th>86991</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0106</td>
+      <td>0.0106</td>
+    </tr>
+    <tr>
+      <th>87126</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>231</td>
+      <td>0.0784</td>
+      <td>0.0784</td>
+    </tr>
+    <tr>
+      <th>87158</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0086</td>
+      <td>0.0086</td>
+    </tr>
+    <tr>
+      <th>87247</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0046</td>
+      <td>0.0046</td>
+    </tr>
+    <tr>
+      <th>88670</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>470</td>
+      <td>0.0013</td>
+      <td>0.0013</td>
+    </tr>
+    <tr>
+      <th>89186</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>331</td>
+      <td>0.0696</td>
+      <td>0.0696</td>
+    </tr>
+    <tr>
+      <th>89385</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>231</td>
+      <td>0.2959</td>
+      <td>0.2959</td>
+    </tr>
+    <tr>
+      <th>89936</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>231</td>
+      <td>0.0719</td>
+      <td>0.0719</td>
+    </tr>
+    <tr>
+      <th>89939</th>
+      <td>20041130</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>233</td>
+      <td>0.0059</td>
+      <td>0.0059</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+<section id="properties-of-stock-returns">
+<h2>Properties of stock returns<a class="headerlink" href="#properties-of-stock-returns" title="Permalink to this heading">#</a></h2>
+<section id="long-run-market-averages">
+<h3>Long-run market averages<a class="headerlink" href="#long-run-market-averages" title="Permalink to this heading">#</a></h3>
+<p>Calculate and plot the time series of annual cross-sectional averages of stock returns, where each year’s average is cap-weighted, and the final time series is equal-weighted.</p>
+<p>Over time, the contribution of dividend yield to total average stock returns has decreased, while share trading turnover has increased.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loop over the 20-year eras, and compute means of annual cap-weighted averages</span>
+<span class="n">years</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1925</span><span class="p">,</span> <span class="mi">2025</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;divyld&#39;</span><span class="p">,</span> <span class="s1">&#39;turnover&#39;</span><span class="p">,</span> <span class="s1">&#39;means&#39;</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">era</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">years</span><span class="p">):</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">era</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">era</span><span class="o">+</span><span class="mi">20</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">divyld</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">turnover</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">era</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="o">//</span><span class="mi">10000</span> <span class="o">-</span><span class="mi">1</span> <span class="p">,</span> <span class="n">era</span><span class="o">+</span><span class="mi">19</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+        <span class="c1"># universe stocks at end of year</span>
+        <span class="n">univ</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
+
+        <span class="c1"># retrieve cap-weighted average of next year&#39;s returns</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">select permno, SUM(LOG(1+ret)) AS ret FROM daily</span>
+<span class="s2">WHERE date &gt; </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">)</span><span class="si">}</span><span class="s2"> AND date &lt;= </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">GROUP BY permno</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">means</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">])</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># retrieve cap-weighted average of annualized turnover</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">select permno, 252*AVG(vol/(shrout*1000)) AS turnover FROM daily</span>
+<span class="s2">WHERE date &gt; </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">)</span><span class="si">}</span><span class="s2"> AND date &lt;= </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">GROUP BY permno</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">turnover</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;turnover&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># retrieve cap-weighted average of annual dividend amounts</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT dist.permno as permno, SUM(daily.shrout * dist.divamt) AS divamt</span>
+<span class="s2">FROM dist INNER JOIN daily</span>
+<span class="s2">ON daily.permno = dist.permno AND daily.date = dist.exdt</span>
+<span class="s2">WHERE dist.divamt &gt; 0 AND dist.exdt &gt; </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span>
+<span class="s2">  AND dist.exdt &lt;= </span><span class="si">{</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">GROUP BY permno</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">sql</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;permno&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">univ</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">divyld</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;divamt&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cap&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;turnover&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">turnover</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;divyld&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">divyld</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">label</span><span class="p">,</span> <span class="s1">&#39;means&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 5/5 [1:03:37&lt;00:00, 763.46s/it]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot mean returns, dividend yield and turnover using both y-axes</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;means&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;divyld&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;average returns&#39;</span><span class="p">,</span> <span class="s1">&#39;dividend yield&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Annual dividend yield and total stock returns&quot;</span><span class="p">)</span>
+<span class="n">bx</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;turnover&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Annual Turnover&quot;</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;turnover&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center right&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Long-Run Market Averages&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/60ffadfa033cd151bb6904be4b613f37465354a0a519a2cb8a970318b5b98662.png" src="_images/60ffadfa033cd151bb6904be4b613f37465354a0a519a2cb8a970318b5b98662.png" />
+</div>
+</div>
+</section>
+<section id="statistical-moments">
+<h3>Statistical moments<a class="headerlink" href="#statistical-moments" title="Permalink to this heading">#</a></h3>
+<p>The volatility of an asset is usually measured using the standard deviation of the returns. The common practice is to report the annualized volatility using the square-root rule which assumes that variance scales linearly with time: e.g. daily by <span class="math notranslate nohighlight">\(\sqrt{252}\)</span>, weekly by <span class="math notranslate nohighlight">\(\sqrt{52}\)</span>, monthly by <span class="math notranslate nohighlight">\(\sqrt{12}\)</span>.  Mean returns are annualized by multiplying by the respective number of periods in a year.</p>
+<p>A normal distribution is symmetric and thin-tailed, and so has no skewness or excess kurtosis. However, many return series are both skewed and fat-tailed (kurtosis in excess of 3).  A left-skewed distribution is longer on the left side of its peak than on its right. In other words, a left-skewed distribution has a long tail on its left side, where the mean typically lies to the left of its median. Left skew is also referred to as negative skew. Right or positive skew has the opposite properties.</p>
+<p>Stock prices are often modeled with a log-normal distribution because prices cannot be negative. Large positive jumps are possible, but extreme negative moves are bounded at zero, hence the distribution of log-normal returns is positively-skewed with a long right tail. The skewness of a log-normal distribution is given by:  <span class="math notranslate nohighlight">\((e^{\sigma^2} + 2) \sqrt{e^{\sigma^2} - 1}\)</span></p>
+<p>By Jensen’s inequality, the arithmetic mean is greater than the geometric mean. Under the assumption of log-normality, the amount by which the arithmetic mean exceeds the geometric means of returns is half the volatility.</p>
+<ul class="simple">
+<li><p>Suppose the continuously compounded (log) returns ( r_t ) are normally distributed with mean ( \mu ) and variance ( \sigma^2 ): <span class="math notranslate nohighlight">\(r_t = \ln \left(\frac{P_t}{P_{t-1}}\right) \sim N(\mu, \sigma^2)\)</span></p></li>
+<li><p>The geometric mean return is given by <span class="math notranslate nohighlight">\(\mu_G = \frac{1}{T} \sum_{t=1}^{T} r_t\)</span>, with expectation <span class="math notranslate nohighlight">\(\mathbb{E}[r_t] = \mu\)</span></p></li>
+<li><p>The arithmetic mean of the simple returns is approximately given by <span class="math notranslate nohighlight">\(\mu_A \approx e^{\mu + \frac{1}{2} \sigma^2} - 1 \approx \mu_G + \frac{1}{2} \sigma^2\)</span>, using the first-order approximation <span class="math notranslate nohighlight">\(e^x \approx 1 + x\)</span> for small <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+</ul>
+<p><strong>Jarque-Bera test</strong></p>
+<p>The Jarque-Bera test statistic can be used to test whether the sample skewness and kurtosis are compatible with an assumption that the returns are normally distributed. When returns are normally distributed, the skewness is asymptotically normally distributed with a variance of 6, so (skewness)<span class="math notranslate nohighlight">\(^2/6\)</span> has a <span class="math notranslate nohighlight">\(\chi^2_1\)</span>
+distribution. Meanwhile, the kurtosis is asymptotically normally distributed with mean 3 and variance of 24, and so (kurtosis - 3)<span class="math notranslate nohighlight">\(^2/24\)</span> also has a <span class="math notranslate nohighlight">\(\chi^2_1\)</span>
+distribution. These two statistics are
+asymptotically independent (uncorrelated), and so their sum is <span class="math notranslate nohighlight">\(~\chi^2_2\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the stock returns sampled at various frequencies</span>
+<span class="n">intervals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;annual&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;monthly&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="s1">&#39;weekly&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="mi">52</span><span class="p">),</span> <span class="s1">&#39;daily&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">252</span><span class="p">)}</span>
+<span class="n">moments</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">begdate</span><span class="p">,</span> <span class="n">enddate</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">begyr</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="o">//</span><span class="mi">10000</span> <span class="o">-</span> <span class="mi">19</span><span class="p">),</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">CRSP_DATE</span><span class="o">//</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">dataset</span><span class="p">,</span> <span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">annualize</span><span class="p">)</span> <span class="ow">in</span> <span class="n">intervals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+    <span class="c1"># If annual or monthly frequency, use StocksBuffer to pre-load all monthly returns</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="s1">&#39;weekly&#39;</span><span class="p">]:</span>
+        <span class="n">stocks</span> <span class="o">=</span> <span class="n">CRSPBuffer</span><span class="p">(</span><span class="n">stocks</span><span class="o">=</span><span class="n">crsp</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;monthly&#39;</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">],</span>
+                            <span class="n">beg</span><span class="o">=</span><span class="n">bd</span><span class="o">.</span><span class="n">begyr</span><span class="p">(</span><span class="n">begdate</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">enddate</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;weekly&#39;</span><span class="p">]:</span>  <span class="c1"># weekly returns already computed from CRSP Daily, and cached</span>
+        <span class="n">stocks</span> <span class="o">=</span> <span class="n">crsp</span>
+
+    <span class="n">univ_year</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">begdate</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># universe as of end of previous calendar year               </span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">begdate</span><span class="p">),</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">enddate</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">)</span>
+    <span class="n">allstocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">beg</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">bd</span><span class="o">.</span><span class="n">date_tuples</span><span class="p">(</span><span class="n">dates</span><span class="p">)):</span>
+
+        <span class="c1"># Update the investment universe every calendar year                                        </span>
+        <span class="k">if</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">beg</span><span class="p">)</span> <span class="o">!=</span> <span class="n">univ_year</span><span class="p">:</span>
+            <span class="n">univ</span> <span class="o">=</span> <span class="n">crsp</span><span class="o">.</span><span class="n">get_universe</span><span class="p">(</span><span class="n">univ_year</span><span class="p">)</span>
+            <span class="n">univ_year</span> <span class="o">=</span> <span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">beg</span><span class="p">)</span>
+
+            <span class="c1"># Use StocksBuffer to cache daily returns for the new calendar year                     </span>
+            <span class="k">if</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;daily&#39;</span><span class="p">]:</span>
+                <span class="n">stocks</span> <span class="o">=</span> <span class="n">CRSPBuffer</span><span class="p">(</span><span class="n">stocks</span><span class="o">=</span><span class="n">crsp</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">],</span>
+                                    <span class="n">beg</span><span class="o">=</span><span class="n">bd</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">beg</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">bd</span><span class="o">.</span><span class="n">endyr</span><span class="p">(</span><span class="n">end</span><span class="p">))</span>
+
+        <span class="c1"># retrieve returns for universe stocks                                                      </span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">stocks</span><span class="o">.</span><span class="n">get_ret</span><span class="p">(</span><span class="n">beg</span><span class="o">=</span><span class="n">beg</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">univ</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">allstocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">end</span><span class="p">))</span>
+
+    <span class="c1"># combine all years&#39; stock returns, require stock in all years                                  </span>
+    <span class="n">allstocks</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">allstocks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+
+    <span class="c1"># compute annualized moments, ignoring small sample warnings</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sa">f</span><span class="s2">&quot;MeanAnnualized&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">allstocks</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">annualize</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;VolAnnualized&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">allstocks</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">annualize</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;Skewness&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">allstocks</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s1">&#39;omit&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="sa">f</span><span class="s2">&quot;ExcessKurtosis&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span>
+                <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">allstocks</span><span class="p">,</span> <span class="n">nan_policy</span><span class="o">=</span><span class="s1">&#39;omit&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="sa">f</span><span class="s2">&quot;Count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">allstocks</span><span class="p">),</span>
+        <span class="p">}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="n">dataset</span><span class="p">:</span> <span class="n">Series</span><span class="p">(</span><span class="n">out</span><span class="p">)})</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">moments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">moments</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">moments</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># accumulate df to results                                    </span>
+<span class="n">moments</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s1">&#39;moments.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 19/19 [00:00&lt;00:00, 37.61it/s]
+100%|██████████| 228/228 [00:04&lt;00:00, 53.61it/s]
+100%|██████████| 991/991 [00:01&lt;00:00, 517.26it/s]
+100%|██████████| 4781/4781 [07:05&lt;00:00, 11.23it/s] 
+</pre></div>
+</div>
+</div>
+</div>
+<p>As we move from annual to daily sampling, stock returns exhibit greater kurtosis (i.e. fat tails) and annualized standard deviation. Skewness is positive – the right tail of the distribution is longer than the left tail – but are U-shaped with daily and annual returns featuring more positive-skewness than weekly or monthly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">moments</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>MeanAnnualized</th>
+      <th>VolAnnualized</th>
+      <th>Skewness</th>
+      <th>ExcessKurtosis</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>annual</th>
+      <td>0.063249</td>
+      <td>0.356397</td>
+      <td>0.434219</td>
+      <td>0.002332</td>
+      <td>1519.0</td>
+    </tr>
+    <tr>
+      <th>monthly</th>
+      <td>0.063249</td>
+      <td>0.376568</td>
+      <td>0.314758</td>
+      <td>2.242009</td>
+      <td>1519.0</td>
+    </tr>
+    <tr>
+      <th>weekly</th>
+      <td>0.062119</td>
+      <td>0.402871</td>
+      <td>0.293850</td>
+      <td>6.612277</td>
+      <td>1519.0</td>
+    </tr>
+    <tr>
+      <th>daily</th>
+      <td>0.063325</td>
+      <td>0.429472</td>
+      <td>0.404691</td>
+      <td>13.332600</td>
+      <td>1519.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">moments</span><span class="p">[</span><span class="n">moments</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">ix</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;C</span><span class="si">{</span><span class="n">ix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">moments</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">moments</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">ix</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Statistical Moments of Stock Returns </span><span class="si">{</span><span class="n">begdate</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">enddate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/c4cde880abed5295254ca768ad563dc2c1a2bd1f794412f056538cb5f3c3f140.png" src="_images/c4cde880abed5295254ca768ad563dc2c1a2bd1f794412f056538cb5f3c3f140.png" />
+</div>
+</div>
+</section>
+<section id="correlations">
+<h3>Correlations<a class="headerlink" href="#correlations" title="Permalink to this heading">#</a></h3>
+<p><strong>Pearson’s correlation</strong>, also known as the linear correlation estimator, measures the strength of a linear relationship between two variables. However, alternative methods can better capture nonlinear dependencies:</p>
+<ul class="simple">
+<li><p><strong>Spearman’s rank correlation</strong> applies Pearson’s correlation to the ranked values of observations, measuring monotonic relationships while being less sensitive to outliers.</p></li>
+<li><p><strong>Kendall’s <span class="math notranslate nohighlight">\(\tau\)</span></strong> quantifies the relationship between two variables by comparing the number of concordant and discordant pairs – pairs that agree or disagree on ordering. It is robust to outliers and effective for skewed or non-normally distributed data.</p></li>
+</ul>
+<p>Monthly SP500 and 30-year Treasury total market returns show positive correlation, which is fairly robust across the three methods.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># retrieve SP500 and 30-Year Treasury total market returns from CRSP Indexes</span>
+<span class="n">ret</span> <span class="o">=</span> <span class="n">bench</span><span class="o">.</span><span class="n">get_series</span><span class="p">([</span><span class="s1">&#39;sprtrn&#39;</span><span class="p">,</span> <span class="s1">&#39;b30ret(mo)&#39;</span><span class="p">],</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;ret&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">ret</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>permno</th>
+      <th>sprtrn</th>
+      <th>b30ret(mo)</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19620731</th>
+      <td>0.006917</td>
+      <td>-0.008187</td>
+    </tr>
+    <tr>
+      <th>19620831</th>
+      <td>0.007498</td>
+      <td>0.031939</td>
+    </tr>
+    <tr>
+      <th>19620928</th>
+      <td>0.008965</td>
+      <td>0.015465</td>
+    </tr>
+    <tr>
+      <th>19621031</th>
+      <td>-0.000354</td>
+      <td>0.012171</td>
+    </tr>
+    <tr>
+      <th>19621130</th>
+      <td>-0.002403</td>
+      <td>0.003414</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20240830</th>
+      <td>0.010093</td>
+      <td>0.020778</td>
+    </tr>
+    <tr>
+      <th>20240930</th>
+      <td>0.004237</td>
+      <td>0.015521</td>
+    </tr>
+    <tr>
+      <th>20241031</th>
+      <td>-0.018615</td>
+      <td>-0.053895</td>
+    </tr>
+    <tr>
+      <th>20241129</th>
+      <td>0.005608</td>
+      <td>0.021467</td>
+    </tr>
+    <tr>
+      <th>20241231</th>
+      <td>-0.004285</td>
+      <td>-0.063115</td>
+    </tr>
+  </tbody>
+</table>
+<p>749 rows × 2 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute alternative measures of correlation</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">spearman</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;sprtrn&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;b30ret(mo)&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+               <span class="n">kendall</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;sprtrn&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;b30ret(mo)&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+               <span class="n">pearson</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;sprtrn&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;b30ret(mo)&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]),</span>
+               <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Correlation of SP500 vs 30-Year Treasury Total Returns&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>spearman</th>
+      <th>kendall</th>
+      <th>pearson</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Correlation of SP500 vs 30-Year Treasury Total Returns</th>
+      <td>0.1348</td>
+      <td>0.0933</td>
+      <td>0.1275</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Scatter plot of SP500 and and 30-year Treasury total market returns</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;sprtrn&#39;</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;b30ret(mo)&#39;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;SP500&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;30-year Treasury&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;SP500 vs 30-Year Treasury Monthly Total Returns&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>            
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/754925d10875bc2e9b2955c52b35bdbc023f6b60f0551e0a76d8d8336e8b0536.png" src="_images/754925d10875bc2e9b2955c52b35bdbc023f6b60f0551e0a76d8d8336e8b0536.png" />
+</div>
+</div>
+<p><strong>APPENDIX</strong></p>
+<p><em>SQL commands</em></p>
+<ul class="simple">
+<li><p>Manage tables</p>
+<ul>
+<li><p>CREATE DATABASE – Creates a new database.</p></li>
+<li><p>CREATE TABLE – Creates a new table.</p></li>
+<li><p>DELETE – Delete data from a table.</p></li>
+<li><p>DROP COLUMN – Deletes a column from a table.</p></li>
+<li><p>DROP DATABASE – Deletes the entire database.</p></li>
+<li><p>DROP TABLE – Deletes a table from a database.</p></li>
+<li><p>TRUNCATE TABLE – Deletes the data but does not delete the table.</p></li>
+</ul>
+</li>
+<li><p><strong>Querying a table</strong></p>
+<ul>
+<li><p>SELECT – Used to select data from a database, which is then returned in a results set.</p></li>
+<li><p>SELECT DISTINCT – Sames as SELECT, except duplicate values are excluded.</p></li>
+<li><p>SELECT INTO – Copies data from one table and inserts it into another.</p></li>
+<li><p>UNIQUE – This constraint ensures all values in a column are unique.</p></li>
+<li><p>FROM – Specifies which table to select or delete data from.</p></li>
+<li><p>AS – Renames a table or column with an alias value which only exists for the duration of the query.</p></li>
+</ul>
+</li>
+<li><p><strong>Query conditions</strong></p>
+<ul>
+<li><p>WHERE – Filters results to only include data which meets the given condition.</p></li>
+<li><p>AND – Used to join separate conditions within a WHERE clause.</p></li>
+<li><p>BETWEEN – Selects values within the given range.</p></li>
+<li><p>IS NULL – Tests for empty (NULL) values.</p></li>
+<li><p>IS NOT NULL – The reverse of NULL. Tests for values that aren’t empty / NULL.</p></li>
+<li><p>LIKE – Returns true if the operand value matches a pattern.</p></li>
+<li><p>NOT – Returns true if a record DOESN’T meet the condition.</p></li>
+<li><p>OR – Used alongside WHERE to include data when either condition is true.</p></li>
+</ul>
+</li>
+<li><p><strong>Organize results</strong></p>
+<ul>
+<li><p>ORDER BY – Used to sort the result data in ascending (default) or descending order through the use of ASC or DESC keywords.</p></li>
+<li><p>GROUP BY – Used alongside aggregate functions (COUNT, MAX, MIN, SUM, AVG) to group the results.</p></li>
+</ul>
+</li>
+<li><p><strong>Join tables</strong></p>
+<ul>
+<li><p>INNER JOIN returns rows that have matching values in both tables.</p></li>
+<li><p>LEFT JOIN returns all rows from the left table, and the matching rows from the right table.-</p></li>
+<li><p>RIGHT JOIN returns all rows from the right table, and the matching records from the left table</p></li>
+<li><p>FULL OUTER JOIN returns all rows when there is a match in either left table or right table.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>References:</strong></p>
+<p>Fama, Eugene F., and Kenneth R. French. 1992. “The cross-section of expected stock returns.” The Journal of Finance 47 (2): 427–65.</p>
+<p>Shumway, Tyler. 1997. The Delisting Bias in CRSP Data. The Journal of Finance, 52, 327-340.</p>
+<p>Bali, Turan G, Robert F Engle, and Scott Murray. 2016. Empirical asset pricing: The cross section of stock returns. John Wiley &amp; Sons.</p>
+<p>Stulz, René M., 2018, “The Shrinking Universe of Public Firms: Facts, Causes, and Consequences”, National Bureau of Economics, 2 (June 2018)</p>
+<p>FRM Exam Book Part I Quantative Analysis Chapter 12</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="README.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">FINANCIAL DATA SCIENCE</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="1.2_jegadeesh_titman.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Jegadeesh-Titman Rolling Portfolios</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finds-package">FinDS package</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sql">SQL</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#redis">Redis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-price-data">Stock price data</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crsp-stocks">CRSP stocks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-splits-and-dividends">Stock splits and dividends</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#market-capitalization">Market capitalization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stock-delistings">Stock delistings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-stock-returns">Properties of stock returns</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#long-run-market-averages">Long-run market averages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#statistical-moments">Statistical moments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#correlations">Correlations</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

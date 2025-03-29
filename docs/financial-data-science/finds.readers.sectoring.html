@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers.sectoring &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.readers.readers" href="finds.readers.readers.html" />
+    <link rel="prev" title="finds.readers.fomcreader" href="finds.readers.fomcreader.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.readers.html">finds.readers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.alfred.html">finds.readers.alfred</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.bea.html">finds.readers.bea</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.taq.html">finds.readers.taq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.ffreader.html">finds.readers.ffreader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.fomcreader.html">finds.readers.fomcreader</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.readers.sectoring</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.readers.sectoring.Crosswalk"><code class="docutils literal notranslate"><span class="pre">Crosswalk</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.readers.sectoring.Crosswalk.sectoring"><code class="docutils literal notranslate"><span class="pre">Crosswalk.sectoring()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.readers.sectoring.Sectoring"><code class="docutils literal notranslate"><span class="pre">Sectoring</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.readers.sectoring.Sectoring.__getitem__"><code class="docutils literal notranslate"><span class="pre">Sectoring.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.readers.sectoring.Sectoring.load"><code class="docutils literal notranslate"><span class="pre">Sectoring.load()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.readers.readers.html">finds.readers.readers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.readers.html">finds.readers</a></li>
+      <li class="breadcrumb-item active">finds.readers.sectoring</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.readers.sectoring.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.readers.sectoring">
+<span id="finds-readers-sectoring"></span><h1>finds.readers.sectoring<a class="headerlink" href="#module-finds.readers.sectoring" title="Permalink to this heading"></a></h1>
+<p>Implement industry sectoring</p>
+<ul class="simple">
+<li><p>Bureau of Economic Analysis: Input-Output Use Tables</p></li>
+<li><p>SIC, NAICS crosswalks: <a class="reference external" href="https://www.naics.com/">https://www.naics.com/</a></p></li>
+<li><p>Fama-French industry codes:
+<a class="reference external" href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/">https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/</a>”</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.readers.sectoring.Crosswalk">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.readers.sectoring.</span></span><span class="sig-name descname"><span class="pre">Crosswalk</span></span><a class="reference internal" href="_modules/finds/readers/sectoring.html#Crosswalk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.readers.sectoring.Crosswalk" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Reader for naics - sic crosswalk</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.readers.sectoring.Crosswalk.sectoring">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sectoring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/readers/sectoring.html#Crosswalk.sectoring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.readers.sectoring.Crosswalk.sectoring" title="Permalink to this definition"></a></dt>
+<dd><p>Load sic - naics crosswalks from  <a class="reference external" href="https://www.naics.com/">https://www.naics.com/</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> – Column name for input code (i.e. map from)</p></li>
+<li><p><strong>name</strong> – Column name of output code (i.e. map to)</p></li>
+<li><p><strong>desc</strong> – Description of output code</p></li>
+<li><p><strong>source</strong> – location to scrape (default is blank to scrape from naics.com)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame indexed by input code</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.readers.sectoring.Sectoring">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.readers.sectoring.</span></span><span class="sig-name descname"><span class="pre">Sectoring</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.database.sql.html#finds.database.sql.SQL" title="finds.database.sql.SQL"><span class="pre">SQL</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/readers/sectoring.html#Sectoring"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.readers.sectoring.Sectoring" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class to implement industry sector grouping schemes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql</strong> – SQL database connection object</p></li>
+<li><p><strong>scheme</strong> – name of sectoring scheme</p></li>
+<li><p><strong>fillna</strong> – value to return if source label is out of range</p></li>
+<li><p><strong>new</strong> – whether to recreate from source (True) or retrieve from SQL</p></li>
+<li><p><strong>source</strong> – url to recreate sector scheme from</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>sectors</strong> – DataFrame mapping input code in index to output ‘name’ column</p>
+</dd>
+</dl>
+<p>Sectoring schemes:</p>
+<ul class="simple">
+<li><p>‘sic1’, ‘sic2’, ‘sic3’: group 4-digit sic to 1, 2, or 3-digits</p></li>
+<li><p>‘sic’: map 6-digit naics to 4-digit sic</p></li>
+<li><p>‘naics’: map 4-digit sic to 6-digit naics</p></li>
+<li><p>‘bea1997’, ‘bea1963’, ‘bea1947’: map naics to bea schemes by vintage year</p></li>
+<li><p>‘codes48’, …, ‘codes5’: map 4-digit sic to FamaFrench schemes</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.readers.sectoring.Sectoring.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/finds/readers/sectoring.html#Sectoring.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.readers.sectoring.Sectoring.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Lookup sectoring group given raw input code/s</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.readers.sectoring.Sectoring.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/finds/readers/sectoring.html#Sectoring.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.readers.sectoring.Sectoring.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load sectoring map from source url or file to SQL</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.readers.fomcreader.html" class="btn btn-neutral float-left" title="finds.readers.fomcreader" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.readers.readers.html" class="btn btn-neutral float-right" title="finds.readers.readers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.backtesting.eventstudy &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.unstructured" href="finds.unstructured.html" />
+    <link rel="prev" title="finds.backtesting.riskpremium" href="finds.backtesting.riskpremium.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.backtesting.html">finds.backtesting.backtesting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.dailyperformance.html">finds.backtesting.dailyperformance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.backtest.html">finds.backtesting.backtest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.riskpremium.html">finds.backtesting.riskpremium</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.backtesting.eventstudy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy"><code class="docutils literal notranslate"><span class="pre">EventStudy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.__call__"><code class="docutils literal notranslate"><span class="pre">EventStudy.__call__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.fit"><code class="docutils literal notranslate"><span class="pre">EventStudy.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.plot"><code class="docutils literal notranslate"><span class="pre">EventStudy.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.read"><code class="docutils literal notranslate"><span class="pre">EventStudy.read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.read_summary"><code class="docutils literal notranslate"><span class="pre">EventStudy.read_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.write"><code class="docutils literal notranslate"><span class="pre">EventStudy.write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.backtesting.eventstudy.EventStudy.write_summary"><code class="docutils literal notranslate"><span class="pre">EventStudy.write_summary()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.backtesting.html">finds.backtesting</a></li>
+      <li class="breadcrumb-item active">finds.backtesting.eventstudy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.backtesting.eventstudy.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.backtesting.eventstudy">
+<span id="finds-backtesting-eventstudy"></span><h1>finds.backtesting.eventstudy<a class="headerlink" href="#module-finds.backtesting.eventstudy" title="Permalink to this heading"></a></h1>
+<p>Evaluate event studies</p>
+<ul class="simple">
+<li><p>Event studies: cumulative abnormal returns</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.backtesting.eventstudy.</span></span><span class="sig-name descname"><span class="pre">EventStudy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sql</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.database.sql.html#finds.database.sql.SQL" title="finds.database.sql.SQL"><span class="pre">SQL</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bench</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.benchmarks.html#finds.structured.benchmarks.Benchmarks" title="finds.structured.benchmarks.Benchmarks"><span class="pre">Benchmarks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">stocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.stocks.html#finds.structured.stocks.Stocks" title="finds.structured.stocks.Stocks"><span class="pre">Stocks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'events'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="finds.structured.structured.html#finds.structured.structured.Structured" title="finds.structured.structured.Structured"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structured</span></code></a></p>
+<p>Class to support statistical tests of event studies</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sql</strong> – connection to user database to store results</p></li>
+<li><p><strong>bench</strong> – Benchmark dataset of index returns for market adjustment</p></li>
+<li><p><strong>stocks</strong> – Stocks structured dataset containing stock returns</p></li>
+<li><p><strong>max_date</strong> – last date to run event study</p></li>
+<li><p><strong>table</strong> – physical name of table in user database to append summary results</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Construct event window market-adjusted returns where valid/available</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – Unique label (used for graph labels and table name)</p></li>
+<li><p><strong>df</strong> – Input DataFrame of stock identifiers and event dates</p></li>
+<li><p><strong>left</strong> – Start (inclusive) of announcement window around event date</p></li>
+<li><p><strong>right</strong> – End (inclusive) of announcement window around event date</p></li>
+<li><p><strong>post</strong> – End (inclusive) post-drift period</p></li>
+<li><p><strong>date_field</strong> – Name of date column in df</p></li>
+</ul>
+</dd>
+</dl>
+<p>Notes:
+- populates ‘car’ attribute with cumulative arithmetic abnormal returns
+- populates ‘bhar’ attribute with abnormal cumulative product returns</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'scar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Compute car, or bhar, and summary statistics of selected rows</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – name of predefined model to compute summary statistics</p></li>
+<li><p><strong>rows</strong> – Subset of rows to evaluate; empty list selects all rows</p></li>
+<li><p><strong>car</strong> – Whether to evaluate CAR (True) or BHAR (False)</p></li>
+<li><p><strong>rho</strong> – Average cross correlation of event returns.  If None, then
+compute from max convolution of post-announcement returns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Dict of summary statistics of full and subsamples</p>
+<ul class="simple">
+<li><p>’window’, ‘window-tvalue’ are CAR at end of event window</p></li>
+<li><p>’post’, ‘post-tvalue’ are CAR from event end till post-drift end</p></li>
+<li><p>’car’, ‘car-stderr’ are daily CAR from beginning of announcement</p></li>
+<li><p>’rows’ is number of input rows</p></li>
+<li><p>’days’ is number of unique dates (same announce dates are grouped)</p></li>
+<li><p>’effective’ is the number of days after correlation effects</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>TODO names of models:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“car” or “bhar”</p></li>
+<li><p>unstandardized or ‘s’tandardized or ‘adj-s’tandardized (simple rho)
+or ‘conv-s’tandardized (with average rho from convolution max)</p></li>
+</ul>
+</div></blockquote>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>Kolari and Pynnonen (2010) eqn[3] cross-sectionally adjusted
+Patell or BMP with avg correlation: multiply variance by 1 + (p*(n-1))</p></li>
+<li><p>Kolari, Pape, Pynnonen (2018) eqn[15] adjusted by average overlap (tau)
+and average covariance ratio (correlation rho)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'best'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'C0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.96</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Plot cumulative abnormal returns, drift and confidence bands</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – Name of model to plot computed results</p></li>
+<li><p><strong>drift</strong> – Whether to start confidence bands at post-event drift start</p></li>
+<li><p><strong>ax</strong> – Axes to plot</p></li>
+<li><p><strong>loc</strong> – Legend location</p></li>
+<li><p><strong>title</strong> – Main title</p></li>
+<li><p><strong>c</strong> – Color</p></li>
+<li><p><strong>vline</strong> – List of x-axis points to plot vertical line</p></li>
+<li><p><strong>hline</strong> – List of y-axis points to plot horizontal line</p></li>
+<li><p><strong>width</strong> – Number of std errs for confidence bands</p></li>
+<li><p><strong>fontsize</strong> – Base font size</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.read" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch daily cumulative abnormal returns series from user table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – name suffix of table to retrieve from</p></li>
+<li><p><strong>left</strong> – offset of left announcement window</p></li>
+<li><p><strong>right</strong> – offet of right announcement window</p></li>
+<li><p><strong>post</strong> – offset of right post-announcement window</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of car and bhar daily cumulative returns</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.read_summary">
+<span class="sig-name descname"><span class="pre">read_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.read_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.read_summary" title="Permalink to this definition"></a></dt>
+<dd><p>Load event study summary from database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> – Name of event to retrieve; if blank, retrieve all events</p></li>
+<li><p><strong>model</strong> – Name of model to retrieve; if blank, retrieve all models</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of rows written</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.write" title="Permalink to this definition"></a></dt>
+<dd><p>Store daily cumulative returns in new user table</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.backtesting.eventstudy.EventStudy.write_summary">
+<span class="sig-name descname"><span class="pre">write_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/finds/backtesting/eventstudy.html#EventStudy.write_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.eventstudy.EventStudy.write_summary" title="Permalink to this definition"></a></dt>
+<dd><p>Save event study summary to database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>overwrite</strong> – Whether to overwrite, else append rows</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of rows written</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.backtesting.riskpremium.html" class="btn btn-neutral float-left" title="finds.backtesting.riskpremium" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.unstructured.html" class="btn btn-neutral float-right" title="finds.unstructured" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

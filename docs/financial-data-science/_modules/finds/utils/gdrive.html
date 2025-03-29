@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.utils.gdrive &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.utils.gdrive</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.utils.gdrive</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Convenience class methods to use google drive apis</span>
+
+<span class="sd">- google REST api&#39;s</span>
+
+<span class="sd">#pip install google-api-python-client</span>
+
+<span class="sd">Author: Terence Lim</span>
+<span class="sd">License: MIT</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">googleapiclient.discovery</span> <span class="kn">import</span> <span class="n">build</span>
+<span class="kn">from</span> <span class="nn">googleapiclient.http</span> <span class="kn">import</span> <span class="n">MediaIoBaseDownload</span><span class="p">,</span> <span class="n">MediaFileUpload</span>
+<span class="kn">from</span> <span class="nn">google_auth_oauthlib.flow</span> <span class="kn">import</span> <span class="n">InstalledAppFlow</span>
+<span class="kn">from</span> <span class="nn">google.auth.transport.requests</span> <span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1">#to_url = &quot;https://drive.google.com/uc?export=download&amp;id=&quot;.format</span>
+
+<span class="c1"># If modifying scopes, delete the file token.pkl.</span>
+<span class="n">_SCOPES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;https://www.googleapis.com/auth/drive&#39;</span><span class="p">]</span>
+<span class="n">_FOLDER</span> <span class="o">=</span> <span class="s1">&#39;application/vnd.google-apps.folder&#39;</span>   <span class="c1"># mimeType of folders</span>
+<span class="n">_HOME</span> <span class="o">=</span> <span class="s1">&#39;root&#39;</span>   <span class="c1"># fileId of root folder</span>
+
+<div class="viewcode-block" id="GDrive"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive">[docs]</a><span class="k">class</span> <span class="nc">GDrive</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class provides basic interface to essential google drive api&#39;s</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    to_url : str formatter</span>
+<span class="sd">        prepend to shared google drive file_id to construct url for download</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    # init() prompts for googleapi authorization, which is stored in a tokenfile</span>
+<span class="sd">    #   in current folder so that not prompted in subsequent executions</span>
+<span class="sd">    g = GDrive()</span>
+
+<span class="sd">    _ = g.ls()                   # display list of folders and files (and types)</span>
+
+<span class="sd">    # NOTE: in all methods, set silent=True to turn off raise exceptions</span>
+<span class="sd">    #   and return None on error (letting caller handle errors gracefully)</span>
+<span class="sd">    items = g.ls(silent=True)  # returns files+folders and their fields</span>
+
+<span class="sd">    g.cd()                       # returns remote current working directory</span>
+<span class="sd">    g.mkdir(&#39;/new_folder&#39;)       # create new folder with absolute path name</span>
+<span class="sd">    g.cd(&#39;new_folder&#39;)           # change remote cwd</span>
+<span class="sd">    g.mkdir(&#39;another_folder&#39;)    # create new folder in remote cwd</span>
+<span class="sd">    g.put(&#39;local.txt&#39;, &#39;another_folder/newfile.txt&#39;)   # upload, relative path</span>
+<span class="sd">    g.put(&#39;local.txt&#39;, &#39;/new_folder&#39;)    # upload, absolute path, infer filename</span>
+<span class="sd">    g.put(&#39;local.txt&#39;)                   # upload to remote cwd, infer filename</span>
+<span class="sd">    g.get(&#39;/new_folder/local.txt&#39;, &#39;localfile.txt&#39;)   # upload, absolute path</span>
+<span class="sd">    g.get(&#39;another_folder/newfile.txt&#39;)  # upload, relative path, infer filename</span>
+<span class="sd">    g.rm(&#39;/new_folder/local.txt&#39;)        # remove, absolute path</span>
+<span class="sd">    g.rm(&#39;another_folder/newfile.txt&#39;)   # remove, relative path</span>
+<span class="sd">    g.rmdir(&#39;another_folder&#39;)            # remove folder from remote cwd</span>
+<span class="sd">    g.rmdir(&#39;/new_folder&#39;)               # remove folder with absolute path name</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    See https://developers.google.com/drive/api/v3/quickstart/python</span>
+<span class="sd">    to turn on the Drive API.  In resulting dialog click DOWNLOAD CLIENT </span>
+<span class="sd">    CONFIGURATION and save the file credentials.json to your working directory.</span>
+
+<span class="sd">    Initially, the class will attempt to open browser to prompt for</span>
+<span class="sd">    authorization (information is stored in tokenfile, so subsequent executions</span>
+<span class="sd">    will not prompt).  If this fails, copy the URL from the console and manually</span>
+<span class="sd">    open it in your browser.</span>
+
+<span class="sd">    Requirements</span>
+<span class="sd">    ------------</span>
+<span class="sd">    pip install --upgrade \</span>
+<span class="sd">        google-api-python-client google-auth-httplib2 google-auth-oauthlib</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="c1">#    to_url = &quot;https://drive.google.com/uc?export=download&amp;id={}&quot;.format</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenfile</span><span class="o">=</span><span class="s1">&#39;token.pkl&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Prompt for authorization, then save for subsequent executions</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokenfile : str, default is &#39;token.pkl&#39;</span>
+<span class="sd">            locally stores authorization information for subsequent executions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">creds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># The file token.pkl stores the user&#39;s access and refresh tokens, and is</span>
+        <span class="c1"># created automatically when the authorization flow completes for the </span>
+        <span class="c1"># first time.  See https://developers.google.com/drive/api/v3/</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tokenfile</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tokenfile</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">token</span><span class="p">:</span>
+                <span class="n">creds</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="c1"># If there are no (valid) credentials available, let the user log in.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">creds</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">creds</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">creds</span> <span class="ow">and</span> <span class="n">creds</span><span class="o">.</span><span class="n">expired</span> <span class="ow">and</span> <span class="n">creds</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">:</span>
+                <span class="n">creds</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="n">Request</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flow</span> <span class="o">=</span> <span class="n">InstalledAppFlow</span><span class="o">.</span><span class="n">from_client_secrets_file</span><span class="p">(</span>
+                    <span class="s1">&#39;credentials.json&#39;</span><span class="p">,</span> <span class="n">_SCOPES</span><span class="p">)</span>
+                <span class="n">creds</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">run_local_server</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># Save the credentials for the next run</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tokenfile</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">token</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">build</span><span class="p">(</span><span class="s1">&#39;drive&#39;</span><span class="p">,</span> <span class="s1">&#39;v3&#39;</span><span class="p">,</span> <span class="n">credentials</span><span class="o">=</span><span class="n">creds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>   <span class="c1"># initial remote current working directory</span>
+
+    <span class="k">def</span> <span class="nf">_fullpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to clean and complete path str&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s1">&#39;..&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwd</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>     <span class="c1"># no trailing &#39;/&#39;</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>  <span class="c1"># prepend cwd if not absolute path name</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pwd</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">):</span>  <span class="c1"># remove repeated &#39;//&#39;</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;/&#39;</span>
+
+<div class="viewcode-block" id="GDrive.fetchall"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.fetchall">[docs]</a>    <span class="k">def</span> <span class="nf">fetchall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">_HOME</span><span class="si">}</span><span class="s2">&#39; in parents&quot;</span><span class="p">,</span>
+                 <span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ownedByMe&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;trashed&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">},</span>
+                 <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;parents&#39;</span><span class="p">,</span><span class="s1">&#39;mimeType&#39;</span><span class="p">],</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper method to fetch list of all files</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        q : str, default &quot;&#39;root&#39; in parents&quot; (select files in top-level folder)</span>
+<span class="sd">            Search query string with which to call service.files().list()</span>
+<span class="sd">        filters : list of dict, default is {&#39;ownedByMe&#39;: True, &#39;trashed&#39;:False}</span>
+<span class="sd">            Files metadata properties to filter on, see</span>
+<span class="sd">            https://developers.google.com/drive/api/v3/reference/files</span>
+<span class="sd">        fields : list of str, default is [&#39;id&#39;,&#39;name&#39;,&#39;parents&#39;,&#39;mimeType&#39;]</span>
+<span class="sd">            Specific fields of files to return, see</span>
+<span class="sd">            https://developers.google.com/drive/api/v3/fields-parameter</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result : list of dicts</span>
+<span class="sd">            dicts of specified fields for list of files that pass filter</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        See https://developers.google.com/drive/api/v3/search-files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">page_token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">filters</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># max pageSize 1000, so loop until done (page_token None)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+                <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">pageSize</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">pageToken</span><span class="o">=</span><span class="n">page_token</span><span class="p">,</span> 
+                <span class="n">spaces</span><span class="o">=</span><span class="s1">&#39;drive&#39;</span><span class="p">,</span>   <span class="c1"># not photos nor appDataFolder</span>
+                <span class="n">fields</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;nextPageToken, files(</span><span class="si">{</span><span class="n">fields</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">num_retries</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">results</span> <span class="o">+=</span> <span class="n">items</span>
+            <span class="n">page_token</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;nextPageToken&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">page_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">==</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">())]</span></div>
+
+<div class="viewcode-block" id="GDrive.fetchone"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.fetchone">[docs]</a>    <span class="k">def</span> <span class="nf">fetchone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch metadata for one file given its path name</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            remote path name</span>
+<span class="sd">        field : str in {&#39;id&#39;, &#39;name&#39;, &#39;mimeType&#39;, &#39;parents&#39;}, default is None</span>
+<span class="sd">            specific metadata field to return.  None to return all fields</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        match : value, or dict of values, or None</span>
+<span class="sd">            value or dict of metadata values of matched file. None if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">parts</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;helper method to split path into parts (why not in os.path???)&quot;&quot;&quot;</span>
+            <span class="n">p</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">((</span><span class="n">parts</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span> <span class="k">else</span> <span class="p">[</span><span class="s1">&#39;/&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="p">([</span><span class="n">t</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="k">else</span> <span class="p">[]))</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">_HOME</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;mimeType&#39;</span><span class="p">:</span> <span class="n">_FOLDER</span><span class="p">,</span> <span class="s1">&#39;parents&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>    <span class="c1"># sequentially try to match path name parts</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">match</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; in parents&quot;</span><span class="p">,</span>
+                                  <span class="n">fields</span><span class="o">=</span><span class="n">match</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">p</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>      <span class="c1"># this part of path name has no match, so exit the method</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">match</span> <span class="k">if</span> <span class="n">field</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">match</span><span class="p">[</span><span class="n">field</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="GDrive.ls"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.ls">[docs]</a>    <span class="k">def</span> <span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of files in remote folder&quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>    <span class="c1"># raise Exception if verbose</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot ls </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>    <span class="c1"># else silently return None</span>
+        <span class="k">elif</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_FOLDER</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; in parents&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="n">maxlen</span><span class="p">,</span> <span class="n">ndirs</span><span class="p">,</span> <span class="n">nfiles</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">_FOLDER</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                        <span class="n">ndirs</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">maxlen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxlen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+                        <span class="n">nfiles</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">_FOLDER</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;{:</span><span class="si">{width}</span><span class="s2">}  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;mimeType&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">maxlen</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39; has </span><span class="si">{</span><span class="n">ndirs</span><span class="si">}</span><span class="s2"> folders, </span><span class="si">{</span><span class="n">nfiles</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">files</span></div>
+
+<div class="viewcode-block" id="GDrive.dir"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.dir">[docs]</a>    <span class="k">def</span> <span class="nf">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of files in remote folder&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="GDrive.cd"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.cd">[docs]</a>    <span class="k">def</span> <span class="nf">cd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change remote working directory&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1"># return cwd if no args</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;mimeType&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">_FOLDER</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>    <span class="c1"># raise Exception if verbose</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot cd &#39;</span> <span class="o">+</span> <span class="n">path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>    <span class="c1"># else silently return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span></div>
+        
+<div class="viewcode-block" id="GDrive.mkdir"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.mkdir">[docs]</a>    <span class="k">def</span> <span class="nf">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create remote folder&quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">fileId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>    <span class="c1"># check if already exists</span>
+        <span class="n">folder</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>  <span class="c1"># try to create new in parent folder</span>
+        <span class="n">folderId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">folderId</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fileId</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot mkdir </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">folderId</span><span class="p">],</span> <span class="s1">&#39;mimeType&#39;</span><span class="p">:</span> <span class="n">_FOLDER</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GDrive.md"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.md">[docs]</a>    <span class="k">def</span> <span class="nf">md</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create remote folder&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GDrive.rmdir"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.rmdir">[docs]</a>    <span class="k">def</span> <span class="nf">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove remote folder and all its contents, bypassing trash bin&quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">fileId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fileId</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>        <span class="c1"># raise Exception if verbose</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot remove </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>        <span class="c1"># else silently return None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">{</span><span class="n">fileId</span><span class="si">}</span><span class="s2">&#39; deleted&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span><span class="p">:</span>   <span class="c1"># if deleted cwd, then cd to parent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GDrive.rm"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.rm">[docs]</a>    <span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove remote file, bypassing trash bin&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;mimeType&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">_FOLDER</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>  <span class="c1"># raise Exception, else silently return None</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Use rmdir to rm </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> and all its contents&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GDrive.delete"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove remote file, bypassing trash bin&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GDrive.get"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download a remote file to local filename</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            relative or absolute path name of remote file</span>
+<span class="sd">        filename : str, default is &#39;&#39;</span>
+<span class="sd">            Output filename.  If blank: infer basename, save in curr local dir</span>
+<span class="sd">        silent : bool, default False</span>
+<span class="sd">            if True, print file statistics if successful, raise exception if not</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        total_file_size : int</span>
+<span class="sd">            or None if unsuccessful and silent</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        see https://developers.google.com/drive/api/v3/manage-downloads</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">fileId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">media</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">get_media</span><span class="p">(</span><span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">downloader</span> <span class="o">=</span> <span class="n">MediaIoBaseDownload</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">media</span><span class="p">)</span>
+            <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">while</span> <span class="n">done</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">status</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">next_chunk</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>   <span class="c1"># raise Exception if verbose</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="kc">None</span>   <span class="c1"># else silently return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Retrieved to </span><span class="si">{}</span><span class="s2">, len=</span><span class="si">{}</span><span class="s2">,  in </span><span class="si">{:.0f}</span><span class="s2"> secs&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">total_size</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tic</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">status</span><span class="o">.</span><span class="n">total_size</span></div>
+
+<div class="viewcode-block" id="GDrive.put"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Upload a local filename to remote folder file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Input local filename</span>
+<span class="sd">        path : str, default is &#39;&#39;</span>
+<span class="sd">            Absolute or relative output filename or folder (basename inferred</span>
+<span class="sd">            from local filename).  If blank: upload to current remote folder</span>
+<span class="sd">        silent : bool, default False</span>
+<span class="sd">            if False, print file statistics if successful</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        total_file_size : int</span>
+<span class="sd">            or None if unsuccessful and silent flag is set to True</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        see https://developers.google.com/drive/api/v3/manage-uploads</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>     <span class="c1"># if path not specified, put in current remote folder</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;mimeType&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">_FOLDER</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>  <span class="c1"># infer base from input filename</span>
+            <span class="n">folder</span> <span class="o">=</span> <span class="n">path</span>                      <span class="c1">#   if output path is folder</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folder</span><span class="p">,</span> <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">media_body</span> <span class="o">=</span> <span class="n">MediaFileUpload</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">resumable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">fileId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">base</span><span class="p">),</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">fileId</span><span class="p">:</span>     <span class="c1"># fileId already exists, so use update method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">,</span> <span class="n">media_body</span><span class="o">=</span><span class="n">media_body</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">folderId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>  <span class="c1"># try to get folder ID</span>
+            <span class="k">if</span> <span class="n">folderId</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>       <span class="c1"># raise Exception if verbose</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Cannot put &#39;</span> <span class="o">+</span> <span class="n">path</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>       <span class="c1"># else silently return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>     <span class="c1"># method creates new file in folder</span>
+                <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">base</span><span class="p">,</span> <span class="s2">&quot;parents&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">folderId</span><span class="p">]},</span>
+                <span class="n">media_body</span><span class="o">=</span><span class="n">media_body</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">, len=</span><span class="si">{}</span><span class="s2">, in </span><span class="si">{:.0f}</span><span class="s2"> secs&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;Updated&quot;</span> <span class="k">if</span> <span class="n">fileId</span> <span class="k">else</span> <span class="s2">&quot;Saved&quot;</span><span class="p">,</span> 
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">base</span><span class="p">),</span> <span class="n">media_body</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">tic</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">media_body</span><span class="o">.</span><span class="n">size</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GDrive.chmod"><a class="viewcode-back" href="../../../finds.utils.gdrive.html#finds.utils.gdrive.GDrive.chmod">[docs]</a>    <span class="k">def</span> <span class="nf">chmod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;reader&#39;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;List, delete or create sharing permissions for a remote file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            name of remote file to change permissions of</span>
+<span class="sd">        action : str in {&#39;list&#39; (default), &#39;create&#39;, &#39;delete&#39;}</span>
+<span class="sd">            permissions action to execute</span>
+<span class="sd">        role : str in {&#39;reader&#39; (default), &#39;writer&#39;, &#39;owner&#39;, &#39;commenter&#39;}</span>
+<span class="sd">            role to permit</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        result: int or str</span>
+<span class="sd">            number of permissions listed or deleted, or shareable link created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fullpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">fileId</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetchone</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fileId</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot chmod </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">permissions</span><span class="p">()</span><span class="o">.</span><span class="n">list</span><span class="p">(</span>
+            <span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;permissions&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>       <span class="c1"># action is create</span>
+            <span class="n">roles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;reader&#39;</span><span class="p">,</span> <span class="s1">&#39;writer&#39;</span><span class="p">,</span> <span class="s1">&#39;owner&#39;</span><span class="p">,</span> <span class="s1">&#39;commenter&#39;</span><span class="p">]</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">role</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;chmod invalid role not in </span><span class="si">{</span><span class="n">roles</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> 
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;anyone&#39;</span> <span class="k">if</span> <span class="n">email</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">email</span><span class="p">,</span>
+                    <span class="s1">&#39;emailAddress&#39;</span><span class="p">:</span> <span class="n">email</span><span class="p">}</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">permissions</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="s1">&#39;webContentLink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>     <span class="c1"># action is delete</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;owner&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">permissions</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+                        <span class="n">fileId</span><span class="o">=</span><span class="n">fileId</span><span class="p">,</span> <span class="n">permissionId</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>      <span class="c1"># action is list</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">silent</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="s2"> permissions exist in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">items</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">GDrive</span><span class="p">()</span>
+    <span class="n">silent</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

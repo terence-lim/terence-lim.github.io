@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers.sectoring &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.readers.sectoring</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.readers.sectoring</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implement industry sectoring</span>
+
+<span class="sd">- Bureau of Economic Analysis: Input-Output Use Tables</span>
+<span class="sd">- SIC, NAICS crosswalks: https://www.naics.com/</span>
+<span class="sd">- Fama-French industry codes: </span>
+<span class="sd">  https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/&quot;</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Column</span>
+<span class="kn">from</span> <span class="nn">finds.database.sql</span> <span class="kn">import</span> <span class="n">SQL</span>
+<span class="kn">from</span> <span class="nn">finds.readers.readers</span> <span class="kn">import</span> <span class="n">requests_get</span>
+<span class="kn">from</span> <span class="nn">finds.readers.ffreader</span> <span class="kn">import</span> <span class="n">FFReader</span>
+<span class="kn">from</span> <span class="nn">finds.readers.bea</span> <span class="kn">import</span> <span class="n">BEA</span>
+
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Crosswalk"><a class="viewcode-back" href="../../../finds.readers.sectoring.html#finds.readers.sectoring.Crosswalk">[docs]</a><span class="k">class</span> <span class="nc">Crosswalk</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Reader for naics - sic crosswalk&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Crosswalk.sectoring"><a class="viewcode-back" href="../../../finds.readers.sectoring.html#finds.readers.sectoring.Crosswalk.sectoring">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sectoring</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load sic - naics crosswalks from  https://www.naics.com/</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            code: Column name for input code (i.e. map from)</span>
+<span class="sd">            name: Column name of output code (i.e. map to)</span>
+<span class="sd">            desc: Description of output code</span>
+<span class="sd">            source: location to scrape (default is blank to scrape from naics.com)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame indexed by input code</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">source</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://www.naics.com/&#39;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;N&#39;</span> <span class="p">:</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;sic-naics-crosswalk-search-results&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;S&#39;</span> <span class="p">:</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;naics-to-sic-crosswalk-search-results&#39;</span><span class="p">}</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">requests_get</span><span class="p">(</span><span class="n">url</span><span class="p">[</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">content</span>
+            
+        <span class="c1"># scrape crosswalk from naics.com website into a DataFrame</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sectors</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">sectors</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^\x20-\x7E]&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sectors</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+        <span class="c1"># rename the columns, based on the direction of conversion</span>
+        <span class="n">sectors</span> <span class="o">=</span> <span class="n">sectors</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">code</span><span class="p">:</span> <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+                                          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                                          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;description&#39;</span><span class="p">})</span>
+
+        <span class="c1"># clean up DataFrame, set its index, and save to sql database</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span>
+        <span class="n">sectors</span> <span class="o">=</span> <span class="n">sectors</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+        <span class="n">sectors</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sectors</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sectors</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">]]</span></div></div>
+        
+
+<div class="viewcode-block" id="Sectoring"><a class="viewcode-back" href="../../../finds.readers.sectoring.html#finds.readers.sectoring.Sectoring">[docs]</a><span class="k">class</span> <span class="nc">Sectoring</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class to implement industry sector grouping schemes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sql: SQL database connection object</span>
+<span class="sd">        scheme: name of sectoring scheme</span>
+<span class="sd">        fillna: value to return if source label is out of range</span>
+<span class="sd">        new: whether to recreate from source (True) or retrieve from SQL</span>
+<span class="sd">        source: url to recreate sector scheme from</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        sectors: DataFrame mapping input code in index to output &#39;name&#39; column</span>
+
+<span class="sd">    Sectoring schemes:</span>
+
+<span class="sd">    - &#39;sic1&#39;, &#39;sic2&#39;, &#39;sic3&#39;: group 4-digit sic to 1, 2, or 3-digits</span>
+<span class="sd">    - &#39;sic&#39;: map 6-digit naics to 4-digit sic</span>
+<span class="sd">    - &#39;naics&#39;: map 4-digit sic to 6-digit naics </span>
+<span class="sd">    - &#39;bea1997&#39;, &#39;bea1963&#39;, &#39;bea1947&#39;: map naics to bea schemes by vintage year</span>
+<span class="sd">    - &#39;codes48&#39;, ..., &#39;codes5&#39;: map 4-digit sic to FamaFrench schemes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">:</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">scheme</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fillna</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">=</span> <span class="n">scheme</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fillna</span> <span class="o">=</span> <span class="n">fillna</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="s1">&#39;sectoring&#39;</span><span class="p">,</span>
+                               <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                               <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                               <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;scheme&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                               <span class="n">Column</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">128</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;sic&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">digits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">scheme</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">-</span> <span class="n">digits</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="n">digits</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">n</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="n">digits</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}{</span><span class="s1">&#39;0&#39;</span><span class="o">*</span><span class="n">n</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">s</span><span class="si">}{</span><span class="s1">&#39;9&#39;</span><span class="o">*</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span>
+                                           <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;scheme&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sic</span><span class="si">{</span><span class="n">digits</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT * FROM </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2"> WHERE scheme=&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">read_dataframe</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+            <span class="c1">#self.sectors.index = self.sectors.index.astype(int)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2"> Sectoring&quot;</span>
+       
+<div class="viewcode-block" id="Sectoring.__getitem__"><a class="viewcode-back" href="../../../finds.readers.sectoring.html#finds.readers.sectoring.Sectoring.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="n">List</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span> <span class="o">|</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Lookup sectoring group given raw input code/s&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">is_list_like</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">code</span><span class="p">)]</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">found</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">found</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">fillna</span></div>
+
+<div class="viewcode-block" id="Sectoring.load"><a class="viewcode-back" href="../../../finds.readers.sectoring.html#finds.readers.sectoring.Sectoring.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load sectoring map from source url or file to SQL&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;Helper to upload dataframe with code in index, name. desc to SQL&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>     <span class="c1"># columns=[&#39;name&#39;, &#39;description&#39;]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">]]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;scheme&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span>
+                <span class="n">delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;scheme&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">delete</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">load_dataframe</span><span class="p">(</span><span class="n">table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                                        <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">,</span>
+                                        <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;naics&#39;</span><span class="p">:</span>
+            <span class="n">_load</span><span class="p">(</span><span class="n">Crosswalk</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;SIC Code&#39;</span><span class="p">,</span>
+                                      <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NAICS Code&#39;</span><span class="p">,</span>
+                                      <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;NAICS Description&#39;</span><span class="p">,</span>
+                                      <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;sic&#39;</span><span class="p">:</span>
+            <span class="n">_load</span><span class="p">(</span><span class="n">Crosswalk</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s1">&#39;NAICS Code&#39;</span><span class="p">,</span>
+                                      <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SIC Code&#39;</span><span class="p">,</span>
+                                      <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;SIC Description&#39;</span><span class="p">,</span>
+                                      <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;codes&#39;</span><span class="p">):</span>
+            <span class="n">_load</span><span class="p">(</span><span class="n">FFReader</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bea&#39;</span><span class="p">):</span>
+            <span class="n">_load</span><span class="p">(</span><span class="n">BEA</span><span class="o">.</span><span class="n">sectoring</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">[</span><span class="mi">3</span><span class="p">:]),</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sectors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">finds.database</span> <span class="kn">import</span> <span class="n">SQL</span><span class="p">,</span> <span class="n">RedisDB</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span><span class="p">,</span> <span class="n">paths</span>
+
+    <span class="n">sql</span> <span class="o">=</span> <span class="n">SQL</span><span class="p">(</span><span class="o">**</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;sql&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">_VERBOSE</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Load sectoring schemes from web to SQL</span>
+    <span class="c1">#</span>
+    <span class="n">codes</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+    <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;sic2&#39;</span>
+    <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span>
+    
+    <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;sic3&#39;</span>
+    <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">49</span><span class="p">]:</span>  <span class="c1"># FamaFrench</span>
+        <span class="n">scheme</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;codes</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]))</span>
+        
+    <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;SIC&#39;</span>  <span class="c1"># SIC from NAICS Crosswalk</span>
+    <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]))</span>
+    
+
+    <span class="n">scheme</span> <span class="o">=</span> <span class="s1">&#39;NAICS&#39;</span>  <span class="c1"># NAICS from SIC Crosswalk</span>
+    <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]))</span>
+       
+
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1947</span><span class="p">,</span> <span class="mi">1963</span><span class="p">,</span> <span class="mi">1997</span><span class="p">]:</span>   <span class="c1"># BEA sectoring scheme</span>
+        <span class="n">scheme</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bea</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]</span> <span class="o">=</span> <span class="n">Sectoring</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">scheme</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">scheme</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">codes</span><span class="p">[</span><span class="n">scheme</span><span class="p">]))</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

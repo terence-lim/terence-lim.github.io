@@ -1,0 +1,2449 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Economic Indicators &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '2.1_economic_indicators';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Linear Regression Diagonostics" href="2.2_regression_diagnostics.html" />
+    <link rel="prev" title="Event Study" href="1.7_event_study.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.2_regression_models.html">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F2.1_economic_indicators.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/2.1_economic_indicators.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Economic Indicators</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fred">FRED</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieving-data-from-websites">Retrieving data from websites</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-structured-files">Download structured files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#web-scraping">Web scraping</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-apis">Using APIs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alfred-archival-fred">ALFRED (Archival FRED)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#popular-fred-series">Popular FRED series</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fred-series-categories">FRED series categories</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisions-and-vintage-dates">Revisions and vintage dates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fred-md-and-fred-qd">FRED-MD and FRED-QD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#release-dates">Release dates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outliers">Outliers</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="economic-indicators">
+<h1>Economic Indicators<a class="headerlink" href="#economic-indicators" title="Permalink to this heading">#</a></h1>
+<p><em>What we learn from history is that people don’t learn from history</em> - Warren Buffett</p>
+<p>Economic data is fundamental to financial analysis, policymaking, and investment strategies. However, many economic indicators are subject to revisions, meaning initial estimates may change over time as more accurate data becomes available. Understanding these revisions is crucial for interpreting past economic conditions, refining forecasting models, and making informed decisions. We explore retrieving data from online sources such as the Federal Reserve Economic Data (FRED), its archival counterpart (ALFRED), and key derived datasets such as FRED-MD and FRED-QD. Additionally, we examine the impact of data revisions on critical economic indicators like Total Nonfarm Payrolls (PAYEMS), and methods for detecting outliers in historical data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">finds.readers</span> <span class="kn">import</span> <span class="n">Alfred</span><span class="p">,</span> <span class="n">fred_md</span><span class="p">,</span> <span class="n">fred_qd</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">plot_date</span><span class="p">,</span> <span class="n">plot_groupbar</span>
+<span class="kn">from</span> <span class="nn">finds.recipes</span> <span class="kn">import</span> <span class="n">is_outlier</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># %matplotlib qt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="fred">
+<h2>FRED<a class="headerlink" href="#fred" title="Permalink to this heading">#</a></h2>
+<p>Federal Reserve Economic Data (FRED) is a widely used online database maintained by the Federal Reserve Bank of St. Louis, providing access to hundreds of thousands of economic data series from national and international sources. Users can retrieve data via the website, an Excel add-in, or API calls.</p>
+</section>
+<section id="retrieving-data-from-websites">
+<h2>Retrieving data from websites<a class="headerlink" href="#retrieving-data-from-websites" title="Permalink to this heading">#</a></h2>
+<p>Economic data can be retrieved from the web through several methods:</p>
+<ol class="arabic simple">
+<li><p><strong>Downloading structured files</strong> – Many websites provide data in formats like CSV, Excel, or JSON, making it easy to import into analytical tools.</p></li>
+<li><p><strong>Web scraping</strong> – Extracting information directly from web pages by identifying specific HTML tags or text patterns.</p></li>
+<li><p><strong>Using APIs</strong> – Some platforms, including FRED, offer APIs that allow developers to automate data retrieval via structured queries.</p></li>
+</ol>
+<section id="download-structured-files">
+<h3>Download structured files<a class="headerlink" href="#download-structured-files" title="Permalink to this heading">#</a></h3>
+<p>Many economic data providers allow users to download pre-structured files containing historical and current data. These files often include metadata, timestamps, and adjustment information.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This URL is the location of the FRED-MD csv file from the St Louis FRED</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://www.stlouisfed.org/-/media/project/frbstl/stlouisfed/research/fred-md/monthly/current.csv&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pandas has several built-in readers for csv, xml, json, excel and even html files          </span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sasdate</th>
+      <th>RPI</th>
+      <th>W875RX1</th>
+      <th>DPCERA3M086SBEA</th>
+      <th>CMRMTSPLx</th>
+      <th>RETAILx</th>
+      <th>INDPRO</th>
+      <th>IPFPNSS</th>
+      <th>IPFINAL</th>
+      <th>IPCONGD</th>
+      <th>...</th>
+      <th>DNDGRG3M086SBEA</th>
+      <th>DSERRG3M086SBEA</th>
+      <th>CES0600000008</th>
+      <th>CES2000000008</th>
+      <th>CES3000000008</th>
+      <th>UMCSENTx</th>
+      <th>DTCOLNVHFNM</th>
+      <th>DTCTHFNM</th>
+      <th>INVEST</th>
+      <th>VIXCLSx</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Transform:</td>
+      <td>5.000</td>
+      <td>5.0</td>
+      <td>5.000</td>
+      <td>5.000000e+00</td>
+      <td>5.00000</td>
+      <td>5.0000</td>
+      <td>5.0000</td>
+      <td>5.0000</td>
+      <td>5.0000</td>
+      <td>...</td>
+      <td>6.000</td>
+      <td>6.000</td>
+      <td>6.00</td>
+      <td>6.00</td>
+      <td>6.00</td>
+      <td>2.0</td>
+      <td>6.00</td>
+      <td>6.00</td>
+      <td>6.0000</td>
+      <td>1.0000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1/1/1959</td>
+      <td>2583.560</td>
+      <td>2426.0</td>
+      <td>15.188</td>
+      <td>2.766768e+05</td>
+      <td>18235.77392</td>
+      <td>21.9616</td>
+      <td>23.3868</td>
+      <td>22.2620</td>
+      <td>31.6664</td>
+      <td>...</td>
+      <td>18.294</td>
+      <td>10.152</td>
+      <td>2.13</td>
+      <td>2.45</td>
+      <td>2.04</td>
+      <td>NaN</td>
+      <td>6476.00</td>
+      <td>12298.00</td>
+      <td>84.2043</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2/1/1959</td>
+      <td>2593.596</td>
+      <td>2434.8</td>
+      <td>15.346</td>
+      <td>2.787140e+05</td>
+      <td>18369.56308</td>
+      <td>22.3917</td>
+      <td>23.7024</td>
+      <td>22.4549</td>
+      <td>31.8987</td>
+      <td>...</td>
+      <td>18.302</td>
+      <td>10.167</td>
+      <td>2.14</td>
+      <td>2.46</td>
+      <td>2.05</td>
+      <td>NaN</td>
+      <td>6476.00</td>
+      <td>12298.00</td>
+      <td>83.5280</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3/1/1959</td>
+      <td>2610.396</td>
+      <td>2452.7</td>
+      <td>15.491</td>
+      <td>2.777753e+05</td>
+      <td>18523.05762</td>
+      <td>22.7142</td>
+      <td>23.8459</td>
+      <td>22.5651</td>
+      <td>31.8987</td>
+      <td>...</td>
+      <td>18.289</td>
+      <td>10.185</td>
+      <td>2.15</td>
+      <td>2.45</td>
+      <td>2.07</td>
+      <td>NaN</td>
+      <td>6508.00</td>
+      <td>12349.00</td>
+      <td>81.6405</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4/1/1959</td>
+      <td>2627.446</td>
+      <td>2470.0</td>
+      <td>15.435</td>
+      <td>2.833627e+05</td>
+      <td>18534.46600</td>
+      <td>23.1981</td>
+      <td>24.1903</td>
+      <td>22.8957</td>
+      <td>32.4019</td>
+      <td>...</td>
+      <td>18.300</td>
+      <td>10.221</td>
+      <td>2.16</td>
+      <td>2.47</td>
+      <td>2.08</td>
+      <td>NaN</td>
+      <td>6620.00</td>
+      <td>12484.00</td>
+      <td>81.8099</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>788</th>
+      <td>8/1/2024</td>
+      <td>20007.209</td>
+      <td>16322.1</td>
+      <td>121.052</td>
+      <td>1.530317e+06</td>
+      <td>710038.00000</td>
+      <td>103.0135</td>
+      <td>100.9825</td>
+      <td>100.9803</td>
+      <td>102.2118</td>
+      <td>...</td>
+      <td>119.653</td>
+      <td>128.291</td>
+      <td>31.26</td>
+      <td>35.81</td>
+      <td>27.97</td>
+      <td>67.9</td>
+      <td>551667.22</td>
+      <td>933066.90</td>
+      <td>5327.6461</td>
+      <td>19.6750</td>
+    </tr>
+    <tr>
+      <th>789</th>
+      <td>9/1/2024</td>
+      <td>20044.142</td>
+      <td>16333.7</td>
+      <td>121.690</td>
+      <td>1.541305e+06</td>
+      <td>716388.00000</td>
+      <td>102.5969</td>
+      <td>100.3826</td>
+      <td>100.0630</td>
+      <td>101.9696</td>
+      <td>...</td>
+      <td>119.220</td>
+      <td>128.682</td>
+      <td>31.44</td>
+      <td>36.00</td>
+      <td>28.11</td>
+      <td>70.1</td>
+      <td>553347.06</td>
+      <td>934283.59</td>
+      <td>5368.5818</td>
+      <td>17.6597</td>
+    </tr>
+    <tr>
+      <th>790</th>
+      <td>10/1/2024</td>
+      <td>20128.752</td>
+      <td>16397.9</td>
+      <td>121.948</td>
+      <td>1.539382e+06</td>
+      <td>720393.00000</td>
+      <td>102.0854</td>
+      <td>99.5434</td>
+      <td>98.9267</td>
+      <td>101.3127</td>
+      <td>...</td>
+      <td>119.064</td>
+      <td>129.169</td>
+      <td>31.55</td>
+      <td>36.22</td>
+      <td>28.14</td>
+      <td>70.5</td>
+      <td>554377.25</td>
+      <td>937299.96</td>
+      <td>5407.3304</td>
+      <td>19.9478</td>
+    </tr>
+    <tr>
+      <th>791</th>
+      <td>11/1/2024</td>
+      <td>20161.687</td>
+      <td>16432.8</td>
+      <td>122.519</td>
+      <td>1.544190e+06</td>
+      <td>725925.00000</td>
+      <td>102.2549</td>
+      <td>99.8216</td>
+      <td>99.4970</td>
+      <td>101.7893</td>
+      <td>...</td>
+      <td>119.112</td>
+      <td>129.375</td>
+      <td>31.61</td>
+      <td>36.21</td>
+      <td>28.29</td>
+      <td>71.8</td>
+      <td>555000.61</td>
+      <td>938899.31</td>
+      <td>5382.4019</td>
+      <td>15.9822</td>
+    </tr>
+    <tr>
+      <th>792</th>
+      <td>12/1/2024</td>
+      <td>20184.060</td>
+      <td>16457.8</td>
+      <td>123.013</td>
+      <td>NaN</td>
+      <td>729191.00000</td>
+      <td>103.1942</td>
+      <td>100.5351</td>
+      <td>100.1302</td>
+      <td>102.2582</td>
+      <td>...</td>
+      <td>119.689</td>
+      <td>129.760</td>
+      <td>31.73</td>
+      <td>36.44</td>
+      <td>28.34</td>
+      <td>74.0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>5370.6184</td>
+      <td>15.6997</td>
+    </tr>
+  </tbody>
+</table>
+<p>793 rows × 127 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="web-scraping">
+<h3>Web scraping<a class="headerlink" href="#web-scraping" title="Permalink to this heading">#</a></h3>
+<p>Web scraping involves extracting data from unstructured web pages by identifying patterns in the HTML structure. This method is useful when structured data files are unavailable, but it requires compliance with website policies.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># URL that displays the most popular series in the FRED economic data web site</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://fred.stlouisfed.org/tags/series?ob=pv&amp;pageID=1&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use requests package to retrieve the web page</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">data</span>    <span class="c1"># a response code of 200 indicates the request has succeeded</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Response [200]&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># the content is just a byte-string that you can parse with Python string (or other) methods</span>
+<span class="n">data</span><span class="o">.</span><span class="n">content</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>b&#39;&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;en&quot;&gt;\n&lt;head&gt;\n    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;\n    &lt;meta charset=&quot;utf-8&quot;&gt;\n                &lt;title&gt;Economic Data Series by Tag | FRED | St. Louis Fed&lt;/&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use the BeautifulSoup package to parse html formats</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s1">&#39;lxml&#39;</span><span class="p">)</span>
+
+<span class="c1"># based on this snippet, we want to extract the href property of the series-title class tag</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">decode</span><span class="p">()[</span><span class="mi">39000</span><span class="p">:</span><span class="mi">40000</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>s=&quot;series-title pager-series-title-gtm&quot; href=&quot;/series/T10Y2Y&quot; id=&quot;titleLink&quot; style=&quot;font-size:1.2em; padding-bottom: 2px&quot;&gt;10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity&lt;/a&gt;&lt;/h3&gt;
+&lt;/div&gt;
+&lt;div class=&quot;display-results-popularity-bar d-none d-sm-block col-sm-2&quot;&gt;
+&lt;span aria-label=&quot;popularity 100% popular&quot; class=&quot;popularity-bar-span-parent&quot; data-target=&quot;popularity-bar-span-T10Y2Y&quot; tabindex=&quot;0&quot; title=&quot;100% popular&quot;&gt;
+&lt;span aria-hidden=&quot;true&quot; class=&quot;popularity_bar&quot; style=&quot;padding-top: 3px; padding-left:60px;&quot;&gt; &lt;/span&gt; &lt;span aria-hidden=&quot;true&quot; class=&quot;popularity_bar_background&quot; id=&quot;popularity-bar-span-T10Y2Y&quot;&gt; &lt;/span&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;series-pager-attr&quot;&gt;
+&lt;td colspan=&quot;2&quot;&gt;
+&lt;div class=&quot;series-meta series-group-meta&quot;&gt;
+&lt;span class=&quot;attributes&quot;&gt;Percent, Not Seasonally Adjusted&lt;/span&gt;
+&lt;br class=&quot;clear&quot;/&gt;
+&lt;/div&gt;
+&lt;div class=&quot;series-meta&quot;&gt;
+&lt;input aria-labelledby=&quot;unitLinkT10Y2Y&quot; class=&quot;pager-item-checkbox pager-check-series-gtm&quot; name=&quot;sids[0]&quot; type=&quot;checkbox&quot; v
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># identify all the tags whose class starts with &#39;series-title&#39;</span>
+<span class="n">tags</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;series-title&#39;</span><span class="p">})</span>
+<span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># show first tag found</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;a class=&quot;series-title pager-series-title-gtm&quot; href=&quot;/series/T10Y2Y&quot; id=&quot;titleLink&quot; style=&quot;font-size:1.2em; padding-bottom: 2px&quot;&gt;10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity&lt;/a&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># extract desired substring (which is a data series mnemonic) from the href property</span>
+<span class="n">details</span> <span class="o">=</span> <span class="p">[</span><span class="n">tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">]</span>  <span class="c1"># only want substring after last &#39;/&#39;</span>
+<span class="n">details</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># show first mnemonic string found</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;T10Y2Y&#39;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="using-apis">
+<h3>Using APIs<a class="headerlink" href="#using-apis" title="Permalink to this heading">#</a></h3>
+<p>APIs (Application Programming Interfaces) enable direct communication with data servers, allowing for real-time data retrieval. Many economic research institutions, including the St Louis Fed, offer APIs to access macroeconomic data programmatically.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># an API call is simply a URL string containing your parameters for the request</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{root}</span><span class="s2">?series_id=</span><span class="si">{series_id}</span><span class="s2">&amp;file_type=</span><span class="si">{file_type}</span><span class="s2">&amp;api_key=</span><span class="si">{api_key}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="s2">&quot;https://api.stlouisfed.org/fred/series&quot;</span><span class="p">,</span> <span class="c1"># base url of the API call</span>
+    <span class="n">series_id</span><span class="o">=</span><span class="n">details</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>                          <span class="c1"># mnemonic of the data series to retrieve</span>
+    <span class="n">file_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">,</span>                              <span class="c1"># request data be returned in json format</span>
+    <span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">])</span>        <span class="c1"># private api key (obtain from FRED for free)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># make the API call to retrieve the data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">content</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>b&#39;{&quot;realtime_start&quot;:&quot;2025-02-28&quot;,&quot;realtime_end&quot;:&quot;2025-02-28&quot;,&quot;seriess&quot;:[{&quot;id&quot;:&quot;T10Y2Y&quot;,&quot;realtime_start&quot;:&quot;2025-02-28&quot;,&quot;realtime_end&quot;:&quot;2025-02-28&quot;,&quot;title&quot;:&quot;10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity&quot;,&quot;observation_start&quot;:&quot;1976-06-01&quot;,&quot;observation_end&quot;:&quot;2025-02-28&quot;,&quot;frequency&quot;:&quot;Daily&quot;,&quot;frequency_short&quot;:&quot;D&quot;,&quot;units&quot;:&quot;Percent&quot;,&quot;units_short&quot;:&quot;%&quot;,&quot;seasonal_adjustment&quot;:&quot;Not Seasonally Adjusted&quot;,&quot;seasonal_adjustment_short&quot;:&quot;NSA&quot;,&quot;last_updated&quot;:&quot;2025-02-28 16:02:07-06&quot;,&quot;popularity&quot;:100,&quot;notes&quot;:&quot;Starting with the update on June 21, 2019, the Treasury bond data used in calculating interest rate spreads is obtained directly from the U.S. Treasury Department (https:\\/\\/www.treasury.gov\\/resource-center\\/data-chart-center\\/interest-rates\\/Pages\\/TextView.aspx?data=yield).\\r\\nSeries is calculated as the spread between 10-Year Treasury Constant Maturity (BC_10YEAR) and 2-Year Treasury Constant Maturity (BC_2YEAR). Both underlying series are published at the U.S. Treasury Department (https:\\/\\/www.treasury.gov\\/resource-center\\/data-chart-center\\/interest-rates\\/Pages\\/TextView.aspx?data=yield).&quot;}]}&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use the json package to convert byte-string data content</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+<span class="n">v</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;realtime_start&#39;: &#39;2025-02-28&#39;,
+ &#39;realtime_end&#39;: &#39;2025-02-28&#39;,
+ &#39;seriess&#39;: [{&#39;id&#39;: &#39;T10Y2Y&#39;,
+   &#39;realtime_start&#39;: &#39;2025-02-28&#39;,
+   &#39;realtime_end&#39;: &#39;2025-02-28&#39;,
+   &#39;title&#39;: &#39;10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity&#39;,
+   &#39;observation_start&#39;: &#39;1976-06-01&#39;,
+   &#39;observation_end&#39;: &#39;2025-02-28&#39;,
+   &#39;frequency&#39;: &#39;Daily&#39;,
+   &#39;frequency_short&#39;: &#39;D&#39;,
+   &#39;units&#39;: &#39;Percent&#39;,
+   &#39;units_short&#39;: &#39;%&#39;,
+   &#39;seasonal_adjustment&#39;: &#39;Not Seasonally Adjusted&#39;,
+   &#39;seasonal_adjustment_short&#39;: &#39;NSA&#39;,
+   &#39;last_updated&#39;: &#39;2025-02-28 16:02:07-06&#39;,
+   &#39;popularity&#39;: 100,
+   &#39;notes&#39;: &#39;Starting with the update on June 21, 2019, the Treasury bond data used in calculating interest rate spreads is obtained directly from the U.S. Treasury Department (https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield).\r\nSeries is calculated as the spread between 10-Year Treasury Constant Maturity (BC_10YEAR) and 2-Year Treasury Constant Maturity (BC_2YEAR). Both underlying series are published at the U.S. Treasury Department (https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield).&#39;}]}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pandas can create a DataFrame directly from a dict data structure</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;seriess&#39;</span><span class="p">])</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+      <th>title</th>
+      <th>observation_start</th>
+      <th>observation_end</th>
+      <th>frequency</th>
+      <th>frequency_short</th>
+      <th>units</th>
+      <th>units_short</th>
+      <th>seasonal_adjustment</th>
+      <th>seasonal_adjustment_short</th>
+      <th>last_updated</th>
+      <th>popularity</th>
+      <th>notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>T10Y2Y</td>
+      <td>2025-02-28</td>
+      <td>2025-02-28</td>
+      <td>10-Year Treasury Constant Maturity Minus 2-Yea...</td>
+      <td>1976-06-01</td>
+      <td>2025-02-28</td>
+      <td>Daily</td>
+      <td>D</td>
+      <td>Percent</td>
+      <td>%</td>
+      <td>Not Seasonally Adjusted</td>
+      <td>NSA</td>
+      <td>2025-02-28 16:02:07-06</td>
+      <td>100</td>
+      <td>Starting with the update on June 21, 2019, the...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="alfred-archival-fred">
+<h3>ALFRED (Archival FRED)<a class="headerlink" href="#alfred-archival-fred" title="Permalink to this heading">#</a></h3>
+<p>ALFRED extends FRED’s functionality by preserving historical versions of economic data. This allows researchers to track how data revisions impact economic narratives over time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">today</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="popular-fred-series">
+<h3>Popular FRED series<a class="headerlink" href="#popular-fred-series" title="Permalink to this heading">#</a></h3>
+<p>FRED organizes its data into <strong>categories, frequencies, and seasonal adjustments</strong>. Some of the most frequently accessed series include employment figures, inflation metrics, and GDP growth rates. A current list of the most popular FRED series can be found <a class="reference external" href="https://fred.stlouisfed.org/tags/series?ob=pv&amp;amp;pageID=1">here</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># scrape FRED most popular page</span>
+<span class="n">popular</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">titles</span> <span class="o">=</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">popular</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  
+<span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">titles</span><span class="p">:</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">request_series</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>   <span class="c1"># requests &#39;series&#39; FRED api</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">series</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">popular</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;popularity&#39;</span><span class="p">]]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Most Popular Series in FRED, retrieved </span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">popular</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Most Popular Series in FRED, retrieved 20250302
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>title</th>
+      <th>popularity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>T10Y2Y</th>
+      <td>10-Year Treasury Constant Maturity Minus 2-Yea...</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <th>MORTGAGE30US</th>
+      <td>30-Year Fixed Rate Mortgage Average in the Uni...</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>FEDFUNDS</th>
+      <td>Federal Funds Effective Rate</td>
+      <td>98</td>
+    </tr>
+    <tr>
+      <th>M2SL</th>
+      <td>M2</td>
+      <td>93</td>
+    </tr>
+    <tr>
+      <th>RRPONTSYD</th>
+      <td>Overnight Reverse Repurchase Agreements: Treas...</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>CPIAUCSL</th>
+      <td>Consumer Price Index for All Urban Consumers: ...</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>UNRATE</th>
+      <td>Unemployment Rate</td>
+      <td>95</td>
+    </tr>
+    <tr>
+      <th>WALCL</th>
+      <td>Assets: Total Assets: Total Assets (Less Elimi...</td>
+      <td>94</td>
+    </tr>
+    <tr>
+      <th>T10Y3M</th>
+      <td>10-Year Treasury Constant Maturity Minus 3-Mon...</td>
+      <td>94</td>
+    </tr>
+    <tr>
+      <th>GDP</th>
+      <td>Gross Domestic Product</td>
+      <td>93</td>
+    </tr>
+    <tr>
+      <th>GDPC1</th>
+      <td>Real Gross Domestic Product</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>DGS10</th>
+      <td>Market Yield on U.S. Treasury Securities at 10...</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>BAMLH0A0HYM2</th>
+      <td>ICE BofA US High Yield Index Option-Adjusted S...</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>MSPUS</th>
+      <td>Median Sales Price of Houses Sold for the Unit...</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>CSUSHPINSA</th>
+      <td>S&amp;P CoreLogic Case-Shiller U.S. National Home ...</td>
+      <td>88</td>
+    </tr>
+    <tr>
+      <th>T10YIE</th>
+      <td>10-Year Breakeven Inflation Rate</td>
+      <td>89</td>
+    </tr>
+    <tr>
+      <th>FPCPITOTLZGUSA</th>
+      <td>Inflation, consumer prices for the United States</td>
+      <td>85</td>
+    </tr>
+    <tr>
+      <th>M1SL</th>
+      <td>M1</td>
+      <td>84</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot popular series</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">layout</span><span class="o">=</span><span class="s1">&#39;constrained&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">cn</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">axes</span><span class="p">),</span> <span class="n">titles</span><span class="p">[:</span><span class="mi">15</span><span class="p">])):</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plot_date</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cn</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.  </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">title</span><span class="p">)[:</span><span class="mi">70</span><span class="p">],</span>
+              <span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">cn</span><span class="o">=</span><span class="n">cn</span><span class="p">,</span> <span class="n">nbins</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FRED Most Popular series (retrieved </span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 0.98, &#39;FRED Most Popular series (retrieved 20250302)&#39;)
+</pre></div>
+</div>
+<img alt="_images/1546246a4438207b7cb83a03fbf0f50afee9b1f5a07f95a320009aa93f5a1af5.png" src="_images/1546246a4438207b7cb83a03fbf0f50afee9b1f5a07f95a320009aa93f5a1af5.png" />
+</div>
+</div>
+</section>
+<section id="fred-series-categories">
+<h3>FRED series categories<a class="headerlink" href="#fred-series-categories" title="Permalink to this heading">#</a></h3>
+<p>One of the most closely watched FRED series is <code class="docutils literal notranslate"><span class="pre">Total</span> <span class="pre">Nonfarm</span> <span class="pre">Payroll</span> <span class="pre">Employment</span> <span class="pre">(PAYEMS)</span></code>, a key labor market indicator. This series belongs to broader employment-related categories.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Retrieve grandparent,  parent and siblings of series                               </span>
+<span class="n">series_id</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;PAYEMS&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">categories</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">grand_category</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">get_category</span><span class="p">(</span><span class="n">category</span><span class="p">[</span><span class="s1">&#39;parent_id&#39;</span><span class="p">])</span>
+<span class="n">parent_category</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">get_category</span><span class="p">(</span><span class="n">category</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+<span class="n">category</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>name</th>
+      <th>parent_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>PAYEMS</th>
+      <td>32305</td>
+      <td>Total Nonfarm</td>
+      <td>11</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Super category </span><span class="si">{</span><span class="n">grand_category</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">grand_category</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="s1">&#39;notes&#39;</span> <span class="ow">in</span> <span class="n">grand_category</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">grand_category</span><span class="p">[</span><span class="s1">&#39;notes&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Super category 11: Current Employment Statistics (Establishment Survey)
+The establishment survey provides data on employment, hours, and
+earnings by industry.  Numerous conceptual and methodological
+differences between the current population (household) and
+establishment surveys result in important distinctions in the
+employment estimates derived from the surveys. Among these are:   The
+household survey includes agricultural workers, the self- employed,
+unpaid family workers, and private household workers among the
+employed. These groups are excluded from the establishment survey.
+The household survey includes people on unpaid leave among the
+employed. The establishment survey does not.   The household survey is
+limited to workers 16 years of age and older. The establishment survey
+is not limited by age.   The household survey has no duplication of
+individuals, because individuals are counted only once, even if they
+hold more than one job. In the establishment survey, employees working
+at more than one job and thus appearing on more than one payroll are
+counted separately for each appearance.   For more information, visit
+http://www.bls.gov/news.release/empsit.tn.htm.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent categories:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">grand_category</span><span class="p">[</span><span class="s1">&#39;children&#39;</span><span class="p">]:</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">get_category</span><span class="p">(</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">node</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+              <span class="sa">f</span><span class="s2">&quot; (children=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;children&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">, series=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Parent categories:
+ 32305: Total Nonfarm  (children=0, series=5)
+ 32306: Total Private  (children=0, series=27)
+ 32307: Goods-Producing  (children=0, series=27)
+ 32326: Service-Providing  (children=0, series=1)
+ 32308: Private Service-Providing  (children=0, series=27)
+ 32309: Mining and Logging  (children=0, series=39)
+ 32310: Construction  (children=0, series=41)
+ 32311: Manufacturing  (children=0, series=31)
+ 32312: Durable Goods  (children=0, series=63)
+ 32313: Nondurable Goods  (children=0, series=55)
+ 32314: Trade, Transportation, and Utilities  (children=0, series=27)
+ 32315: Wholesale Trade  (children=0, series=33)
+ 32316: Retail Trade  (children=0, series=55)
+ 32317: Transportation and Warehousing  (children=0, series=47)
+ 32318: Utilities  (children=0, series=27)
+ 32319: Information  (children=0, series=39)
+ 32320: Financial Activities  (children=0, series=51)
+ 32321: Professional and Business Services  (children=0, series=55)
+ 32322: Education and Health Services  (children=0, series=51)
+ 32323: Leisure and Hospitality  (children=0, series=41)
+ 32324: Other Services  (children=0, series=33)
+ 32325: Government  (children=0, series=23)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sibling series:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">parent_category</span><span class="p">[</span><span class="s1">&#39;series&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">child</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">series_id</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">child</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;seasonal_adjustment&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot; (popularity=</span><span class="si">{</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;popularity&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Sibling series:
+  CES0000000010: Women Employees, Total Nonfarm Seasonally Adjusted (popularity=4)
+  CES0000000039: Women Employees-To-All Employees Ratio: Total Nonfarm Seasonally Adjusted (popularity=16)
+  CEU0000000010: Women Employees, Total Nonfarm Not Seasonally Adjusted (popularity=1)
+  PAYEMS: All Employees, Total Nonfarm Seasonally Adjusted (popularity=83)
+  PAYNSA: All Employees, Total Nonfarm Not Seasonally Adjusted (popularity=47)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;seasonal_adjustment&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+      <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;observation_start&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;observation_end&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;notes&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>PAYEMS: All Employees, Total Nonfarm Seasonally Adjusted  (1939-01-01-2025-01-01)
+
+All Employees: Total Nonfarm, commonly known as Total Nonfarm Payroll,
+is a measure of the number of U.S. workers in the economy that
+excludes proprietors, private household employees, unpaid volunteers,
+farm employees, and the unincorporated self-employed. This measure
+accounts for approximately 80 percent of the workers who contribute to
+Gross Domestic Product (GDP).  This measure provides useful insights
+into the current economic situation because it can represent the
+number of jobs added or lost in an economy. Increases in employment
+might indicate that businesses are hiring which might also suggest
+that businesses are growing. Additionally, those who are newly
+employed have increased their personal incomes, which means (all else
+constant) their disposable incomes have also increased, thus fostering
+further economic expansion.  Generally, the U.S. labor force and
+levels of employment and unemployment are subject to fluctuations due
+to seasonal changes in weather, major holidays, and the opening and
+closing of schools. The Bureau of Labor Statistics (BLS) adjusts the
+data to offset the seasonal effects to show non-seasonal changes: for
+example, women&#39;s participation in the labor force; or a general
+decline in the number of employees, a possible indication of a
+downturn in the economy. To closely examine seasonal and non-seasonal
+changes, the BLS releases two monthly statistical measures: the
+seasonally adjusted All Employees: Total Nonfarm (PAYEMS) and All
+Employees: Total Nonfarm (PAYNSA), which is not seasonally adjusted.
+The series comes from the &#39;Current Employment Statistics
+(Establishment Survey).&#39;  The source code is: CES0000000001
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="revisions-and-vintage-dates">
+<h2>Revisions and vintage dates<a class="headerlink" href="#revisions-and-vintage-dates" title="Permalink to this heading">#</a></h2>
+<p>Economic data revisions occur as new information becomes available, improving the accuracy of initial estimates. The Bureau of Labor Statistics (BLS), for instance, releases an initial estimate of Total Nonfarm Payroll Employment (PAYEMS) on the first Friday of each month. However, this figure is a very rough estimate, which is then revised in subsequent months as more firm-level data is collected.</p>
+<p>These revisions can be significant, sometimes altering economic assessments. ALFRED, the archival FRED tool, allows users to compare initial estimates with later revisions.  For the monthly values of PAYEMS in 2023, we examine the total amount of changes at each subsequent revision.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">20230101</span><span class="p">,</span> <span class="mi">20231231</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span><span class="si">}</span><span class="s2"> (retrieved </span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s2">):&quot;</span><span class="p">)</span>
+<span class="n">latest</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">latest</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>All Employees, Total Nonfarm (retrieved 20250302):
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PAYEMS</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>20230131</th>
+      <td>154780</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230228</th>
+      <td>155086</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230331</th>
+      <td>155171</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230430</th>
+      <td>155387</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230531</th>
+      <td>155614</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230630</th>
+      <td>155871</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230731</th>
+      <td>156019</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230831</th>
+      <td>156176</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20230930</th>
+      <td>156334</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20231031</th>
+      <td>156520</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20231130</th>
+      <td>156661</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20231231</th>
+      <td>156930</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;First Release:&quot;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>First Release:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PAYEMS</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>20230131</th>
+      <td>155073</td>
+      <td>20230203</td>
+      <td>20230309</td>
+    </tr>
+    <tr>
+      <th>20230228</th>
+      <td>155350</td>
+      <td>20230310</td>
+      <td>20230406</td>
+    </tr>
+    <tr>
+      <th>20230331</th>
+      <td>155569</td>
+      <td>20230407</td>
+      <td>20230504</td>
+    </tr>
+    <tr>
+      <th>20230430</th>
+      <td>155673</td>
+      <td>20230505</td>
+      <td>20230601</td>
+    </tr>
+    <tr>
+      <th>20230531</th>
+      <td>156105</td>
+      <td>20230602</td>
+      <td>20230706</td>
+    </tr>
+    <tr>
+      <th>20230630</th>
+      <td>156204</td>
+      <td>20230707</td>
+      <td>20230803</td>
+    </tr>
+    <tr>
+      <th>20230731</th>
+      <td>156342</td>
+      <td>20230804</td>
+      <td>20230831</td>
+    </tr>
+    <tr>
+      <th>20230831</th>
+      <td>156419</td>
+      <td>20230901</td>
+      <td>20231005</td>
+    </tr>
+    <tr>
+      <th>20230930</th>
+      <td>156874</td>
+      <td>20231006</td>
+      <td>20231102</td>
+    </tr>
+    <tr>
+      <th>20231031</th>
+      <td>156923</td>
+      <td>20231103</td>
+      <td>20231207</td>
+    </tr>
+    <tr>
+      <th>20231130</th>
+      <td>157087</td>
+      <td>20231208</td>
+      <td>20240104</td>
+    </tr>
+    <tr>
+      <th>20231231</th>
+      <td>157232</td>
+      <td>20240105</td>
+      <td>20240201</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Second Release:&quot;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Second Release:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PAYEMS</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>20230131</th>
+      <td>155039</td>
+      <td>20230310</td>
+      <td>20230406</td>
+    </tr>
+    <tr>
+      <th>20230228</th>
+      <td>155333</td>
+      <td>20230407</td>
+      <td>20230504</td>
+    </tr>
+    <tr>
+      <th>20230331</th>
+      <td>155420</td>
+      <td>20230505</td>
+      <td>20230601</td>
+    </tr>
+    <tr>
+      <th>20230430</th>
+      <td>155766</td>
+      <td>20230602</td>
+      <td>20230706</td>
+    </tr>
+    <tr>
+      <th>20230531</th>
+      <td>155995</td>
+      <td>20230707</td>
+      <td>20230803</td>
+    </tr>
+    <tr>
+      <th>20230630</th>
+      <td>156155</td>
+      <td>20230804</td>
+      <td>20230831</td>
+    </tr>
+    <tr>
+      <th>20230731</th>
+      <td>156232</td>
+      <td>20230901</td>
+      <td>20231005</td>
+    </tr>
+    <tr>
+      <th>20230831</th>
+      <td>156538</td>
+      <td>20231006</td>
+      <td>20231102</td>
+    </tr>
+    <tr>
+      <th>20230930</th>
+      <td>156773</td>
+      <td>20231103</td>
+      <td>20231207</td>
+    </tr>
+    <tr>
+      <th>20231031</th>
+      <td>156888</td>
+      <td>20231208</td>
+      <td>20240104</td>
+    </tr>
+    <tr>
+      <th>20231130</th>
+      <td>157016</td>
+      <td>20240105</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20231231</th>
+      <td>157347</td>
+      <td>20240202</td>
+      <td>20240307</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Third Release:&quot;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Third Release:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PAYEMS</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>20230131</th>
+      <td>155007</td>
+      <td>20230407</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230228</th>
+      <td>155255</td>
+      <td>20230505</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230331</th>
+      <td>155472</td>
+      <td>20230602</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230430</th>
+      <td>155689</td>
+      <td>20230707</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230531</th>
+      <td>155970</td>
+      <td>20230804</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230630</th>
+      <td>156075</td>
+      <td>20230901</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230731</th>
+      <td>156311</td>
+      <td>20231006</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230831</th>
+      <td>156476</td>
+      <td>20231103</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20230930</th>
+      <td>156738</td>
+      <td>20231208</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20231031</th>
+      <td>156843</td>
+      <td>20240105</td>
+      <td>20240201</td>
+    </tr>
+    <tr>
+      <th>20231130</th>
+      <td>157014</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20231231</th>
+      <td>157304</td>
+      <td>20240308</td>
+      <td>20250206</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fourth Release:&quot;</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Fourth Release:
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>PAYEMS</th>
+      <th>realtime_start</th>
+      <th>realtime_end</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>20230131</th>
+      <td>154773</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230228</th>
+      <td>155060</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230331</th>
+      <td>155206</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230430</th>
+      <td>155484</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230531</th>
+      <td>155787</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230630</th>
+      <td>156027</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230731</th>
+      <td>156211</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230831</th>
+      <td>156421</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20230930</th>
+      <td>156667</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20231031</th>
+      <td>156832</td>
+      <td>20240202</td>
+      <td>20250206</td>
+    </tr>
+    <tr>
+      <th>20231130</th>
+      <td>156661</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+    <tr>
+      <th>20231231</th>
+      <td>156930</td>
+      <td>20250207</td>
+      <td>99991231</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">series_id</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">series_id</span><span class="p">])</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Revision </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Revision </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s2">&quot;Total revisions (&#39;000)&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Total revisions ('000)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Revision 1</th>
+      <td>-349</td>
+    </tr>
+    <tr>
+      <th>Revision 2</th>
+      <td>-348</td>
+    </tr>
+    <tr>
+      <th>Revision 3</th>
+      <td>-2095</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#df = pd.concat([data[i][series_id].rename(f&quot;Revision {i}&quot;)</span>
+<span class="c1">#                for i in range(1, len(data))], axis=1)</span>
+<span class="c1">#labels = pd.concat([data[i][&#39;realtime_start&#39;].rename(f&quot;Revision {i}&quot;)</span>
+<span class="c1">#                    for i in range(1, len(data))], axis=1).fillna(0).astype(int)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plot_groupbar</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Change in </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Revisions and vintage dates of </span><span class="si">{</span><span class="n">series_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/04a7b27fabd47aa136609d5a6d64133decee6debac16a8ec5ab3c665f827cb88.png" src="_images/04a7b27fabd47aa136609d5a6d64133decee6debac16a8ec5ab3c665f827cb88.png" />
+</div>
+</div>
+<section id="fred-md-and-fred-qd">
+<h3>FRED-MD and FRED-QD<a class="headerlink" href="#fred-md-and-fred-qd" title="Permalink to this heading">#</a></h3>
+<p>FRED-MD (Monthly Database) and FRED-QD (Quarterly Database) are curated datasets that streamline access to macroeconomic indicators. These datasets mimic the coverage of macroeconomic datasets used in the research literature and are updated in real-time, relieving users from the task of incorporating data changes and revisions. Historical monthly snap-shots of the datasets are also available.</p>
+</section>
+<section id="release-dates">
+<h3>Release dates<a class="headerlink" href="#release-dates" title="Permalink to this heading">#</a></h3>
+<p>The timing of data releases is crucial for market participants and policymakers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">md_df</span><span class="p">,</span> <span class="n">md_transform</span> <span class="o">=</span> <span class="n">fred_md</span><span class="p">()</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">md_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">md_df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                     <span class="n">release</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                     <span class="n">start</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="c1"># within 4 days of monthend</span>
+                     <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                     <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">title</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;S&amp;P&#39;</span><span class="p">):</span>  <span class="c1"># stock market data available same day close</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span><span class="n">end</span><span class="p">:</span> <span class="n">end</span><span class="p">},</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">alf</span><span class="o">.</span><span class="n">splice_</span><span class="p">:</span>   <span class="c1"># these series were renamed or spliced</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="p">[</span><span class="n">title</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># if renamed</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="o">=</span><span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="p">[</span><span class="n">title</span><span class="p">],</span>
+                             <span class="n">release</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">start</span><span class="o">=</span><span class="n">end</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># within 4 days of monthend</span>
+                             <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                             <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># if FRED-MD series was spliced</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">alf</span><span class="p">(</span><span class="n">series_id</span><span class="o">=</span><span class="n">sub</span><span class="p">,</span>
+                                        <span class="n">reglease</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                        <span class="n">start</span><span class="o">=</span><span class="n">end</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># within 4 days of monthend</span>
+                                        <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span>
+                                        <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">Alfred</span><span class="o">.</span><span class="n">splice_</span><span class="p">[</span><span class="n">title</span><span class="p">][</span><span class="mi">1</span><span class="p">:]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FRED-MD vintage: monthly/current.csv
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># date convention of Consumer Sentiment</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="s1">&#39;UMCSENT&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">out</span><span class="p">[</span><span class="s1">&#39;UMCSENT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">end</span> <span class="o">-</span> <span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># weekly averages of Claims</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="s1">&#39;ICNSA&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">out</span><span class="p">[</span><span class="s1">&#39;CLAIMS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">end</span> <span class="o">-</span> <span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot release dates of series in FRED-MD</span>
+<span class="n">release</span> <span class="o">=</span> <span class="n">Series</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;realtime_start&#39;</span><span class="p">]))</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                  <span class="k">else</span> <span class="kc">None</span>  <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">release</span><span class="p">[</span><span class="o">~</span><span class="n">release</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current (</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">) FRED-MD series, retrieved </span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;First Release Date&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">release</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">release</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;xx-small&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/3859e13092079686e77ee461ecd22388a67081a1f65b206b36890d9f15e70bdc.png" src="_images/3859e13092079686e77ee461ecd22388a67081a1f65b206b36890d9f15e70bdc.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check if recently released data available to update latest FRED-MD                         </span>
+<span class="n">md_missing</span> <span class="o">=</span> <span class="n">md_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">md_missing</span> <span class="o">=</span> <span class="n">md_missing</span><span class="p">[</span><span class="n">md_missing</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Recent values available to update missing in current FRED-MD&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="n">md_missing</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">alf</span><span class="o">.</span><span class="n">splice</span><span class="p">(</span><span class="n">series_id</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Recent values available to update missing in current FRED-MD
+date
+20241031    1538666.0
+20241130    1544822.0
+20241231    1555153.0
+Name: CMRMTSPL, dtype: float64
+date
+20241031    7839
+20241130    8156
+20241231    7600
+Name: HWI, dtype: int64
+date
+20241130    1.145345
+20241231    1.103689
+20250131         NaN
+Name: HWIURATIO, dtype: float64
+date
+20241031    248120.0
+20241130    248160.0
+20241231    248851.0
+Name: ACOGNO, dtype: float64
+date
+20241031    2585582.0
+20241130    2588757.0
+20241231    2584314.0
+Name: BUSINV, dtype: float64
+date
+20241031    1.37
+20241130    1.37
+20241231    1.35
+Name: ISRATIO, dtype: float64
+date
+20241031    3736897.53
+20241130    3745366.76
+20241231    3763355.59
+Name: NONREVSL, dtype: float64
+date
+20241130    149.697308
+20241231    149.793644
+20250131           NaN
+Name: CONSPI, dtype: float64
+date
+20241231    37.90
+20250131    37.66
+20250228    37.53
+Name: S&amp;P PE ratio, dtype: float64
+date
+20241031    554951.25
+20241130    556075.09
+20241231    558854.68
+Name: DTCOLNVHFNM, dtype: float64
+date
+20241031    938525.34
+20241130    941204.79
+20241231    946489.00
+Name: DTCTHFNM, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Find any missing series observations, if any, now available to update current FRED-MD</span>
+<span class="n">Series</span><span class="p">(</span><span class="n">release</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">release</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">md_missing</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(W875RX1, Real personal income excluding current transfer receipts)                              20250131
+(ACOGNO, Manufacturers&#39; New Orders: Consumer Goods)                                              20250204
+(HWI, Help Wanted Index for United States)                                                       20250204
+(NONREVSL, Nonrevolving Consumer Credit Owned and Securitized)                                   20250207
+(CONSPI, Nonrevolving consumer credit to Personal Income)                                        20250207
+(BUSINV, Total Business Inventories)                                                             20250214
+(ISRATIO, Total Business: Inventories to Sales Ratio)                                            20250214
+(CMRMTSPL, Real Manufacturing and Trade Industries Sales)                                        20250228
+(DTCOLNVHFNM, Consumer Motor Vehicle Loans Owned by Finance Companies, Level)                    20250228
+(DTCTHFNM, Total Consumer Loans and Leases Owned and Securitized by Finance Companies, Level)    20250228
+(COMPAPFF, 3-Month Commercial Paper Minus FEDFUNDS)                                                  None
+dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="outliers">
+<h2>Outliers<a class="headerlink" href="#outliers" title="Permalink to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Interquartile Range (IQR) Approach</strong> – Filters data within median ± 10 times the interquartile range to minimize extreme values.</p></li>
+<li><p><strong>Tukey’s Rule</strong> – Proposed by John Tukey, this method classifies data points as “outliers” if they fall beyond 1.5 times the interquartile range (IQR) of the first or third quartile, that is outside of [Q1 - 1.5(Q3-Q1), Q3 + 1.5(Q3-Q1)], and as <strong>“far out”</strong> if beyond 3 times the IQR.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">payems</span> <span class="o">=</span> <span class="n">alf</span><span class="p">(</span><span class="s1">&#39;PAYEMS&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">realtime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">diff</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">payems</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>date
+19390228    0.005898
+19390331    0.005962
+19390430   -0.006162
+19390531    0.006789
+19390630    0.006678
+              ...   
+20240930    0.001517
+20241031    0.000278
+20241130    0.001647
+20241231    0.001934
+20250131    0.000899
+Name: PAYEMS, Length: 1032, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;tukey&#39;</span><span class="p">,</span> <span class="s1">&#39;farout&#39;</span><span class="p">,</span> <span class="s1">&#39;iq10&#39;</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Outliers fraction detected by </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">is_outlier</span><span class="p">(</span><span class="n">payems</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">))</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">payems</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">is_outlier</span><span class="p">(</span><span class="n">payems</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;iq10&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Outliers fraction detected by tukey: 0.0969
+Outliers fraction detected by farout: 0.0329
+Outliers fraction detected by iq10: 0.0029
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>date
+19450930   -0.049622
+20200430   -0.145794
+20200630    0.034217
+Name: PAYEMS, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Box-and-whiskers plot</strong></p>
+<p>A box plot shows the quartiles of the data while the whiskers extend to show the rest of the distribution, except for points that are determined to be “outliers”, which are more than some multiple of the inter-quartile range (IQR) beyond the first and third quartiles.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">payems</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="n">whis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># whiskers at 3xIQR</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: xlabel=&#39;PAYEMS&#39;&gt;
+</pre></div>
+</div>
+<img alt="_images/5cadd12db02d8613eaabaff26d8e64805d3a47d9f4392a91d9725a5063013819.png" src="_images/5cadd12db02d8613eaabaff26d8e64805d3a47d9f4392a91d9725a5063013819.png" />
+</div>
+</div>
+<p><strong>Referenes:</strong></p>
+<p><a class="reference external" href="https://fred.stlouisfed.org/">https://fred.stlouisfed.org/</a></p>
+<p><a class="reference external" href="https://www.stlouisfed.org/research/economists/mccracken/fred-databases">https://www.stlouisfed.org/research/economists/mccracken/fred-databases</a></p>
+<p>McCracken, M. W., &amp; Ng, S. (2016). FRED-MD: A Monthly Database for Macroeconomic Research. Journal of Business &amp; Economic Statistics, 34(4), 574–589.</p>
+<p>McCracken, M.W., Ng, S., 2020. FRED-QD: A Quarterly Database for
+Macroeconomic Research, Federal Reserve Bank of St. Louis Working Paper 2020-
+005</p>
+<p>Katrina Stierholz, 2018, Economic Data Revisions: What They Are and Where to Find Them
+<a class="reference external" href="https://journals.ala.org/index.php/dttp/article/view/6383/8404">https://journals.ala.org/index.php/dttp/article/view/6383/8404</a></p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="1.7_event_study.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Event Study</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="2.2_regression_diagnostics.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Linear Regression Diagonostics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fred">FRED</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieving-data-from-websites">Retrieving data from websites</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-structured-files">Download structured files</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#web-scraping">Web scraping</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-apis">Using APIs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alfred-archival-fred">ALFRED (Archival FRED)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#popular-fred-series">Popular FRED series</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fred-series-categories">FRED series categories</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisions-and-vintage-dates">Revisions and vintage dates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fred-md-and-fred-qd">FRED-MD and FRED-QD</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#release-dates">Release dates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#outliers">Outliers</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

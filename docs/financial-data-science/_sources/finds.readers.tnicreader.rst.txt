@@ -1,0 +1,7 @@
+finds.readers.tnicreader
+========================
+
+.. automodule:: finds.readers.tnicreader
+   :members:
+   :undoc-members:
+   :show-inheritance:

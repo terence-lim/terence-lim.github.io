@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.readers.taq &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.readers.taq</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.readers.taq</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Class and methods to process TAQ trade and quotes tick data</span>
+
+<span class="sd">- NYSE Daily TAQ: Master, NBBO, Trades</span>
+<span class="sd">- marker microstructure: bid-ask spreads, trade conditions, tick test</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span><span class="p">,</span> <span class="n">Timestamp</span>
+<span class="kn">import</span> <span class="nn">indexed_gzip</span> <span class="k">as</span> <span class="nn">igzip</span>
+<span class="kn">import</span> <span class="nn">gzip</span><span class="o">,</span> <span class="nn">io</span><span class="o">,</span> <span class="nn">pickle</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">finds.utils.plots</span> <span class="kn">import</span> <span class="n">plot_time</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="taq_from_csv"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.taq_from_csv">[docs]</a><span class="k">def</span> <span class="nf">taq_from_csv</span><span class="p">(</span><span class="n">chunk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Convert csv from TAQ to dataframe with correct dtypes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chunk: A chunk of csv text </span>
+<span class="sd">        columns: List of column names, else in first line of chunk</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame with correct dtypes and column names</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - column names (provided or parsed from first line) indicate</span>
+<span class="sd">      the corresponding known list of dtypes for nbbo, trade or mast </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">_dtypes</span> <span class="o">=</span> <span class="p">{</span>    <span class="c1"># define dtypes for each TAQ file</span>
+        <span class="s1">&#39;nbbo&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Sequence_Number&#39;</span><span class="p">,</span><span class="s1">&#39;Participant_Timestamp&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;FINRA_ADF_Timestamp&#39;</span><span class="p">],</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Bid_Price&#39;</span><span class="p">,</span><span class="s1">&#39;Bid_Size&#39;</span><span class="p">,</span><span class="s1">&#39;Offer_Price&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Offer_Size&#39;</span><span class="p">,</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">,</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">,</span><span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;trade&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Sequence_Number&#39;</span><span class="p">,</span><span class="s1">&#39;Participant_Timestamp&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;Trade_Reporting_Facility_TRF_Timestamp&#39;</span><span class="p">],</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Trade_Correction_Indicator&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Trade_Through_Exempt_Indicator&#39;</span><span class="p">],</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">,</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;mast&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TradedOnNYSEMKT&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNASDAQBX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNSX&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;TradedOnFINRA&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnISE&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnEdgeA&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;TradedOnEdgeX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnCHX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNYSE&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;TradedOnArca&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNasdaq&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnCBOE&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;TradedOnPSX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnBATSY&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnBATS&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;TradedOnIEX&#39;</span><span class="p">],</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Unit_Of_Trade&#39;</span><span class="p">,</span><span class="s1">&#39;Round_Lot&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Specialist_Clearing_Number&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Specialist_Post_Number&#39;</span><span class="p">],</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Shares_Outstanding&#39;</span><span class="p">,</span> <span class="s1">&#39;Effective_Date&#39;</span><span class="p">],</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Unit_Of_Trade&#39;</span><span class="p">,</span><span class="s1">&#39;Round_Lot&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Specialist_Clearing_Number&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;Specialist_Post_Number&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnNYSEMKT&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNASDAQBX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNSX&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnFINRA&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnISE&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnEdgeA&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnEdgeX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnCHX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNYSE&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnArca&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnNasdaq&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnCBOE&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnPSX&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnBATSY&#39;</span><span class="p">,</span><span class="s1">&#39;TradedOnBATS&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;TradedOnIEX&#39;</span><span class="p">,</span><span class="s1">&#39;Effective_Date&#39;</span><span class="p">]}}</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">chunk</span><span class="p">),</span>
+                     <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;|&#39;</span><span class="p">,</span>
+                     <span class="n">na_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> 
+                     <span class="n">header</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">columns</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="n">names</span><span class="o">=</span><span class="n">columns</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># guess file type from column names, and use its dtypes dict</span>
+    <span class="k">if</span> <span class="s1">&#39;Best_Bid_Price&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>  <span class="c1"># NBBO file</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">_dtypes</span><span class="p">[</span><span class="s1">&#39;nbbo&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s1">&#39;Trade_Price&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>   <span class="c1"># TRADE file</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">_dtypes</span><span class="p">[</span><span class="s1">&#39;trade&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s1">&#39;Round_Lot&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>     <span class="c1"># MASTER file</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">_dtypes</span><span class="p">[</span><span class="s1">&#39;mast&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dtypes</span><span class="p">:</span>  <span class="c1"># coerce each column to its required dtype</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">dtypes</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">dtypes</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">dtypes</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">dtypes</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s1">&#39;Time&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>      <span class="c1"># for nbbo and trade: set timestamp as index</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;%H%M%S</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="s1">&#39;Symbol&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>  <span class="c1"># for master: set symbol field as index</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Symbol&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    
+    <span class="k">if</span> <span class="s1">&#39;END&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>         <span class="c1"># terminator dummy symbol</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;END&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+    
+<div class="viewcode-block" id="TAQ"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ">[docs]</a><span class="k">class</span> <span class="nc">TAQ</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class to manipulate a daily TAQ .csv.gz file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        taq_file: raw .csv.gz input data file name</span>
+<span class="sd">        index_file: name of new (csv.gz) file to write indexed-gzip index</span>
+<span class="sd">        symbols_file: name of new (csv.gz) file to write symbols index</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - NYSE historical samples: </span>
+<span class="sd">      ftp://ftp.nyxdata.com/Historical%20Data%20Samples/</span>
+<span class="sd">    - Uses indexed_gzip package for random access into gzip file</span>
+<span class="sd">    - Implements 3 methods to access raw daily TAQ csv.gz files, e.g.:</span>
+
+<span class="sd">      - trade(n) - next n csv lines</span>
+<span class="sd">      - iter(trade) - iterable, by chunk with same stock symbol</span>
+<span class="sd">      - trade[&#39;AAPL&#39;] - getitem, by symbol</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">taq_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">symbols_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initalize interface to daily TAQ file&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span> <span class="o">=</span> <span class="n">taq_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[12][90]\d\d\d\d\d\d&quot;</span><span class="p">,</span> <span class="n">taq_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index_file</span> <span class="o">=</span> <span class="n">index_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols_file</span> <span class="o">=</span> <span class="n">symbols_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="o">=</span> <span class="kc">None</span>   <span class="c1"># indexed gzip stream for getitem read</span>
+        
+<div class="viewcode-block" id="TAQ.close"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close getitem file handle&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TAQ.open"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">taq_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open with context manager protocol for sequential line reads&quot;&quot;&quot;</span>
+
+        <span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Context manager procotol to open for sequential read&quot;&quot;&quot;</span>
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gz_file</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+                                         <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gz_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+            <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+                <span class="sd">&quot;&quot;&quot;Read next n lines (-1 for entire file)&quot;&quot;&quot;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">chunk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">gz_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">chunk</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gz_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                            <span class="k">break</span>
+                        <span class="n">chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">chunk</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">taq_from_csv</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            
+            <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span>
+
+            <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gz_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">File</span><span class="p">(</span><span class="n">taq_file</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TAQ.read"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read entire file as a DataFrame&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+        
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterator to access next symbol&#39;s chunk of rows&quot;&quot;&quot;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">,</span>
+                      <span class="s2">&quot;rt&quot;</span><span class="p">,</span>
+                      <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+                      <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">line_iterator</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">line</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** Got exception (line_iterator):&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="kc">None</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">line_iterator</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>         <span class="c1"># keep first line as header columns</span>
+        <span class="n">curr</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="n">header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;Symbol&#39;</span><span class="p">)]</span>
+        <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;END&#39;</span><span class="p">):</span> <span class="c1"># check end-of-file</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">curr</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">while</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">curr</span> <span class="o">==</span> <span class="n">prev</span><span class="p">:</span>  <span class="c1"># read until new symbol</span>
+                <span class="n">chunk</span> <span class="o">+=</span> <span class="p">[</span><span class="n">line</span><span class="p">]</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">curr</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="n">header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;Symbol&#39;</span><span class="p">)]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">taq_from_csv</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span><span class="p">),</span> <span class="n">header</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">prev</span>
+            <span class="k">yield</span> <span class="n">df</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">yield</span> <span class="kc">None</span>
+        
+<div class="viewcode-block" id="TAQ.__call__"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return symbol location and size in daily taq gzip file&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">symbols_file</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_file</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="o">=</span> <span class="n">igzip</span>\
+                    <span class="o">.</span><span class="n">IndexedGzipFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">,</span>
+                                     <span class="n">index_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">index_file</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span> <span class="o">=</span> <span class="n">igzip</span><span class="o">.</span><span class="n">IndexedGzipFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TAQ.__getitem__"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get chunk of all rows for the input symbol as a data frame&quot;&quot;&quot;</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">igz_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">taq_from_csv</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">symbol</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="TAQ.index_symbols"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.TAQ.index_symbols">[docs]</a>    <span class="k">def</span> <span class="nf">index_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">symbols_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate indexed_gzip and symbols index files&quot;&quot;&quot;</span>
+        
+        <span class="k">def</span> <span class="nf">_create_index</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index_file</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;generate and save an indexed-gzip index file (12 secs)&quot;&quot;&quot;</span>
+            <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">igzip</span><span class="o">.</span><span class="n">IndexedGzipFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">build_full_index</span><span class="p">()</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">export_index</span><span class="p">(</span><span class="n">index_file</span><span class="p">)</span>    <span class="c1"># save to {index_file}</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Full Index created in </span><span class="si">%d</span><span class="s1"> secs&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;TAQ _create_index failed&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_create_symbols</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">symbols_file</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;generate symbol lookup locations (~100 secs)&quot;&quot;&quot;</span>
+            <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">igzip</span><span class="o">.</span><span class="n">IndexedGzipFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span>
+                    <span class="n">header</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span> <span class="c1"># header in first line</span>
+                    <span class="n">symbols</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span><span class="s1">&#39;size&#39;</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                    <span class="n">prev</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">eof</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;END&#39;</span><span class="p">)</span>
+                    <span class="k">while</span> <span class="ow">not</span> <span class="n">eof</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>     <span class="c1"># iterate until reached end-of-file</span>
+                        <span class="n">tell</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>                       <span class="c1"># current location</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">)</span>  <span class="c1"># parse next line</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">eof</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                            <span class="n">curr</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>\
+                                       <span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="n">header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;Symbol&#39;</span><span class="p">)]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">curr</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">if</span> <span class="n">curr</span> <span class="o">!=</span> <span class="n">prev</span><span class="p">:</span>           <span class="c1"># new symbol: update location</span>
+                            <span class="k">if</span> <span class="n">prev</span><span class="p">:</span>
+                                <span class="n">symbols</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">]</span>\
+                                    <span class="o">=</span> <span class="n">tell</span> <span class="o">-</span> <span class="n">symbols</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">prev</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">curr</span><span class="p">:</span>
+                                <span class="n">symbols</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">curr</span><span class="p">]</span> <span class="o">=</span> <span class="n">tell</span><span class="p">,</span> <span class="mi">0</span>
+                            <span class="n">prev</span> <span class="o">=</span> <span class="n">curr</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> symbols: </span><span class="si">%d</span><span class="s1"> secs&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tic</span><span class="p">))</span>
+                <span class="n">symbols</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">symbols_file</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;TAQ _create_symbols failed&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">index_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index_file</span> <span class="o">=</span> <span class="n">index_file</span>
+        <span class="k">if</span> <span class="n">symbols_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">symbols_file</span> <span class="o">=</span> <span class="n">symbols_file</span>
+        <span class="n">_create_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_file</span><span class="p">)</span>
+        <span class="n">_create_symbols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">taq_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols_file</span><span class="p">)</span></div></div>
+
+<span class="c1">#</span>
+<span class="c1"># tick data transformation methods</span>
+<span class="c1">#</span>
+<span class="n">open_t</span>  <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="s1">&#39;1900-01-01T09:30&#39;</span><span class="p">)</span>    <span class="c1"># default open  9:30am</span>
+<span class="n">close_t</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="s1">&#39;1900-01-01T16:00&#39;</span><span class="p">)</span>    <span class="c1"># default close 4:00pm</span>
+<span class="c1"># np.datetime64(&#39;1900-01-01T09:30:01.000002&#39;) - np.timedelta64(&#39;30&#39;,&#39;ns&#39;)</span>
+
+<div class="viewcode-block" id="clean_trade"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.clean_trade">[docs]</a><span class="k">def</span> <span class="nf">clean_trade</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">open_t</span><span class="p">,</span>
+                <span class="n">close_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">close_t</span><span class="p">,</span>
+                <span class="n">cond</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MOZBTLGWJK145789&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Remove bad trades</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Dataframe containing one day&#39;s trades of a stock</span>
+<span class="sd">        open_t: Exclude records on or before this opening time</span>
+<span class="sd">        close_t: Exclude records after this closing time</span>
+<span class="sd">        cond: condition chars to exclude</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Requires correction code = 0, price and volume &gt; 0</span>
+
+<span class="sd">    - Sale Conditions to exclude by default:</span>
+
+<span class="sd">      - M = Market Center Close Price</span>
+<span class="sd">      - O = Market Center Opening Trade</span>
+<span class="sd">      - Z = Sold (Out of Sequence)</span>
+<span class="sd">      - L = Sold Last (Late Reporting)</span>
+<span class="sd">      - B = Bunched Trade</span>
+<span class="sd">      - G = Bunched Sold Trade</span>
+<span class="sd">      - W = Average Price Trade</span>
+<span class="sd">      - 4 = Derivatively Priced</span>
+<span class="sd">      - 5 = Re-opening Prints</span>
+<span class="sd">      - 7 = Qualified Contingent Trade</span>
+<span class="sd">      - 8 = Placeholder for 611 Exempt</span>
+<span class="sd">      - 9 = Corrected Consolidated Close Price per the Listing Market</span>
+<span class="sd">      - K = Rule 127 (NYSE only) or Rule 155 Trade (NYSE MKT only)</span>
+<span class="sd">      - T = Extended Hours Trade</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">any_in</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if any key is in values&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">v</span> <span class="ow">in</span> <span class="n">values</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">])</span> 
+    
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Trade_Correction_Indicator&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Sale_Condition&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">any_in</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="n">cond</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">open_t</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">open_t</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">close_t</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">,</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">,</span> <span class="s1">&#39;Sale_Condition&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="clean_nbbo"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.clean_nbbo">[docs]</a><span class="k">def</span> <span class="nf">clean_nbbo</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">keep</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">,</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">,</span> <span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Remove bad quotes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Dataframe containing one day&#39;s nbbo quotes of a stock</span>
+<span class="sd">        keep: List of columns to keep</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - requires prices and size &gt; 0 and offer &gt; bid price</span>
+<span class="sd">    - spread &lt;= $5</span>
+<span class="sd">    - cancel correction != &#39;B&#39;</span>
+<span class="sd">    - condition in [&#39;A&#39;,&#39;B&#39;,&#39;H&#39;,&#39;O&#39;,&#39;R&#39;,&#39;W&#39;])</span>
+<span class="sd">    - keep largest sequence number if same time stamp</span>
+<span class="sd">    - drop duplicated records</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>    
+    <span class="c1">#df[&#39;Mid_Price&#39;] = (df[&#39;Best_Offer_Price&#39;] + df[&#39;Best_Bid_Price&#39;]) / 2</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Quote_Cancel_Correction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Quote_Condition&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">,</span><span class="s1">&#39;H&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;W&#39;</span><span class="p">])</span> <span class="o">&amp;</span>         
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Bid_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Bid_Size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Offer_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Offer_Size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span>
+         <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
+         <span class="c1">#(df[&#39;Best_Offer_Price&#39;] - df[&#39;Best_Bid_Price&#39;] &lt; df[&#39;Mid_Price&#39;]*0.05)</span>
+         <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Offer_Price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Bid_Price&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="c1"># spread &lt;= $5</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="n">keep</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Sequence_Number&#39;</span><span class="p">]]</span> <span class="c1"># bad conditions, values</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span><span class="s1">&#39;Sequence_Number&#39;</span><span class="p">])</span>   <span class="c1"># keep later of same time</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">shift</span><span class="p">()</span> <span class="o">!=</span> <span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>       <span class="c1"># keep new records only</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="align_trades"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.align_trades">[docs]</a><span class="k">def</span> <span class="nf">align_trades</span><span class="p">(</span><span class="n">ct</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">cq</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">open_t</span><span class="p">,</span>
+                 <span class="n">inplace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Align each trade with prevailing and forward quotes</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ct: Input dataframe of trades</span>
+<span class="sd">        cq: Input dataframe of nbbo quotes</span>
+<span class="sd">        open_t: drop quotes prior to open time</span>
+<span class="sd">        inplace: whether to overwrite trades dataframe or return as new copy</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame of trades with additional columns, if not inplace. else None</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - prevailing quote at -1ns, forward quote at +5m, drop quotes before open_t</span>
+<span class="sd">    - See Holden and Jacobsen (2014), &quot;Liquidity Measurement&quot;</span>
+<span class="sd">    - Prevailing\_Mid: midquote prevailing before each trade</span>
+<span class="sd">    - Forward\_Mid: midquote prevailing 5 minutes after trade</span>
+<span class="sd">    - Tick\_Test: Whether trade price above, below or equals previous trade</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">open_t</span> <span class="ow">or</span> <span class="n">cq</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+    <span class="n">midprice</span> <span class="o">=</span> <span class="p">(</span><span class="n">cq</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cq</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Prevailing_Mid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">midprice</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;ns&#39;</span><span class="p">),</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;pad&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Forward_Mid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">midprice</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">),</span>
+                                         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;pad&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Tick_Test&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">((</span><span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span> <span class="o">-</span>
+                               <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ct</span></div>
+
+<div class="viewcode-block" id="bin_quotes"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.bin_quotes">[docs]</a><span class="k">def</span> <span class="nf">bin_quotes</span><span class="p">(</span><span class="n">cq</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span>
+               <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">open_t</span><span class="p">,</span>
+               <span class="n">close_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">close_t</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Resample quotes into time interval bins</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cq: Input dataframe of nbbo quote</span>
+<span class="sd">        value: number of time units per bin width</span>
+<span class="sd">        unit: time unit in {&#39;h&#39;, &#39;m&#39;, &#39;s&#39;, &#39;ms&#39;, &#39;us&#39;, &#39;ns&#39;}</span>
+<span class="sd">        open_t: exclusive left bound of first bin</span>
+<span class="sd">        close_t: inclusive right bound of last bin</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame of resampled derived quote liquidity metrics</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - quoted: time-weighted quoted half-spread</span>
+<span class="sd">    - depth: time-weighted average of average bid and offer sizes</span>
+<span class="sd">    - offersize: time-weighted average offer size</span>
+<span class="sd">    - bidsize: time-weighted average bid size</span>
+<span class="sd">    - mid: last midquote</span>
+<span class="sd">    - firstmid: first midquote</span>
+<span class="sd">    - maxmid: max midquote</span>
+<span class="sd">    - minmid: min midquote</span>
+<span class="sd">    - retq: last midquote-to-last midquote return</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; resample(closed=&#39;left&#39;, label=&#39;right&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; agg(Series.sum, min_count=1)</span>
+<span class="sd">    &gt;&gt;&gt; result[result.index &gt; open_t], result[result.index &lt;= close_t]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;h&#39;</span><span class="p">:</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">:</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;us&#39;</span><span class="p">:</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="s1">&#39;ns&#39;</span><span class="p">:</span><span class="s1">&#39;N&#39;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; must be in &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">rule</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rule</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">+</span><span class="n">units</span><span class="p">[</span><span class="n">unit</span><span class="p">],</span> <span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+    <span class="c1"># supplement cq.index with required &#39;intervals&#39; to be new quote times</span>
+    <span class="n">timedelta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">open_t</span><span class="p">,</span> <span class="n">close_t</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">)</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">intervals</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">cq</span><span class="o">.</span><span class="n">index</span><span class="p">)))</span>
+
+    <span class="c1"># compute forward duration of each (supplemented) cq row</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">cq</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">intervals</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;pad&#39;</span><span class="p">)</span>  <span class="c1"># forward fill quotes to intervals</span>
+    <span class="n">q</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>\
+                         <span class="o">.</span><span class="n">diff</span><span class="p">()</span>\
+                         <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>\
+                         <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1e9</span>
+
+    <span class="c1"># sum up &#39;weight&#39; denominator of each interval, for weighted resampling</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+    <span class="c1"># to compute weighted mean, with sum requiring at least one non-null</span>
+    <span class="n">weighted</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">(</span><span class="n">s</span> <span class="o">*</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>\
+                                          <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">Series</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+                                          <span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">])</span>
+    
+    <span class="c1"># compute weighted resampling</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;quoted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span>
+                                <span class="o">-</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">]</span>
+                               <span class="o">+</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;offersize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">])</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;bidsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">])</span>
+    
+    <span class="n">mid</span> <span class="o">=</span> <span class="p">((</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mid</span><span class="o">.</span><span class="n">last</span><span class="p">()</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>  <span class="c1"># fillna(method=&#39;pad&#39;)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;firstmid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mid</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;maxmid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;minmid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;retq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;mid&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">result</span><span class="p">[(</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">open_t</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="bin_trades"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.bin_trades">[docs]</a><span class="k">def</span> <span class="nf">bin_trades</span><span class="p">(</span><span class="n">ct</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span><span class="p">,</span>
+               <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">open_t</span><span class="p">,</span>
+               <span class="n">close_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">close_t</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Resample trades into time interval bins</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ct: Input dataframe of trades</span>
+<span class="sd">        value: number of time units per bin width</span>
+<span class="sd">        unit: time unit in {&#39;h&#39;, &#39;m&#39;, &#39;s&#39;, &#39;ms&#39;, &#39;us&#39;, &#39;ns&#39;}</span>
+<span class="sd">        open_t: exclusive left bound of first bin</span>
+<span class="sd">        close_t: inclusive right bound of last bin</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame of resampled derived trade liquidity metrics</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - counts: number of trades in bin</span>
+<span class="sd">    - last: last trade price in bin (ffill if none)</span>
+<span class="sd">    - first: first trade price in bin</span>
+<span class="sd">    - maxtrade: max trade price in bin</span>
+<span class="sd">    - mintrade: min trade price in bin</span>
+<span class="sd">    - ret: last-to-last trade price return</span>
+<span class="sd">    - vwap: volume weighted average trade price</span>
+<span class="sd">    - effective: volume-weighted effective relative half-spread </span>
+<span class="sd">                 (trade price divided by prevailing midquote, minus 1)</span>
+<span class="sd">    - realized: volume-weighted effective relative half-spread </span>
+<span class="sd">                (trade price divided by 5-minute forward midquote, minus 1)</span>
+<span class="sd">    - impact: volume-weighted realized relative half-spread </span>
+<span class="sd">                 (5-minute forward midquote divided by prevailing, minus 1)</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; resample(closed=&#39;left&#39;, label=&#39;right&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; agg(Series.sum, min_count=1)</span>
+<span class="sd">    &gt;&gt;&gt; result[result.index &gt; open_t], result[result.index &lt;= close_t]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;h&#39;</span><span class="p">:</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span><span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">:</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;us&#39;</span><span class="p">:</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="s1">&#39;ns&#39;</span><span class="p">:</span><span class="s1">&#39;N&#39;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; must be in &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">rule</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rule</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="n">units</span><span class="p">[</span><span class="n">unit</span><span class="p">],</span>
+                <span class="n">closed</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># hack to extend ct.index timestamps to open_t and close_t if necessary</span>
+    <span class="n">timedelta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">ct</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;first&#39;</span><span class="p">)]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>  <span class="c1"># pd.concat warns cannot empty or all-nan</span>
+    <span class="k">if</span> <span class="n">open_t</span> <span class="o">&lt;</span> <span class="n">ct</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">t</span><span class="p">[</span><span class="n">open_t</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">close_t</span> <span class="o">&gt;</span> <span class="n">ct</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">t</span><span class="p">[</span><span class="n">close_t</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span> 
+    <span class="n">t</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">]</span>\
+                       <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>\
+                       <span class="o">.</span><span class="n">sum</span><span class="p">())</span>\
+                       <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">:</span> <span class="s1">&#39;volume&#39;</span><span class="p">})</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span>\
+                       <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">price</span><span class="o">.</span><span class="n">last</span><span class="p">()</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span> <span class="c1"># fillna(method=&#39;pad&#39;)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;first&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">price</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;maxtrade&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">price</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;mintrade&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">price</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+    
+    <span class="c1"># df.resample(&#39;1H&#39;,  how=&#39;ohlc&#39;, axis=0, fill_method=&#39;bfill&#39;)</span>
+    <span class="c1"># def ohlc(x):</span>
+    <span class="c1">#     ohlc={ &quot;open&quot;:x[&quot;open&quot;][0], &quot;high&quot;:max(x[&quot;high&quot;]),</span>
+    <span class="c1">#       &quot;low&quot;:min(x[&quot;low&quot;]),&quot;close&quot;:x[&quot;close&quot;][-1]}</span>
+    <span class="c1">#     return pd.Series(ohlc)</span>
+    <span class="c1"># df.resample(&#39;1D&#39;).apply(ohlc)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;ret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;last&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;last&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span> 
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;vwap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">])</span>\
+                     <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
+                     <span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span>\
+                          <span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                     <span class="c1">#.agg(Series.sum, min_count=-1)\</span>
+    <span class="n">result</span><span class="p">[</span><span class="s1">&#39;effective&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Prevailing_Mid&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>\
+                           <span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">])</span>\
+                           <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">))</span>\
+                           <span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
+                           <span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span>\
+                                <span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                           <span class="c1">#.agg(Series.sum, min_count=-1)\</span>
+
+    <span class="k">if</span> <span class="s1">&#39;Tick_Test&#39;</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+        <span class="c1"># Lee and Ready test: compare to midquote, then tick test if no change</span>
+        <span class="n">leeready</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span>\
+                           <span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Prevailing_Mid&#39;</span><span class="p">])</span>\
+                           <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">leeready</span> <span class="o">=</span> <span class="n">leeready</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">leeready</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Tick_Test&#39;</span><span class="p">])</span>
+
+        <span class="c1"># compute trade weights (for averaging) from volume and sign</span>
+        <span class="n">weighted</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">spread</span><span class="p">:</span>
+                    <span class="p">(</span><span class="n">spread</span> <span class="o">*</span> <span class="n">leeready</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">])</span>\
+                    <span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="o">**</span><span class="n">rule</span><span class="p">)</span>\
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
+                    <span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span>\
+                         <span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)))</span>
+                   <span class="c1">#.agg(Series.sum, min_count=1)\</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;realized&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">]</span>
+                                      <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Forward_Mid&#39;</span><span class="p">])</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;impact&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;Forward_Mid&#39;</span><span class="p">]</span>
+                                    <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;Prevailing_Mid&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="p">[(</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">open_t</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="plot_taq"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.plot_taq">[docs]</a><span class="k">def</span> <span class="nf">plot_taq</span><span class="p">(</span><span class="n">left1</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">right1</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">left2</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">right2</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+             <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">close_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience method for 1x2 primary/secondary-y subplots of tick data&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">left2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">bx</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span>
+                                     <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plot_time</span><span class="p">(</span><span class="n">left2</span><span class="p">,</span> <span class="n">right2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">bx</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="n">close_t</span><span class="p">)</span>
+    <span class="n">plot_time</span><span class="p">(</span><span class="n">left1</span><span class="p">,</span> <span class="n">right1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="n">close_t</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">pad</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span><span class="p">,</span><span class="n">bx</span></div>
+
+<div class="viewcode-block" id="itertaq"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.itertaq">[docs]</a><span class="k">def</span> <span class="nf">itertaq</span><span class="p">(</span><span class="n">trades</span><span class="p">:</span> <span class="n">TAQ</span><span class="p">,</span> <span class="n">quotes</span><span class="p">:</span> <span class="n">TAQ</span><span class="p">,</span> <span class="n">master</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">open_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="n">open_t</span><span class="p">,</span> <span class="n">close_t</span><span class="p">:</span> <span class="n">Timestamp</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">cusips</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+            <span class="n">verbose</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">,</span> <span class="n">has_shares</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Iterates over and filters daily taq trades and quotes by symbol</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trades: Instance of TAQ trades object</span>
+<span class="sd">        quotes: Instance of TAQ nbbo quotes object</span>
+<span class="sd">        master: Reference table from Master file, indexed by symbol</span>
+<span class="sd">        cusips: List of cusips to select</span>
+<span class="sd">        symbols: List of symbols (space separated security class) to select.</span>
+<span class="sd">        open_t: Earliest Timestamp of valid trades and quotes</span>
+<span class="sd">        close_t: Latest Timestamp to keep trades and quotes, inclusive</span>
+<span class="sd">        verbose: Whether to echo messages for debugging</span>
+<span class="sd">        has_shares: If True, require &#39;Shares_Outstanding&#39; &gt; 0 in master table</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    
+    <span class="n">cusips</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cusips</span><span class="p">)</span>  <span class="c1"># require list type</span>
+    <span class="n">symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> <span class="c1"># require list type</span>
+    <span class="n">trade</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">trade</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;trade is none&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">master</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> not in master&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">,</span> <span class="s1">&#39;Security_Description&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">symbols</span> <span class="ow">and</span> <span class="n">symbol</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not in symbols&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">has_shares</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">master</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">,</span> <span class="s1">&#39;Shares_Outstanding&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has no shares&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">cusip</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">,</span> <span class="s1">&#39;CUSIP&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cusips</span> <span class="ow">and</span> <span class="n">cusip</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cusips</span> <span class="ow">and</span> <span class="n">cusip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cusips</span><span class="p">:</span>
+            <span class="n">_print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">cusip</span><span class="si">}</span><span class="s2"> not in cusips&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;trades is empty&#39;</span><span class="p">)</span>            
+            <span class="k">continue</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">quotes</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;quotes is empty&#39;</span><span class="p">)</span>            
+            <span class="k">continue</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">clean_trade</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">open_t</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span> <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span><span class="p">)</span>
+        <span class="n">cq</span> <span class="o">=</span> <span class="n">clean_nbbo</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">cq</span><span class="p">):</span>
+            <span class="n">_print</span><span class="p">(</span><span class="s1">&#39;ct or cq empty&#39;</span><span class="p">)</span>             
+            <span class="k">continue</span>
+        <span class="n">_print</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">cusip</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ct</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cq</span><span class="p">))</span>
+        <span class="n">align_trades</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">cq</span><span class="p">,</span> <span class="n">open_t</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">ct</span><span class="p">,</span> <span class="n">cq</span><span class="p">,</span> <span class="n">master</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="opentaq"><a class="viewcode-back" href="../../../finds.readers.taq.html#finds.readers.taq.opentaq">[docs]</a><span class="k">def</span> <span class="nf">opentaq</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">taqdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper to initialize all master dataframe, trade and quote objects&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">TAQ</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span>
+                             <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_REF_MASTER_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.gz&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+            <span class="n">TAQ</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.gz&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.gzidx&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.csv.gz&#39;</span><span class="p">)),</span>
+            <span class="n">TAQ</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.gz&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.gzidx&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s1">.csv.gz&#39;</span><span class="p">)))</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># test access methods</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">paths</span>
+
+    <span class="c1"># daily taq files from ftp://ftp.nyxdata.com/Historical%20Data%20Samples/</span>
+    <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20191007</span><span class="p">,</span> <span class="mi">20191008</span><span class="p">,</span> <span class="mi">20180305</span><span class="p">,</span> <span class="mi">20180306</span><span class="p">,</span> <span class="mi">20171101</span><span class="p">]</span>
+    <span class="n">taqdir</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="s1">&#39;taq&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># generate input filenames for TAQ, igzip and symbols index files</span>
+    <span class="n">master_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_REF_MASTER_</span><span class="si">{}</span><span class="s1">.gz&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">trade_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{}</span><span class="s1">.gz&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">nbbo_file</span>  <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{}</span><span class="s1">.gz&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+
+    <span class="n">nbbo_index</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{}</span><span class="s1">.gzidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">trade_index</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{}</span><span class="s1">.gzidx&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    
+    <span class="n">nbbo_symbols</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_NBBO_</span><span class="si">{}</span><span class="s1">.csv.gz&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    <span class="n">trade_symbols</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">taqdir</span><span class="p">,</span> <span class="s1">&#39;EQY_US_ALL_TRADE_</span><span class="si">{}</span><span class="s1">.csv.gz&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span>
+    
+    <span class="n">date</span> <span class="o">=</span> <span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">master</span><span class="p">,</span> <span class="n">trades</span><span class="p">,</span> <span class="n">quotes</span> <span class="o">=</span> <span class="n">opentaq</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">taqdir</span><span class="p">)</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    #</span>
+<span class="sd">    # 1. Read lines</span>
+<span class="sd">    #</span>
+<span class="sd">    print(master)</span>
+<span class="sd">    trade = trades.open()</span>
+<span class="sd">    print(trade(5))</span>
+<span class="sd">    quote = quotes.open()</span>
+<span class="sd">    print(quote(5))</span>
+
+<span class="sd">    #</span>
+<span class="sd">    # 2. Read in sequential chunks, symbol by symbol</span>
+<span class="sd">    #</span>
+<span class="sd">    trade = iter(trades)</span>
+<span class="sd">    for _ in range(5):</span>
+<span class="sd">        df = next(trade)</span>
+<span class="sd">        print(f&#39;next Trade symbol {df.index.name}: {len(df)} records&#39;)</span>
+<span class="sd">    </span>
+<span class="sd">    quote = iter(quotes)</span>
+<span class="sd">    for _ in range(5):</span>
+<span class="sd">        df = next(quote)</span>
+<span class="sd">        print(f&#39;next Quote symbol {df.index.name}: {len(df)} records&#39;)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1">#</span>
+    <span class="c1"># 3. getitem by symbol (uses index_gzipped package)</span>
+    <span class="c1">#</span>
+    <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;VTI&#39;</span>
+    <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;AAPL&#39;</span> <span class="c1">#&#39;ZM&#39;</span>
+<span class="c1">#    symbol = &#39;GS&#39;</span>
+    <span class="n">symbol</span> <span class="o">=</span> <span class="s2">&quot;VOO&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">trades</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">quotes</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">clean_trade</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+    <span class="n">cq</span> <span class="o">=</span> <span class="n">clean_nbbo</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">align_trades</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">cq</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">plot_taq</span><span class="p">(</span><span class="n">ct</span><span class="p">[[</span><span class="s1">&#39;Trade_Price&#39;</span><span class="p">,</span> <span class="s1">&#39;Prevailing_Mid&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+             <span class="n">ct</span><span class="p">[</span><span class="s1">&#39;Trade_Volume&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+             <span class="p">(</span><span class="n">cq</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Price&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">cq</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Price&#39;</span><span class="p">])</span>\
+             <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;Quoted Spread&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+             <span class="p">((</span><span class="n">cq</span><span class="p">[</span><span class="s1">&#39;Best_Bid_Size&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">cq</span><span class="p">[</span><span class="s1">&#39;Best_Offer_Size&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>\
+             <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;Depth&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+             <span class="n">open_t</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span>
+             <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">),</span>
+             <span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+             <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tick Prices, Volume, Quotes, Spreads, and Depths (</span><span class="si">{</span><span class="n">dates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>    
+
+    <span class="k">raise</span> <span class="ne">Exception</span>
+    
+    
+    <span class="n">value</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span>
+    <span class="n">timedelta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+    <span class="n">bt</span> <span class="o">=</span> <span class="n">bin_trades</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">)</span>
+    <span class="n">bq</span> <span class="o">=</span> <span class="n">bin_quotes</span><span class="p">(</span><span class="n">cq</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">)</span>
+    <span class="n">bq</span> <span class="o">=</span> <span class="n">bq</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bt</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
+    <span class="n">plot_taq</span><span class="p">(</span><span class="n">bq</span><span class="p">[[</span><span class="s1">&#39;last&#39;</span><span class="p">,</span> <span class="s1">&#39;vwap&#39;</span><span class="p">,</span> <span class="s1">&#39;mid&#39;</span><span class="p">]],</span>
+             <span class="n">bq</span><span class="p">[</span><span class="s1">&#39;quoted&#39;</span><span class="p">],</span>
+             <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;volume&#39;</span><span class="p">],</span>
+             <span class="n">bt</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">],</span>
+             <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+             <span class="n">open_t</span><span class="o">=</span><span class="n">open_t</span><span class="p">,</span>
+             <span class="n">close_t</span><span class="o">=</span><span class="n">close_t</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">),</span>
+             <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}{</span><span class="n">unit</span><span class="si">}</span><span class="s2">-bin Prices, Quotes and Trades&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation of MidQuote and LastTrade </span><span class="si">{</span><span class="n">value</span><span class="si">}{</span><span class="n">unit</span><span class="si">}</span><span class="s2">-bin returns&quot;</span><span class="p">)</span>
+    <span class="n">bq</span><span class="p">[[</span><span class="s1">&#39;ret&#39;</span><span class="p">,</span> <span class="s1">&#39;retq&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="s1">&#39;5&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">close_t</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">close_t</span><span class="o">+</span><span class="n">m1</span><span class="p">)</span>
+    <span class="n">as_print</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">d</span><span class="p">])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

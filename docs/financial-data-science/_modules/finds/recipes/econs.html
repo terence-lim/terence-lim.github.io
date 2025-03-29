@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.recipes.econs &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">finds.recipes.econs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for finds.recipes.econs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Economics tools</span>
+
+<span class="sd">- Bai and Ng (2002), McCracken and Ng (2015, 2020) factors-EM algorithm</span>
+
+<span class="sd">Copyright 2022, Terence Lim</span>
+
+<span class="sd">MIT License</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.ma</span> <span class="kn">import</span> <span class="n">masked_invalid</span> <span class="k">as</span> <span class="n">valid</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas.api</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">adfuller</span><span class="p">,</span> <span class="n">acf</span><span class="p">,</span> <span class="n">pacf</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="n">_VERBOSE</span> <span class="o">=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="mrsq"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.mrsq">[docs]</a><span class="k">def</span> <span class="nf">mrsq</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">kmax</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return marginal R2 of each variable from incrementally adding factors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X: T observations/samples in rows, N variables/features in columns</span>
+<span class="sd">        kmax: maximum number of factors.  If 0, set to rank from SVD</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame with marginal R2 with component in each column</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    From matlab code, Bai and Ng (2002) and McCracken at</span>
+<span class="sd">      https://research.stlouisfed.org/econ/mccracken/fred-databases/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pca.components_[i,:] is vT[i, :]</span>
+    <span class="c1"># pca.explained_variance_ is s**2/(T-1)</span>
+    <span class="c1"># y = pca.transform(x)    # y = s * u: T x n &quot;projection&quot;</span>
+    <span class="c1"># beta = np.diag(pca.singular_values_) @ pca.components_  # &quot;loadings&quot;</span>
+    <span class="c1"># x.T @ x = beta.T @ beta is covariance matrix</span>
+    
+    <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">X</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">mrsq_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">u</span><span class="p">[:,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">k</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span><span class="p">[:,</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">kmax</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)],</span>
+                      <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mrsq_</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">u</span> <span class="o">@</span> <span class="n">u</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Z</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="select_baing"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.select_baing">[docs]</a><span class="k">def</span> <span class="nf">select_baing</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">kmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Determine number of factors based on Bai &amp; Ng (2002) info criterion</span>
+
+<span class="sd">    Args:</span>
+
+<span class="sd">        X: T observations/samples in rows, N variables/features in columns</span>
+<span class="sd">        p: int in [1, 2, 3] to use PCp1 or PCp2 or PCp3 penalty</span>
+<span class="sd">        kmax: Maximum number of factors.  If 0, set to rank from SVD</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        best number of factors based on ICp{p} criterion, or 0 if not determined</span>
+
+<span class="sd">    Notes:</span>
+
+<span class="sd">    - Simplified the calculation of residual variance from adding components:</span>
+<span class="sd">      is just the eigenvalues, no need to compute projections</span>
+<span class="sd">    - The IC curve appears to have multiple minimums: the first &quot;local&quot;</span>
+<span class="sd">      minimum is selected -- may be want prior bound on number of factors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s2">&quot;p must be 1, 2 or 3&quot;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="p">((</span><span class="n">X</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">X</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">NT</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">T</span>
+    <span class="n">NT1</span> <span class="o">=</span> <span class="n">N</span> <span class="o">+</span> <span class="n">T</span>
+    <span class="n">GCT</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>    
+    <span class="n">CT</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">NT</span><span class="o">/</span><span class="n">NT1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">NT1</span><span class="o">/</span><span class="n">NT</span><span class="p">),</span>
+          <span class="p">(</span><span class="n">NT1</span><span class="o">/</span><span class="n">NT</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">GCT</span><span class="p">),</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">GCT</span><span class="p">)</span> <span class="o">/</span> <span class="n">GCT</span><span class="p">]</span>
+    <span class="n">CT</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">CT</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">GCT</span><span class="p">)]</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">eigval</span> <span class="o">=</span> <span class="n">s</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">residual_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">eigval</span><span class="p">)</span> <span class="o">-</span> <span class="n">eigval</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">residual_variance</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">eigval</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">residual_variance</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">eigval</span><span class="p">)</span>
+    <span class="n">ic</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sigma</span> <span class="o">+</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">+</span> <span class="n">CT</span><span class="p">)[:(</span><span class="n">kmax</span> <span class="ow">or</span> <span class="n">GCT</span><span class="p">)]</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ic</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ic</span><span class="p">[</span><span class="mi">1</span><span class="p">:])[</span><span class="mi">0</span><span class="p">]</span>       <span class="c1"># find local minimum</span>
+    <span class="k">return</span> <span class="n">local</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="approximate_factors"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.approximate_factors">[docs]</a><span class="k">def</span> <span class="nf">approximate_factors</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">kmax</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                        <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">_VERBOSE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Fill in missing values with factor model EM algorithm Bai and Ng (2002)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X: T observations/samples in rows, N variables/features in columns</span>
+<span class="sd">        kmax: Maximum number of factors.  If 0, set to rank from SVD minus 1</span>
+<span class="sd">        p: If 0, number of factors is fixed as kmax.  Else picks one of three</span>
+<span class="sd">           information criterion methods in Bai &amp; Ng (2002) to auto-select</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame with missing values imputed with factor EM algorithm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>          <span class="c1"># passed by reference</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>       <span class="c1"># missing entries</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>  <span class="c1"># no row can be all missing</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>  <span class="c1"># no column can be all missing</span>
+
+    <span class="c1"># identify cols with missing values, and initially fill with column mean</span>
+    <span class="n">missing_cols</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_cols</span><span class="p">:</span>
+        <span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">n_iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="n">old_Z</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">Z</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">std</span>             <span class="c1"># standardize the data</span>
+
+        <span class="c1"># &quot;M&quot; step: estimate factors</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+
+        <span class="c1"># auto-select number of factors if p&gt;0 else fix number of factors</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">select_baing</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="n">kmax</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">kmax</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># &quot;E&quot; step: update missing entries</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">u</span><span class="p">[:,</span> <span class="p">:</span><span class="n">r</span><span class="p">]</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">[:</span><span class="n">r</span><span class="p">])</span> <span class="o">@</span> <span class="n">vT</span><span class="p">[:</span><span class="n">r</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_cols</span><span class="p">:</span>
+            <span class="n">Z</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">E</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span>
+
+        <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">Z</span> <span class="o">*</span> <span class="n">std</span><span class="p">)</span> <span class="o">+</span> <span class="n">mean</span>  <span class="c1"># undo standardization</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Z</span> <span class="o">-</span> <span class="n">old_Z</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_iter</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">delta</span><span class="si">:</span><span class="s2">8.3g</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>       <span class="c1"># diff**2/prev**2</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">Z</span></div>
+
+
+
+<div class="viewcode-block" id="fillna_em"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.fillna_em">[docs]</a><span class="k">def</span> <span class="nf">fillna_em</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">add_intercept</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+              <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span> <span class="n">maxiter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+              <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Fill missing data with EM Normal distribution&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">add_intercept</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">X</span><span class="p">))</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>   <span class="c1"># identify missing entries</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>    <span class="c1"># no row all missing</span>
+    <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>    <span class="c1"># no column all missing</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="c1"># columns with missing </span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">niter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxiter</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">niter</span><span class="p">:</span>
+            <span class="c1"># Initially, just replace with column means</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span> 
+                <span class="n">X</span><span class="p">[</span><span class="n">missing</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="n">col</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">XX</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span>
+            <span class="n">inv_XX</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">XX</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>  <span class="c1"># E, M step for each column with missing values</span>
+                <span class="c1"># &quot;M&quot; step: estimate covariance matrix</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># x = np.delete(X, (col), axis=1)</span>
+                <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="c1">#xx = np.delete(np.delete(XX, (col), axis=0), (col), axis=1)</span>
+                    <span class="n">M</span> <span class="o">=</span> <span class="n">inv</span><span class="p">(</span><span class="n">XX</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">][</span><span class="n">mask</span><span class="p">,</span> <span class="p">:])</span> <span class="o">@</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">M</span> <span class="o">=</span> <span class="o">-</span><span class="n">inv_XX</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">/</span> <span class="n">inv_XX</span><span class="p">[</span><span class="n">col</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+                <span class="c1"># &quot;E&quot; step: update expected missing values</span>
+                <span class="c1"># y = X[:, mask] @ M</span>
+                <span class="n">X</span><span class="p">[</span><span class="n">missing</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">missing</span><span class="p">[:,</span> <span class="n">col</span><span class="p">],:][:,</span> <span class="n">mask</span><span class="p">]</span> <span class="o">@</span> <span class="n">M</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">add_intercept</span><span class="p">:]</span>
+        <span class="c1"># record the current NLL</span>
+        <span class="n">nll</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">multivariate_normal</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                                              <span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                                              <span class="n">cov</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                                              <span class="n">allow_singular</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">niter</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">nll</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">niter</span> <span class="ow">and</span> <span class="n">prev_nll</span> <span class="o">-</span> <span class="n">nll</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">prev_nll</span> <span class="o">=</span> <span class="n">nll</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+<span class="c1">######################</span>
+<span class="c1">#</span>
+<span class="c1"># Econometrics</span>
+<span class="c1">#</span>
+<span class="c1">######################</span>
+
+<div class="viewcode-block" id="integration_order"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.integration_order">[docs]</a><span class="k">def</span> <span class="nf">integration_order</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">Series</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                      <span class="n">pvalue</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">lags</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="s1">&#39;AIC&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns order of integration by iteratively testing for unit root</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df: Input Series</span>
+<span class="sd">        verbose: Whether to display results</span>
+<span class="sd">        max_order: maximum number of orders to test</span>
+<span class="sd">        pvalue: Required p-value to reject Dickey-Fuller unit root</span>
+<span class="sd">        lags: Method automatically determine lag length, or maxlag;</span>
+<span class="sd">              in {&quot;AIC&quot;, &quot;BIC&quot;, &quot;t-stat&quot;}, int (maxlag), 0 (12*(nobs/100)^{1/4})</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Integration order, or -1 if max_order exceeded</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Augmented Dickey-Fuller unit root test:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lags</span><span class="p">:</span>   <span class="c1"># test with default maxlag</span>
+            <span class="n">dftest</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">maxlag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">autolag</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lags</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>    <span class="c1"># test using IC-determined lag length</span>
+            <span class="n">dftest</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">autolag</span><span class="o">=</span><span class="n">lags</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>          <span class="c1"># test with given maximum number of lags</span>
+            <span class="n">dftest</span> <span class="o">=</span> <span class="n">adfuller</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">autolag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxlag</span><span class="o">=</span><span class="n">lags</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">dftest</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span>
+                             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Test Statistic&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;p-value&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;Lags Used&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;Obs Used&#39;</span><span class="p">],</span>
+                             <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;I(</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">dftest</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Critical Value (</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+                
+        <span class="k">if</span> <span class="n">dftest</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">pvalue</span><span class="p">:</span>  <span class="c1"># reject null that is a unit root</span>
+            <span class="k">return</span> <span class="n">i</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="least_squares"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.least_squares">[docs]</a><span class="k">def</span> <span class="nf">least_squares</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
+                  <span class="n">x</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">add_constant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">stdres</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;To compute least square coefficients, supports groupby().apply</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: DataFrame with x and y series in columns</span>
+<span class="sd">        x: List of x columns</span>
+<span class="sd">        y: List of y columns</span>
+<span class="sd">        add_constant: Whether to add intercept as first column</span>
+<span class="sd">        stdres: Whether to output residual stdev</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Series (if only single y input) of regression coefficients, or</span>
+<span class="sd">        DataFrame (multiple y) with coeffs, and optionally stdres, in columns</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">add_constant</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">X</span><span class="p">])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_intercept&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">X</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Y</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">if</span> <span class="n">stdres</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">b</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">Y</span><span class="o">-</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">b</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;_stdres&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span>
+            <span class="n">Series</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">))</span>   <span class="c1"># return as Series for groupby.apply</span></div>
+
+<div class="viewcode-block" id="fstats"><a class="viewcode-back" href="../../../finds.recipes.econs.html#finds.recipes.econs.fstats">[docs]</a><span class="k">def</span> <span class="nf">fstats</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tail</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Helper to compute F-stats at all candidate break points</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        x: Input Series</span>
+<span class="sd">        tail: Tail fractions to skip computations</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array of f-stats at each candidate break-point</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">rse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">sse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">rse</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">tail</span><span class="p">),</span> <span class="nb">int</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">tail</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">sse</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">],</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">i</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">))</span><span class="o">/</span><span class="n">n</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">rse</span> <span class="o">-</span> <span class="n">sse</span><span class="p">)</span><span class="o">/</span><span class="n">rse</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># TODO: remove lm()</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>    
+<span class="k">def</span> <span class="nf">_lm</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">,</span>
+       <span class="n">add_constant</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">flatten</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NamedTuple</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Calculate linear multiple regression model results as namedtuple</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x: RHS independent variables</span>
+<span class="sd">        y: LHS dependent variables</span>
+<span class="sd">        add_constant: Whether to hstack &#39;Intercept&#39; column before x variables</span>
+<span class="sd">        flatten: Whether to flatten fitted and residuals series</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        LinearModel named tuple, with key and values</span>
+
+<span class="sd">        - coefficients: estimated linear regression coefficients</span>
+<span class="sd">        - fitted: fitted y values</span>
+<span class="sd">        - residuals: fitted - actual y values</span>
+<span class="sd">        - rsq: R-squared</span>
+<span class="sd">        - rvalue: square root of r-squared</span>
+<span class="sd">        - stderr: std dev of residuals</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;helper to optionally flatten 1D array&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">flatten</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">a</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">a</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">a</span>
+    
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">add_constant</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">X</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">X</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Y</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;coefficients&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">)}</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">X</span> <span class="o">@</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;residuals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">]</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;rsq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;fitted&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;rvalue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;rsq&#39;</span><span class="p">]))</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;stderr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;residuals&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;LinearModel&#39;</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">())(</span><span class="o">**</span><span class="n">out</span><span class="p">)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2024, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

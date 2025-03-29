@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.backtesting.backtesting &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.backtesting.dailyperformance" href="finds.backtesting.dailyperformance.html" />
+    <link rel="prev" title="finds.backtesting" href="finds.backtesting.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.backtesting.backtesting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.backtesting.backtesting.bivariate_sorts"><code class="docutils literal notranslate"><span class="pre">bivariate_sorts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#finds.backtesting.backtesting.univariate_sorts"><code class="docutils literal notranslate"><span class="pre">univariate_sorts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.dailyperformance.html">finds.backtesting.dailyperformance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.backtest.html">finds.backtesting.backtest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.riskpremium.html">finds.backtesting.riskpremium</a></li>
+<li class="toctree-l2"><a class="reference internal" href="finds.backtesting.eventstudy.html">finds.backtesting.eventstudy</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.backtesting.html">finds.backtesting</a></li>
+      <li class="breadcrumb-item active">finds.backtesting.backtesting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.backtesting.backtesting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.backtesting.backtesting">
+<span id="finds-backtesting-backtesting"></span><h1>finds.backtesting.backtesting<a class="headerlink" href="#module-finds.backtesting.backtesting" title="Permalink to this heading"></a></h1>
+<p>Utilities for backtesting</p>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.backtesting.backtesting.bivariate_sorts">
+<span class="sig-prename descclassname"><span class="pre">finds.backtesting.backtesting.</span></span><span class="sig-name descname"><span class="pre">bivariate_sorts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.stocks.html#finds.structured.stocks.Stocks" title="finds.structured.stocks.Stocks"><span class="pre">Stocks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.signals.html#finds.structured.signals.Signals" title="finds.structured.signals.Signals"><span class="pre">Signals</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebalbeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebalend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(30.0,</span> <span class="pre">70.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minprc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mincap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdecile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtesting.html#bivariate_sorts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtesting.bivariate_sorts" title="Permalink to this definition"></a></dt>
+<dd><p>Generate monthly time series of holdings by two-way sort procedure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stocks</strong> – Stocks object for accessing stock returns and price data</p></li>
+<li><p><strong>label</strong> – Name of signal to retrieve</p></li>
+<li><p><strong>signals</strong> – Call to extract cross section of values for the signal</p></li>
+<li><p><strong>rebalbeg</strong> – First rebalance date (YYYYMMDD)</p></li>
+<li><p><strong>rebalend</strong> – Last holding date (YYYYMMDD)</p></li>
+<li><p><strong>pct</strong> – Percentile breakpoints to sort high, medium and low buckets</p></li>
+<li><p><strong>window</strong> – No. of months to look back for signal values; 0 is exact month</p></li>
+<li><p><strong>months</strong> – Months (e.g. 6=June) to retrieve univ; empty for all months</p></li>
+<li><p><strong>maxdecile</strong> – Include largest stocks decile from 1 through maxdecile</p></li>
+<li><p><strong>mincap</strong> – Minimum market cap</p></li>
+<li><p><strong>minobs</strong> – Minimum required sample size with non-missing signal values</p></li>
+<li><p><strong>leverage</strong> – Multiplier for leverage or shorting</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>3-tuple of spread holdings, smb holdings, and subportfolio sizes</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>Independent sort by median (NYSE) mkt cap and 30/70 (NYSE) HML percentiles</p></li>
+<li><p>Subportfolios of the intersections are value-weighted;</p></li>
+<li><p>Spread portfolios are equal-weighted of subportfolios</p></li>
+<li><p>Portfolio are resorted every June; and other months’ holdings are
+adjusted by monthly realized retx (i.e. dividends not reinvested)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="finds.backtesting.backtesting.univariate_sorts">
+<span class="sig-prename descclassname"><span class="pre">finds.backtesting.backtesting.</span></span><span class="sig-name descname"><span class="pre">univariate_sorts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.stocks.html#finds.structured.stocks.Stocks" title="finds.structured.stocks.Stocks"><span class="pre">Stocks</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="finds.structured.signals.html#finds.structured.signals.Signals" title="finds.structured.signals.Signals"><span class="pre">Signals</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebalbeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebalend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">months</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(20.0,</span> <span class="pre">80.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leverage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minprc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mincap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdecile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Series</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/backtesting/backtesting.html#univariate_sorts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.backtesting.backtesting.univariate_sorts" title="Permalink to this definition"></a></dt>
+<dd><p>Monthly series of cap-weighted holdings of univariate spread portfolios</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stocks</strong> – Stocks object for accessing stock returns and price data</p></li>
+<li><p><strong>label</strong> – Name of signal to retrieve</p></li>
+<li><p><strong>signals</strong> – Call to extract cross section of values for the signal</p></li>
+<li><p><strong>rebalbeg</strong> – First rebalance date (YYYYMMDD)</p></li>
+<li><p><strong>rebalend</strong> – Last holding date (YYYYMMDD)</p></li>
+<li><p><strong>pct</strong> – Percentile breakpoints to sort high, medium and low buckets</p></li>
+<li><p><strong>window</strong> – No. of months to look back for signal values; 0 is exact month</p></li>
+<li><p><strong>months</strong> – Months (e.g. 6=June) to retrieve univ; empty for all months</p></li>
+<li><p><strong>maxdecile</strong> – Include largest stocks decile from 1 through maxdecile</p></li>
+<li><p><strong>mincap</strong> – Minimum market cap</p></li>
+<li><p><strong>minobs</strong> – Minimum required sample size with non-missing signal values</p></li>
+<li><p><strong>leverage</strong> – Multiplier for leverage or shorting</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.backtesting.html" class="btn btn-neutral float-left" title="finds.backtesting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.backtesting.dailyperformance.html" class="btn btn-neutral float-right" title="finds.backtesting.dailyperformance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

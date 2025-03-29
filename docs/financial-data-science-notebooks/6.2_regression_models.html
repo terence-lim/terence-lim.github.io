@@ -1,0 +1,2726 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Machine Learning: Regression &#8212; Financial Data Science Python Notebooks</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '6.2_regression_models';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deep Learning" href="6.3_deep_learning.html" />
+    <link rel="prev" title="Machine Learning: Classification" href="6.1_classification_models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+
+<a class="navbar-brand logo" href="README.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Financial Data Science Python Notebooks</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="README.html">
+                    FINANCIAL DATA SCIENCE
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1.1_stock_prices.html">Stock Prices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.2_jegadeesh_titman.html">Jegadeesh-Titman Rolling Portfolios</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.3_fama_french.html">Fama-French Portfolio Sorts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.4_fama_macbeth.html">Fama-Macbeth Cross-sectional Regressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.5_contrarian_trading.html">Contrarian Trading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.6_quant_factors.html">Quant Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="1.7_event_study.html">Event Study</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.1_economic_indicators.html">Economic Indicators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.2_regression_diagnostics.html">Linear Regression Diagonostics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.3_time_series.html">Time Series Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.4_approximate_factors.html">Approximate Factor Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2.5_economic_states.html">State Space Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.1_term_structure.html">Term Structure of Interest Rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.2_bond_returns.html">Interest Rate Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.3_options_pricing.html">Options Pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.4_value_at_risk.html">Value at Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.6_market_microstructure.html">Market Microstructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3.7_event_risk.html">Event Risk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.1_network_graphs.html">Supply Chain Network Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.2_community_detection.html">Industry Community Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.3_graph_centrality.html">Input-Output Graph Centrality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.4_link_prediction.html">Product Market Link Prediction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4.5_spatial_regression.html">Earnings Spatial Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.1_fomc_topics.html">FOMC Topic Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5.2_management_sentiment.html">Management Sentiment Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.1_classification_models.html">Machine Learning: Classification</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Machine Learning: Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.3_deep_learning.html">Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.4_convolutional_net.html">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.5_recurrent_net.html">Recurrent Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.6_reinforcement_learning.html">Reinforcement Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="6.7_language_modeling.html">Language Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.1_large_language_models.html">Large Language Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.2_llm_finetuning.html">Fine-tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.3_llm_prompting.html">Prompting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="7.4_llm_agents.html">Agents</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/terence-lim/financial-data-science-notebooks.git/issues/new?title=Issue%20on%20page%20%2F6.2_regression_models.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/6.2_regression_models.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Machine Learning: Regression</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macroeconomic-forecasting">Macroeconomic forecasting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regression-models">Regression models</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-subset-selection">Forward Subset Selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-least-squares-regression">Partial Least Squares Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ridge-regression">Ridge Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lasso-regression">Lasso Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-tree">Decision Tree</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting">Gradient boosting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#random-forest">Random Forest</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="machine-learning-regression">
+<h1>Machine Learning: Regression<a class="headerlink" href="#machine-learning-regression" title="Permalink to this heading">#</a></h1>
+<p><em>Whereof what’s past is prologue</em> - Shakespeare</p>
+<p>We explore supervised machine learning and regression models for macroeconomic forecasting, with a focus on predicting the industrial production index (INDPRO) using a wide range of economic indicators. To improve generalization and predictive performance, we investigate methods such as subset selection, penalized regression, decision trees, and ensemble learning, aiming to strike a balance between model complexity and accuracy.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>    
+<span class="kn">from</span> <span class="nn">finds.readers.alfred</span> <span class="kn">import</span> <span class="n">Alfred</span><span class="p">,</span> <span class="n">fred_md</span>
+<span class="kn">from</span> <span class="nn">finds.utils</span> <span class="kn">import</span> <span class="n">plot_date</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">credentials</span>
+<span class="c1"># %matplotlib qt</span>
+<span class="n">VERBOSE</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="macroeconomic-forecasting">
+<h2>Macroeconomic forecasting<a class="headerlink" href="#macroeconomic-forecasting" title="Permalink to this heading">#</a></h2>
+<p>For the candidate regression models, the independent variables consist of up to three lags of each economic indicator. The objective is to predict the rate of change in the industrial production index (INDPRO) for the following month while minimizing the <strong>mean squared error (MSE)</strong> loss function, which is appropriate for continuous-valued targets.</p>
+<p>Monthly macroeconomic data is retrieved from FRED-MD, with any missing recent values supplemented from other public sources. Suggested transformations are applied to each time series to ensure stationarity. The pre-2023 period is used for training, while the post-2023 period is reserved for testing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">alf</span> <span class="o">=</span> <span class="n">Alfred</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;fred&#39;</span><span class="p">][</span><span class="s1">&#39;api_key&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get latest FRED-MD data</span>
+<span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;M&#39;</span> 
+<span class="n">beg</span> <span class="o">=</span> <span class="mi">19640701</span>  <span class="c1"># 19620701</span>
+<span class="n">df</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">fred_md</span><span class="p">()</span>   <span class="c1"># </span>
+<span class="n">transforms</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">split_date</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="mi">20000</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Train/test date ranges:&quot;</span><span class="p">,</span> <span class="n">beg</span><span class="p">,</span> <span class="n">split_date</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FRED-MD vintage: monthly/current.csv
+Train/test date ranges: 19640701 20221231 20241231
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Splice in common updates: source of PE ratio, Commercial Paper</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;S&amp;P PE ratio&#39;</span><span class="p">]:</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">alf</span><span class="o">.</span><span class="n">splice</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;COMPAPFF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;COMPAPFF&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>  <span class="c1"># forward fill 20200430</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;CP3M&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;CP3M&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>          <span class="c1"># forward fill 20200430</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Apply time series transformations according to FRED-MD</span>
+<span class="n">transformed</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">transformed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alf</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">tcode</span><span class="o">=</span><span class="n">transforms</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">))</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">transformed</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">beg</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Drop columns with missing data</span>
+<span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">series_id</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">series_id</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span>
+    <span class="n">missing</span><span class="o">.</span><span class="n">extend</span><span class="p">([(</span><span class="n">date</span><span class="p">,</span> <span class="n">series_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">~</span><span class="n">g</span><span class="p">]])</span>
+<span class="n">missing_per_row</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">missing</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">missing</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;series_id&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;original:&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;dropna:&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># drop columns where missing values</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">missing</span><span class="p">[</span><span class="s1">&#39;series_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+<span class="n">data</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>original: (726, 126) dropna: (726, 122)
+series_id
+ACOGNO          332
+UMCSENT         163
+TWEXAFEGSMTH    103
+ANDENO           44
+Name: count, dtype: int64
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>RPI</th>
+      <th>W875RX1</th>
+      <th>DPCERA3M086SBEA</th>
+      <th>CMRMTSPL</th>
+      <th>RETAIL</th>
+      <th>INDPRO</th>
+      <th>IPFPNSS</th>
+      <th>IPFINAL</th>
+      <th>IPCONGD</th>
+      <th>IPDCONGD</th>
+      <th>...</th>
+      <th>DDURRG3M086SBEA</th>
+      <th>DNDGRG3M086SBEA</th>
+      <th>DSERRG3M086SBEA</th>
+      <th>CES0600000008</th>
+      <th>CES2000000008</th>
+      <th>CES3000000008</th>
+      <th>DTCOLNVHFNM</th>
+      <th>DTCTHFNM</th>
+      <th>INVEST</th>
+      <th>VIXCLS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>19640731</th>
+      <td>0.005422</td>
+      <td>0.005404</td>
+      <td>0.007343</td>
+      <td>0.019986</td>
+      <td>0.004947</td>
+      <td>0.006552</td>
+      <td>0.010342</td>
+      <td>0.011313</td>
+      <td>0.014079</td>
+      <td>0.016438</td>
+      <td>...</td>
+      <td>0.000667</td>
+      <td>-0.000369</td>
+      <td>-0.000090</td>
+      <td>-0.000016</td>
+      <td>0.003231</td>
+      <td>-0.004158</td>
+      <td>-0.003798</td>
+      <td>-0.002430</td>
+      <td>-0.002831</td>
+      <td>11.2238</td>
+    </tr>
+    <tr>
+      <th>19640831</th>
+      <td>0.005644</td>
+      <td>0.006061</td>
+      <td>0.005992</td>
+      <td>-0.020139</td>
+      <td>0.013974</td>
+      <td>0.006506</td>
+      <td>-0.000936</td>
+      <td>-0.000939</td>
+      <td>-0.001865</td>
+      <td>0.007219</td>
+      <td>...</td>
+      <td>-0.002031</td>
+      <td>-0.002398</td>
+      <td>0.001406</td>
+      <td>-0.000016</td>
+      <td>-0.003263</td>
+      <td>0.004141</td>
+      <td>-0.005958</td>
+      <td>-0.001818</td>
+      <td>0.011673</td>
+      <td>13.6898</td>
+    </tr>
+    <tr>
+      <th>19640930</th>
+      <td>0.004123</td>
+      <td>0.004205</td>
+      <td>-0.004164</td>
+      <td>0.027173</td>
+      <td>0.009372</td>
+      <td>0.003703</td>
+      <td>-0.004690</td>
+      <td>-0.003759</td>
+      <td>-0.011267</td>
+      <td>-0.023656</td>
+      <td>...</td>
+      <td>0.000728</td>
+      <td>0.003749</td>
+      <td>-0.001674</td>
+      <td>-0.000015</td>
+      <td>-0.006462</td>
+      <td>0.004090</td>
+      <td>-0.011142</td>
+      <td>-0.003802</td>
+      <td>0.010582</td>
+      <td>10.5167</td>
+    </tr>
+    <tr>
+      <th>19641031</th>
+      <td>0.000555</td>
+      <td>0.000650</td>
+      <td>0.006499</td>
+      <td>-0.013866</td>
+      <td>-0.039421</td>
+      <td>-0.013947</td>
+      <td>-0.010404</td>
+      <td>-0.013269</td>
+      <td>-0.020030</td>
+      <td>-0.109875</td>
+      <td>...</td>
+      <td>-0.001712</td>
+      <td>-0.002344</td>
+      <td>0.000525</td>
+      <td>-0.011757</td>
+      <td>0.016093</td>
+      <td>-0.024760</td>
+      <td>0.005974</td>
+      <td>-0.000704</td>
+      <td>-0.003579</td>
+      <td>11.0924</td>
+    </tr>
+    <tr>
+      <th>19641130</th>
+      <td>0.006703</td>
+      <td>0.007352</td>
+      <td>-0.009111</td>
+      <td>-0.009745</td>
+      <td>0.009335</td>
+      <td>0.030429</td>
+      <td>0.029043</td>
+      <td>0.031929</td>
+      <td>0.036884</td>
+      <td>0.128121</td>
+      <td>...</td>
+      <td>0.004137</td>
+      <td>0.000985</td>
+      <td>-0.000352</td>
+      <td>0.011772</td>
+      <td>-0.019272</td>
+      <td>0.024828</td>
+      <td>-0.009946</td>
+      <td>-0.002806</td>
+      <td>-0.002694</td>
+      <td>12.0087</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>20240831</th>
+      <td>0.000066</td>
+      <td>-0.000117</td>
+      <td>0.000711</td>
+      <td>0.000375</td>
+      <td>-0.001144</td>
+      <td>0.004869</td>
+      <td>0.004515</td>
+      <td>0.007094</td>
+      <td>0.009218</td>
+      <td>0.047547</td>
+      <td>...</td>
+      <td>0.000600</td>
+      <td>-0.002222</td>
+      <td>-0.000061</td>
+      <td>-0.002580</td>
+      <td>0.001376</td>
+      <td>-0.006110</td>
+      <td>-0.001974</td>
+      <td>-0.000766</td>
+      <td>0.001445</td>
+      <td>19.6750</td>
+    </tr>
+    <tr>
+      <th>20240930</th>
+      <td>0.001458</td>
+      <td>0.000240</td>
+      <td>0.005257</td>
+      <td>0.007155</td>
+      <td>0.008903</td>
+      <td>-0.004205</td>
+      <td>-0.005809</td>
+      <td>-0.008928</td>
+      <td>-0.002317</td>
+      <td>-0.001441</td>
+      <td>...</td>
+      <td>0.005721</td>
+      <td>-0.002598</td>
+      <td>0.000553</td>
+      <td>0.004137</td>
+      <td>0.001906</td>
+      <td>0.004652</td>
+      <td>-0.002368</td>
+      <td>-0.001586</td>
+      <td>-0.001644</td>
+      <td>17.6597</td>
+    </tr>
+    <tr>
+      <th>20241031</th>
+      <td>0.003690</td>
+      <td>0.003488</td>
+      <td>0.001757</td>
+      <td>-0.001714</td>
+      <td>0.005575</td>
+      <td>-0.004547</td>
+      <td>-0.007220</td>
+      <td>-0.010970</td>
+      <td>-0.006158</td>
+      <td>-0.028598</td>
+      <td>...</td>
+      <td>-0.002965</td>
+      <td>0.003609</td>
+      <td>0.000788</td>
+      <td>-0.003839</td>
+      <td>-0.005006</td>
+      <td>-0.002154</td>
+      <td>-0.000146</td>
+      <td>0.003227</td>
+      <td>-0.000473</td>
+      <td>19.9478</td>
+    </tr>
+    <tr>
+      <th>20241130</th>
+      <td>0.002184</td>
+      <td>0.002756</td>
+      <td>0.004346</td>
+      <td>0.003993</td>
+      <td>0.006484</td>
+      <td>-0.001453</td>
+      <td>-0.001180</td>
+      <td>-0.000155</td>
+      <td>-0.004246</td>
+      <td>0.018794</td>
+      <td>...</td>
+      <td>-0.000986</td>
+      <td>0.000117</td>
+      <td>-0.002176</td>
+      <td>-0.000639</td>
+      <td>-0.002760</td>
+      <td>0.003190</td>
+      <td>-0.000872</td>
+      <td>-0.001679</td>
+      <td>-0.011753</td>
+      <td>15.9822</td>
+    </tr>
+    <tr>
+      <th>20241231</th>
+      <td>0.001234</td>
+      <td>0.001391</td>
+      <td>0.005441</td>
+      <td>0.006665</td>
+      <td>0.007175</td>
+      <td>0.009853</td>
+      <td>0.007300</td>
+      <td>0.006569</td>
+      <td>0.003359</td>
+      <td>-0.013311</td>
+      <td>...</td>
+      <td>-0.004215</td>
+      <td>0.004218</td>
+      <td>0.002086</td>
+      <td>0.002521</td>
+      <td>0.005776</td>
+      <td>-0.001439</td>
+      <td>0.002963</td>
+      <td>0.002748</td>
+      <td>0.002421</td>
+      <td>15.6997</td>
+    </tr>
+  </tbody>
+</table>
+<p>726 rows × 122 columns</p>
+</div></div></div>
+</div>
+<p>Data beyond the split date is excluded from model training to ensure a proper evaluation of generalization performance.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Split time series train and test set</span>
+<span class="k">def</span> <span class="nf">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">split_date</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to split train/test time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="o">&lt;=</span><span class="n">end</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="o">&gt;</span><span class="n">end</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="o">&lt;=</span><span class="n">end</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="o">&gt;</span><span class="n">end</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">columns_map</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">lag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to create lagged column names&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">columns_unmap</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to extract lagged column names&quot;&quot;&quot;</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">],</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">target_id</span> <span class="o">=</span> <span class="s1">&#39;INDPRO&#39;</span>
+<span class="n">lags</span> <span class="o">=</span> <span class="mi">3</span>   <span class="c1"># Include up to 3 lags of exogs</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">target_id</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">lags</span><span class="p">:]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">lags</span><span class="p">:]</span>\
+               <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns_map</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">lag</span><span class="p">))</span>
+               <span class="k">for</span> <span class="n">lag</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">+</span><span class="mi">1</span><span class="p">)],</span>
+              <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                      
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># new table to collect final fitted models</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>    <span class="c1"># collect test and train errors</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">final_models</span> <span class="o">=</span> <span class="p">{}</span>  
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="regression-models">
+<h2>Regression models<a class="headerlink" href="#regression-models" title="Permalink to this heading">#</a></h2>
+<p>Complex regression models with numerous features or parameters risk overfitting, capturing noise rather than true patterns. Several techniques help mitigate overfitting and improve model generalization:</p>
+<ul class="simple">
+<li><p><strong>Cross-validation</strong>: Hyperparameter tuning using cross-validation helps ensure models generalize well across different data subsets. <strong>K-fold Cross-Validation (K-fold CV)</strong> divides the dataset into <span class="math notranslate nohighlight">\(K\)</span> parts, training the model on <span class="math notranslate nohighlight">\(K-1\)</span> sections and testing it on the remaining part, iterating through all folds and averaging results. <strong>Leave-One-Out Cross-Validation (LOOCV)</strong> is a special case where each data point serves as the test set once, helping refine hyperparameter selection.</p></li>
+<li><p><strong>Information criteria penalty</strong>: The <strong>Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC)</strong> aid model selection by balancing goodness of fit and complexity. AIC, defined as <span class="math notranslate nohighlight">\(AIC = 2k - 2\ln(L)\)</span>, where <span class="math notranslate nohighlight">\(k\)</span> is the number of parameters and <span class="math notranslate nohighlight">\(L\)</span> is the likelihood, favors models that explain the data with minimal complexity. BIC, given by <span class="math notranslate nohighlight">\(BIC = k\ln(n) - 2\ln(L)\)</span>, introduces a stronger penalty for sample size <span class="math notranslate nohighlight">\(n\)</span>, preferring simpler models for large datasets. Lower AIC or BIC values indicate better models.</p></li>
+<li><p><strong>Ensemble learning</strong>: By combining multiple weak learners, ensemble methods enhance model robustness. Bagging averages predictions from multiple models trained on different data subsets, reducing variance. Boosting sequentially corrects model errors, improving overall accuracy.</p></li>
+</ul>
+<section id="forward-subset-selection">
+<h3>Forward Subset Selection<a class="headerlink" href="#forward-subset-selection" title="Permalink to this heading">#</a></h3>
+<p><strong>Forward Subset Regression</strong> is a stepwise variable selection method used in regression modeling to identify the best subset of predictors. It begins with no variables in the model and iteratively adds the most significant predictor at each step, based on a chosen criterion, and stops when adding more variables does not significantly improve model performance. Penalized selection criteria, such as AIC or BIC, helps avoid overfitting. Forward selection is computationally more efficient than exhaustive search methods but may miss the optimal subset if an initially excluded variable becomes relevant later in combination with others.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">forward_select</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">selected</span><span class="p">,</span> <span class="n">ic</span><span class="o">=</span><span class="s1">&#39;aic&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;helper to forward select next regressor, using sm.OLS&quot;&quot;&quot;</span>
+    <span class="n">remaining</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">remaining</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="n">selected</span> <span class="o">+</span> <span class="p">[</span><span class="n">x</span><span class="p">]])</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;select&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+                        <span class="s1">&#39;aic&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">aic</span><span class="p">,</span>
+                        <span class="s1">&#39;bic&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">bic</span><span class="p">,</span>
+                        <span class="s1">&#39;rsquared&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">rsquared</span><span class="p">,</span>
+                        <span class="s1">&#39;rsquared_adj&#39;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">rsquared_adj</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">ic</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># find best bic, and show selection criteria scores</span>
+<span class="n">ic</span> <span class="o">=</span> <span class="s1">&#39;bic&#39;</span>   <span class="c1"># select by information criterion</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">selected</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">models</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">):</span>
+    <span class="n">select</span> <span class="o">=</span> <span class="n">forward_select</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span>
+                            <span class="n">X_train</span><span class="p">,</span>
+                            <span class="n">selected</span><span class="p">,</span>
+                            <span class="n">ic</span><span class="o">=</span><span class="n">ic</span><span class="p">)</span>
+    <span class="n">models</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">select</span>
+    <span class="n">selected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">select</span><span class="p">[</span><span class="s1">&#39;select&#39;</span><span class="p">])</span>
+<span class="n">selected</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">selected</span><span class="p">[[</span><span class="n">ic</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">selected</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="n">selected</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="n">best</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">subset</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">[</span><span class="s1">&#39;select&#39;</span><span class="p">]]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Forward Selection Subset&#39;</span><span class="p">)</span>
+<span class="n">subset</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Forward Selection Subset
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>select</th>
+      <th>aic</th>
+      <th>bic</th>
+      <th>rsquared</th>
+      <th>rsquared_adj</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Initial Claims</th>
+      <td>CLAIMS_1</td>
+      <td>-4772.162</td>
+      <td>-4767.612</td>
+      <td>0.355</td>
+      <td>0.354</td>
+    </tr>
+    <tr>
+      <th>Real M2 Money Stock</th>
+      <td>M2REAL_2</td>
+      <td>-4814.414</td>
+      <td>-4805.315</td>
+      <td>0.394</td>
+      <td>0.393</td>
+    </tr>
+    <tr>
+      <th>All Employees, Wholesale Trade</th>
+      <td>USWTRADE_2</td>
+      <td>-4843.063</td>
+      <td>-4829.414</td>
+      <td>0.420</td>
+      <td>0.418</td>
+    </tr>
+    <tr>
+      <th>All Employees, Service-Providing</th>
+      <td>SRVPRD_2</td>
+      <td>-4864.114</td>
+      <td>-4845.916</td>
+      <td>0.439</td>
+      <td>0.436</td>
+    </tr>
+    <tr>
+      <th>5-Year Treasury Constant Maturity Minus Federal Funds Rate</th>
+      <td>T5YFFM_3</td>
+      <td>-4881.249</td>
+      <td>-4858.500</td>
+      <td>0.454</td>
+      <td>0.450</td>
+    </tr>
+    <tr>
+      <th>Total Business: Inventories to Sales Ratio</th>
+      <td>ISRATIO_2</td>
+      <td>-4895.191</td>
+      <td>-4867.893</td>
+      <td>0.467</td>
+      <td>0.462</td>
+    </tr>
+    <tr>
+      <th>All Employees, Service-Providing</th>
+      <td>SRVPRD_1</td>
+      <td>-4911.828</td>
+      <td>-4879.981</td>
+      <td>0.481</td>
+      <td>0.475</td>
+    </tr>
+    <tr>
+      <th>All Employees, Financial Activities</th>
+      <td>USFIRE_2</td>
+      <td>-4928.888</td>
+      <td>-4892.490</td>
+      <td>0.495</td>
+      <td>0.489</td>
+    </tr>
+    <tr>
+      <th>All Employees, Trade, Transportation, and Utilities</th>
+      <td>USTPU_1</td>
+      <td>-4945.576</td>
+      <td>-4904.629</td>
+      <td>0.508</td>
+      <td>0.502</td>
+    </tr>
+    <tr>
+      <th>Consumer Motor Vehicle Loans Owned by Finance Companies, Level</th>
+      <td>DTCOLNVHFNM_3</td>
+      <td>-4952.630</td>
+      <td>-4907.133</td>
+      <td>0.514</td>
+      <td>0.507</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Nondurable Energy Consumer Goods: Residential Utilities</th>
+      <td>IPB51222S_3</td>
+      <td>-4960.975</td>
+      <td>-4910.928</td>
+      <td>0.521</td>
+      <td>0.514</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Nondurable Goods Materials</th>
+      <td>IPNMAT_3</td>
+      <td>-4974.770</td>
+      <td>-4920.175</td>
+      <td>0.532</td>
+      <td>0.524</td>
+    </tr>
+    <tr>
+      <th>Canadian Dollars to U.S. Dollar Spot Exchange Rate</th>
+      <td>EXCAUS_3</td>
+      <td>-4983.489</td>
+      <td>-4924.343</td>
+      <td>0.539</td>
+      <td>0.531</td>
+    </tr>
+    <tr>
+      <th>M1</th>
+      <td>M1SL_3</td>
+      <td>-4993.678</td>
+      <td>-4929.983</td>
+      <td>0.547</td>
+      <td>0.538</td>
+    </tr>
+    <tr>
+      <th>Nonrevolving consumer credit to Personal Income</th>
+      <td>CONSPI_2</td>
+      <td>-5001.564</td>
+      <td>-4933.319</td>
+      <td>0.554</td>
+      <td>0.544</td>
+    </tr>
+    <tr>
+      <th>Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity, Quoted on an Investment Basis</th>
+      <td>GS10_1</td>
+      <td>-5008.976</td>
+      <td>-4936.181</td>
+      <td>0.560</td>
+      <td>0.549</td>
+    </tr>
+    <tr>
+      <th>Capacity Utilization: Manufacturing (SIC)</th>
+      <td>CUMFNS_2</td>
+      <td>-5014.366</td>
+      <td>-4937.022</td>
+      <td>0.564</td>
+      <td>0.553</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Manufacturing (SIC)</th>
+      <td>IPMANSICS_2</td>
+      <td>-5041.837</td>
+      <td>-4959.943</td>
+      <td>0.582</td>
+      <td>0.571</td>
+    </tr>
+    <tr>
+      <th>All Employees, Nondurable Goods</th>
+      <td>NDMANEMP_1</td>
+      <td>-5056.048</td>
+      <td>-4969.605</td>
+      <td>0.592</td>
+      <td>0.580</td>
+    </tr>
+    <tr>
+      <th>Average Hourly Earnings of Production and Nonsupervisory Employees, Construction</th>
+      <td>CES2000000008_1</td>
+      <td>-5065.393</td>
+      <td>-4974.400</td>
+      <td>0.598</td>
+      <td>0.586</td>
+    </tr>
+    <tr>
+      <th>Average Weekly Overtime Hours of Production and Nonsupervisory Employees, Manufacturing</th>
+      <td>AWOTMAN_2</td>
+      <td>-5075.474</td>
+      <td>-4979.931</td>
+      <td>0.605</td>
+      <td>0.593</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Equipment: Business Equipment</th>
+      <td>IPBUSEQ_2</td>
+      <td>-5083.967</td>
+      <td>-4983.875</td>
+      <td>0.611</td>
+      <td>0.598</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Total Index</th>
+      <td>INDPRO_2</td>
+      <td>-5091.928</td>
+      <td>-4987.286</td>
+      <td>0.617</td>
+      <td>0.604</td>
+    </tr>
+    <tr>
+      <th>Real Estate Loans, All Commercial Banks</th>
+      <td>REALLN_1</td>
+      <td>-5096.759</td>
+      <td>-4987.568</td>
+      <td>0.620</td>
+      <td>0.607</td>
+    </tr>
+    <tr>
+      <th>All Employees, Mining, Quarrying, and Oil and Gas Extraction</th>
+      <td>CES1021000001_2</td>
+      <td>-5102.029</td>
+      <td>-4988.288</td>
+      <td>0.624</td>
+      <td>0.610</td>
+    </tr>
+    <tr>
+      <th>Moody's Seasoned Baa Corporate Bond Yield</th>
+      <td>BAA_1</td>
+      <td>-5106.126</td>
+      <td>-4987.835</td>
+      <td>0.627</td>
+      <td>0.613</td>
+    </tr>
+    <tr>
+      <th>Moody's Seasoned Aaa Corporate Bond Yield</th>
+      <td>AAA_1</td>
+      <td>-5110.792</td>
+      <td>-4987.951</td>
+      <td>0.631</td>
+      <td>0.616</td>
+    </tr>
+    <tr>
+      <th>All Employees, Mining, Quarrying, and Oil and Gas Extraction</th>
+      <td>CES1021000001_1</td>
+      <td>-5116.399</td>
+      <td>-4989.008</td>
+      <td>0.635</td>
+      <td>0.620</td>
+    </tr>
+    <tr>
+      <th>Industrial Production: Materials</th>
+      <td>IPMAT_1</td>
+      <td>-5120.986</td>
+      <td>-4989.046</td>
+      <td>0.638</td>
+      <td>0.623</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="n">n</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;series_id&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="s1">&#39;lag&#39;</span> <span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])}</span>
+                     <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">selected</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="n">best</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;select&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                    <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;series_id&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lag</th>
+      <th>description</th>
+    </tr>
+    <tr>
+      <th>series_id</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CLAIMS</th>
+      <td>1</td>
+      <td>Initial Claims</td>
+    </tr>
+    <tr>
+      <th>M2REAL</th>
+      <td>2</td>
+      <td>Real M2 Money Stock</td>
+    </tr>
+    <tr>
+      <th>USWTRADE</th>
+      <td>2</td>
+      <td>All Employees, Wholesale Trade</td>
+    </tr>
+    <tr>
+      <th>SRVPRD</th>
+      <td>2</td>
+      <td>All Employees, Service-Providing</td>
+    </tr>
+    <tr>
+      <th>T5YFFM</th>
+      <td>3</td>
+      <td>5-Year Treasury Constant Maturity Minus Federa...</td>
+    </tr>
+    <tr>
+      <th>ISRATIO</th>
+      <td>2</td>
+      <td>Total Business: Inventories to Sales Ratio</td>
+    </tr>
+    <tr>
+      <th>SRVPRD</th>
+      <td>1</td>
+      <td>All Employees, Service-Providing</td>
+    </tr>
+    <tr>
+      <th>USFIRE</th>
+      <td>2</td>
+      <td>All Employees, Financial Activities</td>
+    </tr>
+    <tr>
+      <th>USTPU</th>
+      <td>1</td>
+      <td>All Employees, Trade, Transportation, and Util...</td>
+    </tr>
+    <tr>
+      <th>DTCOLNVHFNM</th>
+      <td>3</td>
+      <td>Consumer Motor Vehicle Loans Owned by Finance ...</td>
+    </tr>
+    <tr>
+      <th>IPB51222S</th>
+      <td>3</td>
+      <td>Industrial Production: Nondurable Energy Consu...</td>
+    </tr>
+    <tr>
+      <th>IPNMAT</th>
+      <td>3</td>
+      <td>Industrial Production: Nondurable Goods Materials</td>
+    </tr>
+    <tr>
+      <th>EXCAUS</th>
+      <td>3</td>
+      <td>Canadian Dollars to U.S. Dollar Spot Exchange ...</td>
+    </tr>
+    <tr>
+      <th>M1SL</th>
+      <td>3</td>
+      <td>M1</td>
+    </tr>
+    <tr>
+      <th>CONSPI</th>
+      <td>2</td>
+      <td>Nonrevolving consumer credit to Personal Income</td>
+    </tr>
+    <tr>
+      <th>GS10</th>
+      <td>1</td>
+      <td>Market Yield on U.S. Treasury Securities at 10...</td>
+    </tr>
+    <tr>
+      <th>CUMFNS</th>
+      <td>2</td>
+      <td>Capacity Utilization: Manufacturing (SIC)</td>
+    </tr>
+    <tr>
+      <th>IPMANSICS</th>
+      <td>2</td>
+      <td>Industrial Production: Manufacturing (SIC)</td>
+    </tr>
+    <tr>
+      <th>NDMANEMP</th>
+      <td>1</td>
+      <td>All Employees, Nondurable Goods</td>
+    </tr>
+    <tr>
+      <th>CES2000000008</th>
+      <td>1</td>
+      <td>Average Hourly Earnings of Production and Nons...</td>
+    </tr>
+    <tr>
+      <th>AWOTMAN</th>
+      <td>2</td>
+      <td>Average Weekly Overtime Hours of Production an...</td>
+    </tr>
+    <tr>
+      <th>IPBUSEQ</th>
+      <td>2</td>
+      <td>Industrial Production: Equipment: Business Equ...</td>
+    </tr>
+    <tr>
+      <th>INDPRO</th>
+      <td>2</td>
+      <td>Industrial Production: Total Index</td>
+    </tr>
+    <tr>
+      <th>REALLN</th>
+      <td>1</td>
+      <td>Real Estate Loans, All Commercial Banks</td>
+    </tr>
+    <tr>
+      <th>CES1021000001</th>
+      <td>2</td>
+      <td>All Employees, Mining, Quarrying, and Oil and ...</td>
+    </tr>
+    <tr>
+      <th>BAA</th>
+      <td>1</td>
+      <td>Moody's Seasoned Baa Corporate Bond Yield</td>
+    </tr>
+    <tr>
+      <th>AAA</th>
+      <td>1</td>
+      <td>Moody's Seasoned Aaa Corporate Bond Yield</td>
+    </tr>
+    <tr>
+      <th>CES1021000001</th>
+      <td>1</td>
+      <td>All Employees, Mining, Quarrying, and Oil and ...</td>
+    </tr>
+    <tr>
+      <th>IPMAT</th>
+      <td>1</td>
+      <td>Industrial Production: Materials</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot BIC vs number selected</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">selected</span><span class="p">[</span><span class="s1">&#39;bic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+<span class="n">selected</span><span class="p">[</span><span class="s1">&#39;aic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">best</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">best</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;ob&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;BIC&#39;</span><span class="p">,</span> <span class="s1">&#39;AIC&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;best=</span><span class="si">{</span><span class="n">best</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forward Subset Selection with </span><span class="si">{</span><span class="n">ic</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">bx</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">selected</span><span class="p">[</span><span class="s1">&#39;rsquared&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">bx</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">)</span>
+<span class="n">selected</span><span class="p">[</span><span class="s1">&#39;rsquared_adj&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">bx</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;rsquared&#39;</span><span class="p">,</span> <span class="s1">&#39;rsquared_adj&#39;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+<span class="n">bx</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;# Predictors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/065436f22579d2d737f32dc21f4a2d046857be8d271c3de849a02d605e8c0d9a.png" src="_images/065436f22579d2d737f32dc21f4a2d046857be8d271c3de849a02d605e8c0d9a.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># evaluate train and test mse</span>
+<span class="n">X_subset</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s1">&#39;select&#39;</span><span class="p">]]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">X_subset</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Forward Subset Regression (k=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">[</span><span class="n">subset</span><span class="p">[</span><span class="s1">&#39;select&#39;</span><span class="p">]])</span>
+<span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>                               
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_subset</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/7a2c3d3bede36a49affbcac8cf5beed08c405b0f7f97a7125672bb6b129866f4.png" src="_images/7a2c3d3bede36a49affbcac8cf5beed08c405b0f7f97a7125672bb6b129866f4.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>Forward Subset Regression (k=29)</td>
+      <td>0.005955</td>
+      <td>0.007674</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="partial-least-squares-regression">
+<h3>Partial Least Squares Regression<a class="headerlink" href="#partial-least-squares-regression" title="Permalink to this heading">#</a></h3>
+<p>Partial Least Squares (PLS) Regression combines features of principal component analysis (PCA) and multiple linear regression. PLS constructs new latent variables (components) as linear combinations of the original predictors that maximize covariance with the response variable. The number of components (<code class="docutils literal notranslate"><span class="pre">n_components</span></code>) parameter controls the dimensionality reduction and must be chosen carefully to balance bias-variance tradeoff. This method is particularly useful when datasets have more predictors than observations and strong multicollinearity.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># split train and test, fit standard scaling using train set</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.cross_decomposition</span> <span class="kn">import</span> <span class="n">PLSRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">KFold</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># fit with 5-fold CV to choose n_components</span>
+<span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">31</span><span class="p">):</span>
+    <span class="n">pls</span> <span class="o">=</span> <span class="n">PLSRegression</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">pls</span><span class="p">,</span>
+                            <span class="n">X</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+                            <span class="n">y</span><span class="o">=</span><span class="n">Y_train</span><span class="p">,</span>
+                            <span class="n">n_jobs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">,</span>
+                            <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span>
+                            <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">score</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show cross-validation results and best model</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">mse</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Mean Squared Error&#39;</span><span class="p">,</span>
+         <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Number of Components&#39;</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;PLS Regression with </span><span class="si">{</span><span class="n">n_splits</span><span class="si">}</span><span class="s2">-fold CV&quot;</span><span class="p">,</span>
+         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">mse</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">mse</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">best</span><span class="p">,</span> <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">best</span><span class="p">],</span> <span class="s2">&quot;or&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;MSE&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;best=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/163f5dcd9bd8cd5b0435fa6095a1abb8c27f3fb3c9b386c261331ce49f3adb64.png" src="_images/163f5dcd9bd8cd5b0435fa6095a1abb8c27f3fb3c9b386c261331ce49f3adb64.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### evaluate train and test mse</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">PLSRegression</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">best</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PLS Regression(k=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">Y_test</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/027468d4656b61baf0d9b4a1c25690030c8578540b5bb6aea88c197c110154b1.png" src="_images/027468d4656b61baf0d9b4a1c25690030c8578540b5bb6aea88c197c110154b1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>PLS Regression(k=11)</td>
+      <td>0.005306</td>
+      <td>0.008791</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="ridge-regression">
+<h3>Ridge Regression<a class="headerlink" href="#ridge-regression" title="Permalink to this heading">#</a></h3>
+<p>Ridge Regression is a linear regression model that includes L2 regularization, which helps prevent overfitting by adding a penalty term to the loss function. The objective function is modified as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_w ||y - Xw||^2 + \lambda ||w||^2
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(||y - Xw||^2\)</span> is the standard least squares error, and <span class="math notranslate nohighlight">\(\lambda ||w||^2\)</span> is the penalty term that shrinks the model coefficients <span class="math notranslate nohighlight">\(w\)</span> towards zero. The <span class="math notranslate nohighlight">\(\lambda\)</span> parameter (<code class="docutils literal notranslate"><span class="pre">alpha</span></code> in <code class="docutils literal notranslate"><span class="pre">sklearn</span></code>’s <code class="docutils literal notranslate"><span class="pre">Ridge</span></code>) controls the strength of regularization: larger values reduce model complexity by forcing coefficients to be smaller, while smaller values make Ridge behave like standard linear regression. Ridge retains all features but reduces their impact, which is useful when dealing with multicollinearity, without completely eliminating any predictor.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">RidgeCV</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>  <span class="c1"># for parameter tuning</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot fitted coefficients vs regularization alpha</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>\
+         <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_subset</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span> <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">coefs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;value of alpha regularization parameter&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Ridge Regression fitted coefficients&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0f3d4e072ad4b3935cf6bcd6504405100398afe9eb21481efd1cbf41bd7d7d96.png" src="_images/0f3d4e072ad4b3935cf6bcd6504405100398afe9eb21481efd1cbf41bd7d7d96.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># RidgeCV LOOCV</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">RidgeCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="n">alphas</span><span class="p">,</span>
+                <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">,</span>
+                <span class="n">cv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># to use Leave-One-Out cross validation</span>
+                <span class="n">store_cv_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Ridge (alpha=</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">alpha_</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">Y_test</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/7a9c618fd70e96433f0e90182feb31f7fd6603bf4ad5557447697a6e7f6c8f7e.png" src="_images/7a9c618fd70e96433f0e90182feb31f7fd6603bf4ad5557447697a6e7f6c8f7e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>Ridge (alpha=1.8)</td>
+      <td>0.004305</td>
+      <td>0.009825</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="lasso-regression">
+<h3>Lasso Regression<a class="headerlink" href="#lasso-regression" title="Permalink to this heading">#</a></h3>
+<p>Lasso Regression (Least Absolute Shrinkage and Selection Operator) is a linear regression model that includes <strong>L1 regularization</strong>, which adds the sum of the absolute values of the coefficients as a penalty term to the loss function. This encourages sparsity, meaning it shrinks some coefficients to exactly zero, effectively performing feature selection. The objective function is:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_w ||y - Xw||^2_2 + \alpha ||w||_1
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span> is a hyperparameter controlling the strength of regularization: a higher <span class="math notranslate nohighlight">\(\alpha\)</span> increases shrinkage, leading to more coefficients being set to zero. Lasso regression is particularly useful when dealing with high-dimensional data where many features may be irrelevant, by reducing model complexity and improving interpretability. However, with correlated features, it tends to arbitrarily select one and ignore the others.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">LassoCV</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>  <span class="c1"># for parameter tuning</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot fitted coefficients vs regularization</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Lasso</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>\
+         <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_subset</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span><span class="o">.</span><span class="n">coef_</span>  <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">coefs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;value of alpha regularization parameter&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Lasso fitted coefficients&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/9561b66fbf210a0e1beb6e4b6abc9144c37b5374387ff42a142a94c190598c1d.png" src="_images/9561b66fbf210a0e1beb6e4b6abc9144c37b5374387ff42a142a94c190598c1d.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># LassoCV 10-Fold CV</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span><span class="n">alphas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">n_jobs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">,</span>
+                <span class="n">max_iter</span><span class="o">=</span><span class="mi">20000</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Lasso (alpha=</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">alpha_</span><span class="si">:</span><span class="s2">.3g</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">Y_test</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/0aecf4760d6fd5210cdb85f8cebf4b28e5756b0fda42e01ae59985df92f2825a.png" src="_images/0aecf4760d6fd5210cdb85f8cebf4b28e5756b0fda42e01ae59985df92f2825a.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>Lasso (alpha=0.000255)</td>
+      <td>0.006279</td>
+      <td>0.006808</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display nonzero coefs</span>
+<span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">argsort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)))[:</span><span class="n">nonzero</span><span class="p">]</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;series_id&#39;</span><span class="p">:</span> <span class="n">columns_unmap</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">argsort</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;lags&#39;</span><span class="p">:</span> <span class="n">columns_unmap</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">argsort</span><span class="p">])[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s1">&#39;desc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">columns_unmap</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">argsort</span><span class="p">])[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="s1">&#39;coef&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">[</span><span class="n">argsort</span><span class="p">]})</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;series_id&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lasso: Nonzero Coefficients&quot;</span><span class="p">)</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Lasso: Nonzero Coefficients
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lags</th>
+      <th>desc</th>
+      <th>coef</th>
+    </tr>
+    <tr>
+      <th>series_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CLAIMS</th>
+      <td>1</td>
+      <td>Initial Claims</td>
+      <td>-0.005356</td>
+    </tr>
+    <tr>
+      <th>SRVPRD</th>
+      <td>1</td>
+      <td>All Employees, Service-Providing</td>
+      <td>-0.001268</td>
+    </tr>
+    <tr>
+      <th>M2REAL</th>
+      <td>2</td>
+      <td>Real M2 Money Stock</td>
+      <td>0.000893</td>
+    </tr>
+    <tr>
+      <th>IPNMAT</th>
+      <td>3</td>
+      <td>Industrial Production: Nondurable Goods Materials</td>
+      <td>0.000751</td>
+    </tr>
+    <tr>
+      <th>USGOVT</th>
+      <td>1</td>
+      <td>All Employees, Government</td>
+      <td>-0.000716</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>M2SL</th>
+      <td>3</td>
+      <td>M2</td>
+      <td>0.000020</td>
+    </tr>
+    <tr>
+      <th>COMPAPFF</th>
+      <td>3</td>
+      <td>3-Month Commercial Paper Minus FEDFUNDS</td>
+      <td>-0.000020</td>
+    </tr>
+    <tr>
+      <th>UEMPLT5</th>
+      <td>3</td>
+      <td>Number Unemployed for Less Than 5 Weeks</td>
+      <td>0.000019</td>
+    </tr>
+    <tr>
+      <th>CUSR0000SAS</th>
+      <td>3</td>
+      <td>Consumer Price Index for All Urban Consumers: ...</td>
+      <td>0.000009</td>
+    </tr>
+    <tr>
+      <th>RPI</th>
+      <td>3</td>
+      <td>Real Personal Income</td>
+      <td>0.000002</td>
+    </tr>
+  </tbody>
+</table>
+<p>82 rows × 3 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="decision-tree">
+<h3>Decision Tree<a class="headerlink" href="#decision-tree" title="Permalink to this heading">#</a></h3>
+<p>Decision trees partition the predictor space into regions, making predictions based on mean values (for regression) or mode (for classification).</p>
+<ul class="simple">
+<li><p>A <strong>decision tree</strong> consists of a sequence of splitting rules that divide observations into different regions. These trees are typically drawn upside down, with the leaves at the bottom.</p></li>
+<li><p><strong>Terminal nodes</strong> or <strong>leaves</strong> represent the final partitions of the predictor space where observations are grouped.</p></li>
+<li><p><strong>Internal nodes</strong> are points in the tree where the predictor space is split.</p></li>
+<li><p><strong>Branches</strong> connect the nodes and represent different decision paths.</p></li>
+<li><p>A <strong>stump</strong> refers to a decision tree with only a single split (one internal node).</p></li>
+</ul>
+<p>Decision trees are constructed using <strong>recursive binary splitting</strong>, a top-down, greedy algorithm. The process begins with all observations in a single region, and at each step, the predictor space is split into two new branches based on the best possible split at that moment (without considering future steps). The best split is determined by selecting the predictor and cutpoint that minimize a chosen cost function, such as the <strong>Residual Sum of Squares (RSS)</strong> in regression. The process continues recursively until a stopping criterion is met, such as a minimum number of observations per node.</p>
+<p>Growing a tree until all leaves are pure (containing only one class) often leads to overfitting. Tree complexity is measured by the number of nodes, and controlling this complexity is crucial. If trees are allowed to grow too large, they may fit the training data well but perform poorly on unseen data. A balance must be found where accuracy on the test set is maximized before further tree growth begins to decrease performance.</p>
+<p>Overfitting can be mitigated by pruning the tree using cost complexity pruning. A fully grown tree is simplified by removing less important splits to minimize the following function:</p>
+<div class="math notranslate nohighlight">
+\[\sum_{m=1}^{|T|} \sum_{x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha |T|
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(|T|\)</span> is the number of terminal nodes, <span class="math notranslate nohighlight">\(R_m\)</span> represents a region in the predictor space, and <span class="math notranslate nohighlight">\(\hat{y}_{R_m}\)</span> is the predicted response for that region. Pruning is controlled by a tuning parameter <span class="math notranslate nohighlight">\(\alpha\)</span>, where higher values result in smaller trees that generalize better.</p>
+<p>For classification tasks, different impurity measures determine the best binary splits:</p>
+<ul class="simple">
+<li><p><strong>Classification error rate</strong>: Measures the proportion of incorrectly classified observations in a node. While intuitive, it is not sensitive enough for effective tree growth.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+\hat{\rho}_{m,c} = \frac{n_{m,c}}{n_m}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_m\)</span> is the number of observations in node <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n_{m,c}\)</span> is the number of observations in node <span class="math notranslate nohighlight">\(m\)</span> belonging to class <span class="math notranslate nohighlight">\(c\)</span>.</p>
+<ul class="simple">
+<li><p><strong>Gini index</strong>: Measures total variance across classes. A lower Gini index indicates that most observations in a node belong to a single class.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+G = \sum_{k=1}^{K} \hat{\rho}_{mk} (1 - \hat{\rho}_{mk})
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\hat{\rho}_{mk}\)</span> represents the proportion of training observations in node <span class="math notranslate nohighlight">\(m\)</span> that belong to class <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<ul class="simple">
+<li><p><strong>Entropy</strong>: Measures node impurity. Lower entropy values indicate purer nodes.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+D = -\sum_{k=1}^{K} \hat{\rho}_{mk} \log \hat{\rho}_{mk}
+\]</div>
+<p><strong>Deviance</strong> is a statistical measure used to assess model performance in classification problems. It is derived from the likelihood function and is a measure of how well the predicted probabilities match the actual class labels. It is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[
+Deviance = -2 \sum_{m=1}^{g} \sum_{c=1}^{w} n_{m,c} \ln \hat{p}_{m,c}
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(g\)</span> is the number of terminal nodes (leaf nodes) in the forest.</p></li>
+<li><p><span class="math notranslate nohighlight">\(w\)</span> is the number of classes.</p></li>
+<li><p><span class="math notranslate nohighlight">\(n_{m,c}\)</span> is the number of observations in node <span class="math notranslate nohighlight">\(m\)</span> belonging to class <span class="math notranslate nohighlight">\(c\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{p}_{m,c}\)</span> is the predicted probability of class <span class="math notranslate nohighlight">\(c\)</span> in node <span class="math notranslate nohighlight">\(m\)</span>.</p></li>
+</ul>
+<p>with the <strong>residual mean deviance</strong> given by: <span class="math notranslate nohighlight">\(\frac{\text{deviance}}{n - 1}\)</span></p>
+<p>A lower deviance indicates better model performance, meaning the predicted class probabilities align more closely with the true class labels.</p>
+<p><strong>Advantages:</strong></p>
+<ul class="simple">
+<li><p>Easy to interpret and visualize, even for non-experts.</p></li>
+<li><p>Often reflect human decision-making processes.</p></li>
+<li><p>Can handle qualitative predictors without requiring dummy variables.</p></li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul class="simple">
+<li><p>Less accurate than some other regression and classification models.</p></li>
+<li><p>Highly sensitive to small changes in data, making them non-robust.</p></li>
+<li><p>Tend to overfit categorical variables.</p></li>
+</ul>
+<p>Decision tree performance can be significantly improved using <strong>ensemble methods</strong> such as:</p>
+<ul class="simple">
+<li><p><strong>Bagging (Bootstrap Aggregating)</strong>: Reduces variance by averaging predictions from multiple decision trees trained on different bootstrap samples.</p></li>
+<li><p><strong>Random Forests</strong>: A variant of bagging that introduces additional randomness by selecting a random subset of features at each split.</p></li>
+<li><p><strong>Boosting</strong>: Sequentially builds trees where each new tree corrects the errors of the previous ones, reducing bias and improving predictive performance.</p></li>
+</ul>
+<p>By aggregating multiple decision trees, these ensemble methods enhance generalization and reduce overfitting, making decision trees more robust and effective for complex predictive modeling.</p>
+</section>
+<section id="gradient-boosting">
+<h3>Gradient boosting<a class="headerlink" href="#gradient-boosting" title="Permalink to this heading">#</a></h3>
+<p>Gradient Boosting is an ensemble learning technique that builds models sequentially, where each new model corrects the errors of the previous ones. It uses decision trees as weak learners and minimizes the loss function by optimizing the model in the direction of the gradient of the loss. Key parameters include <code class="docutils literal notranslate"><span class="pre">n_estimators</span></code> (number of trees), <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code> (step size for updates, controlling how much each tree contributes), and <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> (tree depth, preventing overfitting). Gradient Boosting can be computationally expensive and prone to overfitting if not regularized using techniques like early stopping or shrinkage (learning_rate tuning).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingRegressor</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">scale</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">scale</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># tune max_depth with 5-fold CV</span>
+<span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span> <span class="c1"># tune max_depth for best performance</span>
+    <span class="n">boosted</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">boosted</span><span class="p">,</span>
+                            <span class="n">X_train</span><span class="p">,</span>
+                            <span class="n">Y_train</span><span class="p">,</span>
+                            <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span>
+                            <span class="n">n_jobs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">,</span>
+                            <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">score</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">mse</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Mean Squared Error&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;max depth&#39;</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Gradient Boosting Regressor with </span><span class="si">{</span><span class="n">n_splits</span><span class="si">}</span><span class="s2">-fold CV&quot;</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">mse</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">mse</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">best</span><span class="p">,</span> <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">best</span><span class="p">],</span> <span class="s2">&quot;or&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;mse&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;best=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/37e169456e84a2094d7e2b7f50fb5762219eb6de9e14c75cb4aaca108825f3ed.png" src="_images/37e169456e84a2094d7e2b7f50fb5762219eb6de9e14c75cb4aaca108825f3ed.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># evaluate train and test MSE</span>
+<span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Boosting (depth=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">best</span><span class="p">,</span>
+                                  <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y_pred</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">Y_test</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/7ff1ee81e3a5dd841181134c3b88e255e354915704c738c62bda51c5359c9ca8.png" src="_images/7ff1ee81e3a5dd841181134c3b88e255e354915704c738c62bda51c5359c9ca8.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>Boosting (depth=3)</td>
+      <td>0.002704</td>
+      <td>0.007407</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>Feature importances</strong>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Show feature importance</span>
+<span class="n">top_n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Gradient Boosting: Top </span><span class="si">{</span><span class="n">top_n</span><span class="si">}</span><span class="s2"> Feature Importances&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;importance&#39;</span><span class="p">:</span> <span class="n">imp</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                           <span class="s1">&#39;series_id&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                           <span class="s1">&#39;lags&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                           <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])}</span>
+                     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="n">top_n</span><span class="p">:]))},</span>
+                    <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Gradient Boosting: Top 10 Feature Importances
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>importance</th>
+      <th>series_id</th>
+      <th>lags</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.140886</td>
+      <td>BUSLOANS</td>
+      <td>1</td>
+      <td>Commercial and Industrial Loans, All Commercia...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.136621</td>
+      <td>CLAIMS</td>
+      <td>1</td>
+      <td>Initial Claims</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.031817</td>
+      <td>UEMPLT5</td>
+      <td>3</td>
+      <td>Number Unemployed for Less Than 5 Weeks</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.030436</td>
+      <td>M2REAL</td>
+      <td>3</td>
+      <td>Real M2 Money Stock</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.029806</td>
+      <td>USGOOD</td>
+      <td>1</td>
+      <td>All Employees, Goods-Producing</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.027816</td>
+      <td>M2SL</td>
+      <td>1</td>
+      <td>M2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.022606</td>
+      <td>IPNMAT</td>
+      <td>1</td>
+      <td>Industrial Production: Nondurable Goods Materials</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.020286</td>
+      <td>DMANEMP</td>
+      <td>1</td>
+      <td>All Employees, Durable Goods</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.019784</td>
+      <td>EXCAUS</td>
+      <td>1</td>
+      <td>Canadian Dollars to U.S. Dollar Spot Exchange ...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.018134</td>
+      <td>UNRATE</td>
+      <td>1</td>
+      <td>Unemployment Rate</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="random-forest">
+<h3>Random Forest<a class="headerlink" href="#random-forest" title="Permalink to this heading">#</a></h3>
+<p><strong>Random Forest</strong> is an ensemble learning method that builds multiple decision trees and combines their predictions to improve accuracy and reduce overfitting. It operates by randomly selecting subsets of the training data and features (using bootstrap sampling and feature bagging) to create diverse trees. The final prediction is determined by majority voting (for classification) or averaging (for regression). Key parameters include <code class="docutils literal notranslate"><span class="pre">n_estimators</span></code> (number of trees), <code class="docutils literal notranslate"><span class="pre">max_depth</span></code>** (maximum depth of each tree), <code class="docutils literal notranslate"><span class="pre">max_features</span></code> (number of features considered for splitting), and <code class="docutils literal notranslate"><span class="pre">min_samples_split</span></code> (minimum samples needed to split a node). Feature importance scores can be extracted to interpret which variables influence predictions most. Random Forest handles missing data well and mitigates overfitting through averaging multiple models.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">ts_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># tune max_depth with 5-fold CV</span>
+<span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span>
+<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">,</span>
+           <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">mse</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span> <span class="c1">#tune for best performance</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
+                            <span class="n">X_train</span><span class="p">,</span>
+                            <span class="n">Y_train</span><span class="p">,</span>
+                            <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span>
+                            <span class="n">n_jobs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="n">VERBOSE</span><span class="p">,</span>
+                            <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;neg_mean_squared_error&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">score</span>
+    <span class="c1">#print(i, np.sqrt(abs(score)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">mse</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;MSE&#39;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;max depth&#39;</span><span class="p">,</span>
+         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Random Forest Regressor with </span><span class="si">{</span><span class="n">n_splits</span><span class="si">}</span><span class="s2">-fold CV&quot;</span><span class="p">)</span>
+<span class="n">best</span> <span class="o">=</span> <span class="n">mse</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">mse</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">best</span><span class="p">,</span> <span class="n">mse</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">best</span><span class="p">],</span> <span class="s2">&quot;or&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Mean Squared Error&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;best=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/a016879c4ca5f1ef8d0c11bd8ff49a0264fa6faa30fdbf3a55c5ec2ab79090df.png" src="_images/a016879c4ca5f1ef8d0c11bd8ff49a0264fa6faa30fdbf3a55c5ec2ab79090df.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;RandomForest (depth=</span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="n">best</span><span class="p">,</span>
+                              <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Y_pred</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">Y_test</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">final_models</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_date</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y_test</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span> <span class="n">Y_pred</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+          <span class="n">legend1</span><span class="o">=</span><span class="p">[</span><span class="n">target_id</span><span class="p">,</span> <span class="s1">&#39;Cumulative Test Prediction&#39;</span><span class="p">],</span>
+          <span class="n">title</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+          <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Test Period&#39;</span><span class="p">,</span>
+          <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+          <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/6130a6bf315ebd6c6aa28d9328cefe536f59a72e502d9f8666f175d88adc2d3e.png" src="_images/6130a6bf315ebd6c6aa28d9328cefe536f59a72e502d9f8666f175d88adc2d3e.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+           <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">train</span><span class="p">[</span><span class="n">name</span><span class="p">]),</span>
+           <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">test</span><span class="p">[</span><span class="n">name</span><span class="p">])},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSE&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>train</th>
+      <th>test</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>RMSE</th>
+      <td>RandomForest (depth=15)</td>
+      <td>0.00376</td>
+      <td>0.005875</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>Feature importance</strong> scores:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Feature importance</span>
+<span class="n">top_n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">imp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random Forest: Top </span><span class="si">{</span><span class="n">top_n</span><span class="si">}</span><span class="s2"> Feature Importances&quot;</span><span class="p">)</span>
+<span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;importance&#39;</span><span class="p">:</span> <span class="n">imp</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                          <span class="s1">&#39;series_id&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+                          <span class="s1">&#39;lags&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">alf</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])}</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="n">top_n</span><span class="p">:]))},</span>
+                   <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Random Forest: Top 10 Feature Importances
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>importance</th>
+      <th>series_id</th>
+      <th>lags</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>0.051226</td>
+      <td>CLAIMS</td>
+      <td>1</td>
+      <td>Initial Claims</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.046733</td>
+      <td>BUSLOANS</td>
+      <td>1</td>
+      <td>Commercial and Industrial Loans, All Commercia...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.044055</td>
+      <td>M2SL</td>
+      <td>1</td>
+      <td>M2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.015825</td>
+      <td>USGOOD</td>
+      <td>1</td>
+      <td>All Employees, Goods-Producing</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0.015268</td>
+      <td>UNRATE</td>
+      <td>1</td>
+      <td>Unemployment Rate</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0.014617</td>
+      <td>UEMPLT5</td>
+      <td>3</td>
+      <td>Number Unemployed for Less Than 5 Weeks</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0.014576</td>
+      <td>IPCONGD</td>
+      <td>1</td>
+      <td>Industrial Production: Consumer Goods</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0.014529</td>
+      <td>UEMPLT5</td>
+      <td>1</td>
+      <td>Number Unemployed for Less Than 5 Weeks</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0.014496</td>
+      <td>M1SL</td>
+      <td>1</td>
+      <td>M1</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>0.013855</td>
+      <td>DMANEMP</td>
+      <td>1</td>
+      <td>All Employees, Durable Goods</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><strong>Summary:</strong></p>
+<p>The <strong>root mean squared error (RMSE)</strong> performance of all the models, based on train and test samples, is summarized in the following chart:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">to_frame</span><span class="p">())</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="p">[</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.85</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Regression RMSE&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.35</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/638eb56ed4542b9d0a252f739e508288cd751ee6e4e95944cb8eabd402a1f877.png" src="_images/638eb56ed4542b9d0a252f739e508288cd751ee6e4e95944cb8eabd402a1f877.png" />
+</div>
+</div>
+<p><strong>References:</strong></p>
+<p>Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani. “An Introduction to Statistical Learning with Applications in R”. New York, Springer, 2013.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="6.1_classification_models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Machine Learning: Classification</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="6.3_deep_learning.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Deep Learning</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macroeconomic-forecasting">Macroeconomic forecasting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#regression-models">Regression models</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-subset-selection">Forward Subset Selection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-least-squares-regression">Partial Least Squares Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ridge-regression">Ridge Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lasso-regression">Lasso Regression</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#decision-tree">Decision Tree</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gradient-boosting">Gradient boosting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#random-forest">Random Forest</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Terence Lim
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2020-2025.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

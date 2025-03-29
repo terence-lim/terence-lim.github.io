@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>finds.unstructured.edgar &mdash; Financial Data Science  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="finds.unstructured.vocab" href="finds.unstructured.vocab.html" />
+    <link rel="prev" title="finds.unstructured.unstructured" href="finds.unstructured.unstructured.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Financial Data Science
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="finds.database.html">finds.database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.structured.html">finds.structured</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.backtesting.html">finds.backtesting</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="finds.unstructured.html">finds.unstructured</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="finds.unstructured.unstructured.html">finds.unstructured.unstructured</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">finds.unstructured.edgar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finds.unstructured.edgar.Edgar"><code class="docutils literal notranslate"><span class="pre">Edgar</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.__getitem__"><code class="docutils literal notranslate"><span class="pre">Edgar.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.close"><code class="docutils literal notranslate"><span class="pre">Edgar.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.extract_filenames"><code class="docutils literal notranslate"><span class="pre">Edgar.extract_filenames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.extract_item"><code class="docutils literal notranslate"><span class="pre">Edgar.extract_item()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.fetch_detail"><code class="docutils literal notranslate"><span class="pre">Edgar.fetch_detail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.fetch_filing"><code class="docutils literal notranslate"><span class="pre">Edgar.fetch_filing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.fetch_index"><code class="docutils literal notranslate"><span class="pre">Edgar.fetch_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.fetch_tickers"><code class="docutils literal notranslate"><span class="pre">Edgar.fetch_tickers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.get_detail_filings"><code class="docutils literal notranslate"><span class="pre">Edgar.get_detail_filings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.open"><code class="docutils literal notranslate"><span class="pre">Edgar.open()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.parse_pathname"><code class="docutils literal notranslate"><span class="pre">Edgar.parse_pathname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.save_detail"><code class="docutils literal notranslate"><span class="pre">Edgar.save_detail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.save_filing"><code class="docutils literal notranslate"><span class="pre">Edgar.save_filing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.save_item"><code class="docutils literal notranslate"><span class="pre">Edgar.save_item()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.to_localdir"><code class="docutils literal notranslate"><span class="pre">Edgar.to_localdir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.to_localname"><code class="docutils literal notranslate"><span class="pre">Edgar.to_localname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.edgar_url"><code class="docutils literal notranslate"><span class="pre">Edgar.edgar_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#finds.unstructured.edgar.Edgar.ticker_url"><code class="docutils literal notranslate"><span class="pre">Edgar.ticker_url</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="finds.unstructured.vocab.html">finds.unstructured.vocab</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="finds.readers.html">finds.readers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.recipes.html">finds.recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="finds.utils.html">finds.utils</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Financial Data Science</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="finds.unstructured.html">finds.unstructured</a></li>
+      <li class="breadcrumb-item active">finds.unstructured.edgar</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/finds.unstructured.edgar.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-finds.unstructured.edgar">
+<span id="finds-unstructured-edgar"></span><h1>finds.unstructured.edgar<a class="headerlink" href="#module-finds.unstructured.edgar" title="Permalink to this heading"></a></h1>
+<p>Class and methods to retrieve and manipulate EDGAR text data</p>
+<ul class="simple">
+<li><p>SEC Edgar: 10-K, 10-Q, 8-K</p></li>
+<li><p>MD&amp;A and Business Descriptions items</p></li>
+</ul>
+<p>Copyright 2022, Terence Lim</p>
+<p>MIT License</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">finds.unstructured.edgar.</span></span><span class="sig-name descname"><span class="pre">Edgar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">savedir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zipped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class to retrieve and pre-process Edgar website documents</p>
+<blockquote>
+<div><p>&lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<ul class="simple">
+<li><p>e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</p></li>
+</ul>
+</div></blockquote>
+<p>10-K and 10-Q zipped archive
+- 10X/YYYY,zip</p>
+<p>10-K and 10-Q local file (zip -q -r 2019.zip 2019)
+- 10X/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<p>10-K and 10-Q detail folder
+- 10X/detail/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<p>8-K local file
+- 10X/YYYY/YYYYMMDD/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<p>8-K detail folder
+- 10X/8-K/detail/YYYY/YYYYMMDD/</p>
+<p>10-K MDA local text file
+- 10X/10-K/mda10K/PERMNO/YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<p>10-K MDA zipped archive (zip -q -r mda10K.zip mda10K)
+- 10X/10-K/mda10K.zip</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieves text of document file by pathname from archive</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.close" title="Permalink to this definition"></a></dt>
+<dd><p>Close the archive</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.extract_filenames">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.extract_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.extract_filenames" title="Permalink to this definition"></a></dt>
+<dd><p>Extract ordered list of .htm and .txt filenames from filing detail</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>detail</strong> – Text of detail file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of html filenames found in the detail file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.extract_item">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.extract_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.extract_item" title="Permalink to this definition"></a></dt>
+<dd><p>Extract mda or business description item from input text</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – Full text of filing, from which to extract passage for item</p></li>
+<li><p><strong>item</strong> – Item to extract, in {‘mda10K’, ‘bus10K’, ‘mda10Q’, ‘qqr10K’}</p></li>
+</ul>
+</dd>
+</dl>
+<p>Notes:</p>
+<p><a class="reference external" href="https://www.sec.gov/fast-answers/answersreada10khtm.html">https://www.sec.gov/fast-answers/answersreada10khtm.html</a></p>
+<p>10-Q items:</p>
+<p>PART I—FINANCIAL INFORMATION
+Item 1. Financial Statements.
+Item 2. Management’s Discussion and Analysis
+Item 3. Quantitative and Qualitative Disclosures About Market Risk.
+Item 4. Controls and Procedures.</p>
+<p>PART II—OTHER INFORMATION
+Item 1. Legal Proceedings.
+Item 1A. Risk Factors.
+Item 2. Unregistered Sales of Equity Securities and Use of Proceeds.</p>
+<p>10-K items:</p>
+<p>Part 1
+Item 1 – Business
+Item 1A – Risk Factors
+Item 1B – Unresolved Staff Comments
+Item 2 – Properties
+Item 3 – Legal Proceedings
+Item 4 – Mine Safety Disclosures
+Part 2
+Item 5 – Market
+Item 6 – Consolidated Financial Data
+Item 7 – Management’s Discussion and Analysis of Financial Condition and Results of Operations
+Item 7A – Quantitative and Qualitative Disclosures about Market Risks
+Forward Looking Statements
+Item 8 – Financial Statements
+Item 9A. Controls and Procedures
+Item 9B. Other Information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.fetch_detail">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fetch_detail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.fetch_detail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.fetch_detail" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch from HTML filename, containing table of document hyperlinks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pathname</strong> – Relative pathname to fetch</p></li>
+<li><p><strong>root</strong> – Root prefix of url</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.fetch_filing">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fetch_filing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'lxml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.fetch_filing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.fetch_filing" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch and parse filing text from url pathname or local html file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pathname</strong> – Relative pathname to fetch</p></li>
+<li><p><strong>root</strong> – Root prefix of url or local directory</p></li>
+<li><p><strong>features</strong> – Parser to use e.g. lxml, lxml-xml, html.parser</p></li>
+<li><p><strong>form</strong> – Additional parsing to remove preamble for form=’8-K’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Text of body, parsed per Loughran and McDonald “Stage One”</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.fetch_index">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fetch_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.fetch_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.fetch_index" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch edgar daily index or full index, or all daily dates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – Retrieve daily index for this date (unless 0)</p></li>
+<li><p><strong>year</strong> – Retrieve full-index for this year/quarter (unless 0)</p></li>
+<li><p><strong>quarter</strong> – Retrieve full-index for this year/quarter (unless 0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict of filings meta data from daily or full index, or daily dates</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If no arguments, retrieve all dates by walking daily index tree</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.fetch_tickers">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fetch_tickers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Series</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.fetch_tickers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.fetch_tickers" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch tickers-to-cik lookup from SEC web page as a pandas Series</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.get_detail_filings">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_detail_filings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.get_detail_filings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.get_detail_filings" title="Permalink to this definition"></a></dt>
+<dd><p>Fetch detail and concatenated filings given edgar pathname</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pathname</strong> – Edgar pathname of filing</p></li>
+<li><p><strong>form</strong> – Special parsing to exclude preamble if form in ‘8-K’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of detail and concatenated filings text</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>Fetch detail text and extract filenames, with assumed primary first</p></li>
+<li><p>If first filename is htm or is form8k, then fetch all concatenate</p></li>
+<li><p>Else only read first (txt) file.</p></li>
+<li><p>If still fail then fetch from pathname</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.open"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.open" title="Permalink to this definition"></a></dt>
+<dd><p>Opens local (zipped or folder) archive and return list of documents</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – Year or daily date</p></li>
+<li><p><strong>item</strong> – Item in {‘mda10K, ‘detail’, ‘bus10K’, ‘qqr10K}</p></li>
+<li><p><strong>form</strong> – Filing type in {‘10-K’, ‘10-Q’, ‘8-K’}</p></li>
+<li><p><strong>permno</strong> – Identifier of security to retrieve</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List filenames in selected archive</p>
+</dd>
+</dl>
+<p>Notes:</p>
+<ul>
+<li><p>local file names are per Loughran-McDonald convention:</p>
+<dl class="simple">
+<dt>&lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</dt><dd><p>e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</p>
+</dd>
+</dl>
+</li>
+<li><p>filings text:</p>
+<ul class="simple">
+<li><p>10K/10Q documents are in: ~10X/YYYY/YYYYMMDD/&lt;localname&gt;</p></li>
+<li><p>8K documents are in: ~10X/8-K/YYYY/YYYYMMDD/&lt;localname&gt;</p></li>
+</ul>
+</li>
+<li><p>index details of filings:</p>
+<ul class="simple">
+<li><p>10K/10Q detail are in: ~10X/detail/YYYY/YYYYMMDD/&lt;localname&gt;</p></li>
+<li><p>8K detail are in: ~10X/8-K/detail/YYYY/YYYYMMDD/&lt;localname&gt;</p></li>
+</ul>
+</li>
+<li><p>extracted items by permno are in: ~/FORM/ITEM/PERMNO/</p>
+<ul class="simple">
+<li><p>10-K mda are in: ~10X/10-K/mda10K/PERMNO/</p></li>
+<li><p>10-K bus are in: ~10X/10-K/bus10K/PERMNO/</p></li>
+</ul>
+</li>
+<li><p>zipped archives created with: zip -q -r 2021.zip 2019</p>
+<ul class="simple">
+<li><p>2021.zip contains the year’s 10-K and 10-Q filings</p></li>
+<li><p>10-K/detail/2021.zip contains the index details of those 10-X’s.</p></li>
+<li><p>10-K/mda10K.zip contains extracted MD&amp;A sections from 10-K’s</p></li>
+<li><p>10-K/bus10K.zip contains extracted Business Description sections</p></li>
+<li><p>8-K/2021.zip contains the year’s 8-K filings</p></li>
+<li><p>8-K/detail/2021.zip contains the index details of those 8-K’s</p></li>
+</ul>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.parse_pathname">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parse_pathname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.parse_pathname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.parse_pathname" title="Permalink to this definition"></a></dt>
+<dd><p>Extract meta info and locations from edgar pathname</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pathname</strong> – Main pathname from Edgar index file</p></li>
+<li><p><strong>filename</strong> – Suffix to append to resource location and return</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Prepend resource location to filename, if desired to download;
+else dictionary of the meta and location info</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<p><a class="reference external" href="https://www.sec.gov/Archives/edgar/data/51143/0000051143-13-000007.txt">https://www.sec.gov/Archives/edgar/data/51143/0000051143-13-000007.txt</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.save_detail">
+<span class="sig-name descname"><span class="pre">save_detail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cik</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.save_detail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.save_detail" title="Permalink to this definition"></a></dt>
+<dd><p>Save text of detail file to a local filename</p>
+<p>Examples:</p>
+<p>~10X/detail/YYYY/YYYYMMDD/&lt;localname&gt;</p>
+<p>~10X/8-K/detail/YYYY/YYYYMMDD/&lt;localname&gt;</p>
+<p>&lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.save_filing">
+<span class="sig-name descname"><span class="pre">save_filing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cik</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.save_filing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.save_filing" title="Permalink to this definition"></a></dt>
+<dd><p>Save text of filing to a local filename</p>
+<p>Examples:</p>
+<p>~10X/YYYY/YYYYMMDD/&lt;localname&gt;</p>
+<p>~10X/8-K/YYYY/YYYYMMDD/&lt;localname&gt;</p>
+<p>&lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.save_item">
+<span class="sig-name descname"><span class="pre">save_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.save_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.save_item" title="Permalink to this definition"></a></dt>
+<dd><p>Save text of filing to a local filename</p>
+<p>Examples:</p>
+<p>~10X/10-K/mda10K/PERMNO/&lt;localname&gt;</p>
+<p>~10X/10-K/bus10K/PERMNO/&lt;localname&gt;</p>
+<p>&lt;localname&gt;: YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.to_localdir">
+<span class="sig-name descname"><span class="pre">to_localdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permno</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.to_localdir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.to_localdir" title="Permalink to this definition"></a></dt>
+<dd><p>Construct local dir name prefix for local archive</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> – ‘10K’ or ‘10Q’ for items; ‘’ for 10K/10Q filings</p></li>
+<li><p><strong>item</strong> – ‘detail’ or ‘mda10K’ or ‘bus10K’, or ‘qqr10K’</p></li>
+<li><p><strong>date</strong> – Year or date; 0 for mda10K/bus10K/qqr10K</p></li>
+<li><p><strong>permno</strong> – For mda10K/bus10K/qqr10K only</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Local folder name to store the filing or item</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.to_localname">
+<span class="sig-name descname"><span class="pre">to_localname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cik</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/finds/unstructured/edgar.html#Edgar.to_localname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#finds.unstructured.edgar.Edgar.to_localname" title="Permalink to this definition"></a></dt>
+<dd><p>Construct local filename from components and filing pathname</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – Filing date</p></li>
+<li><p><strong>form</strong> – Type of form</p></li>
+<li><p><strong>cik</strong> – Company identifier</p></li>
+<li><p><strong>pathname</strong> – Edgar file pathname – only need the last suffix, e.g.
+edgar/data/1000045/0000950170-22-000940.txt</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Local filename (per Loughran-McDonald) to store associated filing.</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<p>&lt;localname&gt; = YYYYMMDD_FORM__edgar_data_CIK_ADSH.txt</p>
+<ul class="simple">
+<li><p>e.g. 20211105_10-Q_edgar_data_1761312_0001558370-21-014714.txt</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.edgar_url">
+<span class="sig-name descname"><span class="pre">edgar_url</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://www.sec.gov/Archives/'</span></em><a class="headerlink" href="#finds.unstructured.edgar.Edgar.edgar_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="finds.unstructured.edgar.Edgar.ticker_url">
+<span class="sig-name descname"><span class="pre">ticker_url</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://www.sec.gov/include/ticker.txt'</span></em><a class="headerlink" href="#finds.unstructured.edgar.Edgar.ticker_url" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="finds.unstructured.unstructured.html" class="btn btn-neutral float-left" title="finds.unstructured.unstructured" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="finds.unstructured.vocab.html" class="btn btn-neutral float-right" title="finds.unstructured.vocab" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Terence Lim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
