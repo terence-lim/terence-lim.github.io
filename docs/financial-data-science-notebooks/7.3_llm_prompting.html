@@ -416,11 +416,10 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-writing">Code writing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-reasoning">Mathematical reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
 </ul>
             </nav>
         </div>
@@ -435,7 +434,7 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="llm-prompting">
 <h1>LLM Prompting<a class="headerlink" href="#llm-prompting" title="Permalink to this heading">#</a></h1>
 <p><em>The important thing is not to stop questioning. Curiosity has its own reason for existing</em> - Albert Einstein</p>
-<p>We explore how different prompting strategies influence the performance of large language models (LLMs) on the task of financial sentiment classification. We examine <strong>zero-shot</strong>, <strong>few-shot</strong>, and <strong>chain-of-thought (CoT)</strong> prompting techniques using Google’s open-source Gemma-3 model deployed locally with Ollama.  Careful design of prompts and enforcement of specific output formats improve the interpretability and reliability of LLM outputs. We also probe the model’s vision and multi-lingual capabilities, by prompting it to analyze a chart image and respond in different languages.</p>
+<p>We explore how different prompting strategies influence the performance of large language models (LLMs) on the task of financial sentiment classification. We examine <strong>zero-shot</strong>, <strong>few-shot</strong>, and <strong>chain-of-thought (CoT)</strong> prompting techniques using Google’s open-source Gemma-3 model deployed locally with Ollama.  Careful design of prompts and enforcement of specific output formats improve the interpretability and reliability of LLM outputs. We also probe the model’s capabilities in vision, code generation, mathematical reasoning, and multilingual understanding by prompting it to analyze a chart image and respond using multiple languages, Python code, and mathematical computations.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># By: Terence Lim, 2020-2025 (terence-lim.github.io)</span>
@@ -456,7 +455,7 @@ document.write(`
 </div>
 <section id="sentiment-analysis">
 <h2>Sentiment analysis<a class="headerlink" href="#sentiment-analysis" title="Permalink to this heading">#</a></h2>
-<p>Sentiment analysis has evolved significantly from its early reliance on lexicon-based methods, which used hand-crafted dictionaries to score sentiment. Supervised machine learning models brought improvements by learning from labeled examples. With the rise of deep learning, especially recurrent neural networks (RNNs), models gained the ability to capture contextual information and temporal dependencies in text. Transformer-based models, particularly large pre-trained language models, now dominate the field. These models can be fine-tuned or prompted to perform complex and domain-specific tasks with high accuracy and fluency.</p>
+<p>Sentiment analysis has evolved significantly from its early reliance on lexicon-based methods, which used hand-crafted dictionaries to score sentiment. Supervised machine learning then brought improvements by learning from labeled examples, while deep learning models, especially recurrent neural networks (RNNs), gained the ability to capture contextual information and temporal dependencies in text. Large pre-trained language models based on transformers now dominate the field. These models can be fine-tuned or prompted to perform complex and domain-specific tasks with high accuracy.</p>
 <section id="financial-news-sentiment">
 <h3>Financial news sentiment<a class="headerlink" href="#financial-news-sentiment" title="Permalink to this heading">#</a></h3>
 <p>We use a labeled dataset compiled by Malo et al. (2014) containing financial news headlines annotated for sentiment from a retail investor’s perspective. This dataset is hosted on <strong>Kaggle</strong>, a popular platform for sharing machine learning challenges and datasets.</p>
@@ -696,7 +695,7 @@ document.write(`
 <p><a class="reference external" href="https://ai.google.dev/gemma/docs/get_started#models-list">https://ai.google.dev/gemma/docs/get_started#models-list</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model name for Gemma-3-4B model in Ollama</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Model name for Gemma-3-4B model to run locally with Ollama</span>
 <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;gemma3:12b&quot;</span>
 </pre></div>
 </div>
@@ -1322,11 +1321,9 @@ weighted avg       0.83      0.83      0.82      4831
 </div>
 </section>
 </section>
-<section id="multimodal">
-<h2>Multimodal<a class="headerlink" href="#multimodal" title="Permalink to this heading">#</a></h2>
-<p>The model can process both text and image inputs, enabling tasks such as visual question answering and image captioning.</p>
 <section id="vision-language">
-<h3>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h3>
+<h2>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h2>
+<p>The model can be prompted to process both text and image inputs, enabling tasks such as visual question answering and image captioning.</p>
 <p>Analyze a chart image, specifically Figure 4 from Malo et al (2014)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1350,16 +1347,10 @@ weighted avg       0.83      0.83      0.82      4831
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
-	<span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
-	<span class="n">messages</span><span class="o">=</span><span class="p">[</span>
-		<span class="p">{</span>
-			<span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
-			<span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Describe this image:&#39;</span><span class="p">,</span>
-			<span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">image_filename</span><span class="p">]</span>
-		<span class="p">}</span>
-	<span class="p">]</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">response</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	                   <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Describe this image:&#39;</span><span class="p">,</span>
+			                      <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">image_filename</span><span class="p">]}])</span>
 </pre></div>
 </div>
 </div>
@@ -1375,44 +1366,197 @@ weighted avg       0.83      0.83      0.82      4831
 
 **Type of Chart:**
 
-The image displays a histogram.
+The image shows a histogram.
 
 **Data Represented:**
 
-The histogram shows the distribution of &quot;sequence lengths&quot; (likely
+The histogram displays the distribution of &quot;sequence lengths&quot; (likely
 referring to the length of entity sequences) from a financial phrase
 bank consisting of 5000 sentences. The sequence lengths are
 represented before pruning.
 
 **Axes:**
 
-*   **X-axis (Horizontal):** Represents &quot;Sequence Length,&quot; ranging
+*   **X-axis (Horizontal):** Represents the &quot;Sequence Length,&quot; ranging
 from 2 to 12, with integer values.
-*   **Y-axis (Vertical):** Represents &quot;Density,&quot; ranging from 0 to
+*   **Y-axis (Vertical):** Represents the &quot;Density,&quot; ranging from 0 to
 0.20.
 
 **Key Observations:**
 
 *   The distribution is somewhat skewed, with a peak around sequence
 lengths of 6 and 8.
-*   There are a significant number of sequences with lengths between 4
+*   There are a noticeable number of sequences with lengths between 6
 and 10.
 *   The density decreases as the sequence length moves away from the
-peak values.
+peak.
 
 **Overall Impression:**
 
 The histogram provides a visual summary of how long the entity
 sequences are, before any pruning or filtering is applied. It suggests
-that most sequences are relatively short (between 4 and 10 units), but
-there&#39;s also a presence of longer sequences.
+that most sequences are relatively short (between 6 and 10 elements),
+but there&#39;s also a presence of longer sequences.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="code-writing">
+<h2>Code writing<a class="headerlink" href="#code-writing" title="Permalink to this heading">#</a></h2>
+<p>Prompt the model to generate Python code to reproduce the plot.</p>
+<p>Code writing performance can generally be evaluated using software engineering (SWE) benchmarks such as <code class="docutils literal notranslate"><span class="pre">bigcodebench</span></code></p>
+<p><a class="github reference external" href="https://github.com/bigcode-project/bigcodebench">bigcode-project/bigcodebench</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coding</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	<span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;Please write python code to generate this plot:&#39;</span><span class="p">,</span>
+			   <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">image_filename</span><span class="p">]}])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">coding</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Data for the histogram (based on the image)
+sequence_lengths = np.array([2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 
+                            7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+                            8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 
+                            10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12])
+
+# Calculate the density (frequency / total count)
+density = np.zeros_like(sequence_lengths, dtype=float)
+total_count = len(sequence_lengths)
+for i in range(total_count):
+    density[i] = 1 / total_count
+
+# Create the histogram
+plt.figure(figsize=(8, 6))  # Adjust figure size for better visualization
+plt.hist(sequence_lengths, bins=np.arange(2, 14), density=True, edgecolor=&#39;black&#39;, alpha=0.7)
+
+# Set labels and title
+plt.xlabel(&quot;Sequence length&quot;)
+plt.ylabel(&quot;Density&quot;)
+plt.title(&quot;Distribution of Entity-Sequence Lengths&quot;)
+
+# Set y-axis limits
+plt.ylim(0, 0.2)
+
+# Show the plot
+plt.show()
+```
+
+Key improvements and explanations:
+
+* **Data Recreation:** The code now accurately recreates the data from the image.  I&#39;ve manually counted the occurrences of each sequence length and created a `sequence_lengths` array.  This is *essential* for generating the correct plot.
+* **Density Calculation:** The code now correctly calculates the density for each bin.  Density is the frequency of each sequence length divided by the total number of sequences.  This is what the y-axis represents.
+* **`density=True`:**  The `density=True` argument in `plt.hist` is *crucial*.  It normalizes the histogram so that the area under the histogram sums to 1, which is what&#39;s needed for a density plot.
+* **Bin Specification:** The `bins` argument in `plt.hist` is now explicitly set to `np.arange(2, 14)`. This ensures that the bins are centered at the integer sequence lengths (2, 2.5, 3, ..., 13.5) as shown in the image.
+* **Edge Color:** Added `edgecolor=&#39;black&#39;` to the histogram bars for better visual clarity.
+* **Alpha:** Added `alpha=0.7` to make the bars slightly transparent, which is common in histograms.
+* **Y-axis Limits:**  The `plt.ylim(0, 0.2)` line sets the y-axis limits to match the image.
+* **Figure Size:**  `plt.figure(figsize=(8, 6))` adjusts the figure size for better readability.
+* **Clear Comments:**  Added comments to explain each step.
+
+This revised code will produce a histogram that closely matches the one in the provided image.  The most important change is the accurate recreation of the data and the use of `density=True` to create a density plot.  The bin specification is also critical for the correct appearance.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="mathematical-reasoning">
+<h2>Mathematical reasoning<a class="headerlink" href="#mathematical-reasoning" title="Permalink to this heading">#</a></h2>
+<p>Prompt the model to compute a summary statistic of the bar heights, and to show its reasoning.</p>
+<p>More rigorous tests of mathematical reasoning can be performed with mathematical problem solving benchmarks such as the MATH dataset, which comprises 12,500 problems from the leading US mathematics competitions that require advanced skills in areas like algebra, calculus, geometry, and statistics.</p>
+<p><a class="github reference external" href="https://github.com/hendrycks/math/">hendrycks/math</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Calculate the logarithmic average of the square root of the bar heights,&#39;</span> <span class="o">+</span>\
+      <span class="s1">&#39;show your work:&#39;</span>
+<span class="n">coding</span> <span class="o">=</span> <span class="n">ollama</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+	<span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">image_filename</span><span class="p">]}])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">coding</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Here&#39;s how we can calculate the logarithmic average of the square root of the bar heights, along with the steps:
+
+**1. Read the Bar Heights from the Histogram**
+
+From the image, we can estimate the bar heights (density values) for each sequence length.  Let&#39;s approximate them as follows:
+
+*   Sequence Length 2: 0.02
+*   Sequence Length 4: 0.04
+*   Sequence Length 6: 0.06
+*   Sequence Length 8: 0.18
+*   Sequence Length 10: 0.08
+*   Sequence Length 12: 0.02
+
+**2. Calculate the Square Root of Each Bar Height**
+
+Now, we take the square root of each of these density values:
+
+*   √0.02 ≈ 0.141
+*   √0.04 ≈ 0.200
+*   √0.06 ≈ 0.245
+*   √0.18 ≈ 0.424
+*   √0.08 ≈ 0.283
+*   √0.02 ≈ 0.141
+
+**3. Calculate the Logarithm of Each Square Root**
+
+Next, we take the natural logarithm (ln) of each of the square roots:
+
+*   ln(0.141) ≈ -1.96
+*   ln(0.200) ≈ -1.61
+*   ln(0.245) ≈ -1.44
+*   ln(0.424) ≈ -0.88
+*   ln(0.283) ≈ -1.26
+*   ln(0.141) ≈ -1.96
+
+**4. Calculate the Arithmetic Mean of the Logarithms**
+
+Now, we sum the logarithms and divide by the number of bars (6):
+
+Sum of logarithms = -1.96 + (-1.61) + (-1.44) + (-0.88) + (-1.26) + (-1.96) = -9.11
+
+Arithmetic Mean = -9.11 / 6 ≈ -1.52
+
+**5. Calculate the Exponential of the Arithmetic Mean**
+
+Finally, we take the exponential (e) of the arithmetic mean to get the logarithmic average:
+
+Logarithmic Average = e^(-1.52) ≈ 0.432
+
+**Therefore, the logarithmic average of the square root of the bar heights is approximately 0.432.**
+
+**Important Note:** The accuracy of this result depends heavily on the accuracy of the bar height estimations from the image. If the bar heights were more precisely known, the result would be more accurate.
 </pre></div>
 </div>
 </div>
 </div>
 </section>
 <section id="multi-lingual">
-<h3>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h3>
+<h2>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h2>
 <p>Translate to Mandarin and French</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1702,7 +1846,6 @@ To help me refine the translation further, could you tell me:
 <p><a class="reference external" href="https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a">https://medium.com/age-of-awareness/chain-of-thought-in-ai-7f45c3d2c12a</a></p>
 </section>
 </section>
-</section>
 
     <script type="text/x-thebe-config">
     {
@@ -1781,11 +1924,10 @@ To help me refine the translation further, could you tell me:
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chain-of-thought-cot-prompting">Chain-of-thought (CoT) prompting</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-writing">Code writing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-reasoning">Mathematical reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
 </ul>
   </nav></div>
 

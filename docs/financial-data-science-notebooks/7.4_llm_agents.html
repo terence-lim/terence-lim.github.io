@@ -407,7 +407,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory">Memory</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval-augmented-generation-rag">Retrieval-augmented generation (RAG)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval-augmented-generation">Retrieval-augmented generation</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chromadb-vector-database">ChromaDB vector database</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval">Retrieval</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation">Generation</a></li>
@@ -418,11 +418,12 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#role-playing">Role playing</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-writing">Code writing</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-reasoning">Mathematical reasoning</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#audio">Audio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#audio">Audio</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -913,8 +914,8 @@ positive change.
 </div>
 </section>
 </section>
-<section id="retrieval-augmented-generation-rag">
-<h2>Retrieval-augmented generation (RAG)<a class="headerlink" href="#retrieval-augmented-generation-rag" title="Permalink to this heading">#</a></h2>
+<section id="retrieval-augmented-generation">
+<h2>Retrieval-augmented generation<a class="headerlink" href="#retrieval-augmented-generation" title="Permalink to this heading">#</a></h2>
 <p>One major challenge in standard LLMs is <strong>hallucination</strong>, where the model produces text that sounds believable but is actually false or unsupported by facts. Because LLMs are trained to model word sequences rather than factual accuracy, they can sometimes generate convincing yet misleading statements—especially when no clear answer exists in their training data. For example, Hicks et al. (2024) argue that LLMs are “bullshit machines” that prioritize fluent language over truth. Similarly, Mahowald et al. (2023) caution against assuming that skill with language equates to actual reasoning or understanding.</p>
 <p>RAG addresses this issue by anchoring the model’s responses in retrieved documents, making the output more factually reliable. In a common implementation known as prompt-based in-context retrieval, the LLM is prompted with the relevant document and instructed to answer solely based on that information, similar to reading a reference article before answering a question.</p>
 <p>RAG enhances LLM performance by dynamically retrieving and integrating external knowledge, allowing for better factual accuracy and handling of long-context tasks. It is increasingly used in several practical domains:</p>
@@ -1923,8 +1924,10 @@ approaches.
 </div>
 </section>
 </section>
+<section id="multimodal">
+<h2>Multimodal<a class="headerlink" href="#multimodal" title="Permalink to this heading">#</a></h2>
 <section id="multi-lingual">
-<h2>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h2>
+<h3>Multi-lingual<a class="headerlink" href="#multi-lingual" title="Permalink to this heading">#</a></h3>
 <p>LLM agents built on the Phi-4-multimodal model can take advantage of its multilingual capabilities, supporting over 20 languages including English, French, German, Hindi, Italian, Portuguese, Spanish, and Thai. To evaluate language-specific performance, benchmarks and leaderboards based on MMLU and other open datasets are available. For example:</p>
 <p><a class="reference external" href="https://huggingface.co/spaces/uonlp/open_multilingual_llm_leaderboard">https://huggingface.co/spaces/uonlp/open_multilingual_llm_leaderboard</a></p>
 <div class="cell docutils container">
@@ -2008,86 +2011,10 @@ performance of the company.
 </div>
 </div>
 </section>
-<section id="code-writing">
-<h2>Code writing<a class="headerlink" href="#code-writing" title="Permalink to this heading">#</a></h2>
-<p>LLM code writing agents can also be evaluated using software engineering (SWE) benchmarks such as <code class="docutils literal notranslate"><span class="pre">bigcodebench</span></code>.</p>
-<p><a class="github reference external" href="https://github.com/bigcode-project/bigcodebench">bigcode-project/bigcodebench</a></p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">Write python code to compute the square root of 17 raised to the power of 3.</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">)))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Certainly! To compute the square root of 17 raised to the power of 3, you can
-use the `math` module in Python, which provides a function for computing the
-square root (`sqrt`) and a function for exponentiation (`pow`). Here&#39;s how you
-can do it:
-
-```python
-import math
-
-# Compute the square root of 17 raised to the power of 3
-result = math.sqrt(pow(17, 3))
-
-print(result)
-```
-
-This code first calculates 17 raised to the power of 3 using `pow(17, 3)`, then
-computes the square root of the result using `
-</pre></div>
-</div>
-</div>
-</div>
-</section>
-<section id="mathematical-reasoning">
-<h2>Mathematical reasoning<a class="headerlink" href="#mathematical-reasoning" title="Permalink to this heading">#</a></h2>
-<p>More rigorous tests of LLM mathematical reasoning agents can be performed with mathematical problem solving benchmarks such as the MATH dataset, which comprises 12,500 problems from the leading US mathematics competitions that require advanced skills in areas like algebra, calculus, geometry, and statistics.</p>
-<p><a class="github reference external" href="https://github.com/hendrycks/math/">hendrycks/math</a></p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">Calculate \sqrt{17^</span><span class="si">{3}</span><span class="s2">}</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">)))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>To calculate \(\sqrt{17^3}\), we can follow these steps:
-
-1. First, calculate \(17^3\):
-   \[
-   17^3 = 17 \times 17 \times 17
-   \]
-   \[
-   17 \times 17 = 289
-   \]
-   \[
-   289 \times 17 = 4913
-   \]
-   So, \(17^3 = 4913\).
-
-2. Next, find the square root of 4913:
-   \[
-   \sqrt{4913}
-   \]
-
-The square root of 4913 is approximately 70.07 (rounded to two decimal places).
-
-Therefore, \(\sqrt{17^3} \approx 70.07\).
-</pre></div>
-</div>
-</div>
-</div>
-</section>
 <section id="vision-language">
-<h2>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h2>
-<p>Optical character recognition (OCR) and chart and table interpretation of figure 6 from the MVCP document.</p>
-<p>More comprehensive benchmarks and datasets for multimodal evaluation of image and video analysis are available, e.g.</p>
+<h3>Vision language<a class="headerlink" href="#vision-language" title="Permalink to this heading">#</a></h3>
+<p>Perform optical character recognition (OCR) and chart and table interpretation of figure 6 from the MVCP document.</p>
+<p>Multimodal evaluation of agents for image and video analysis can be performed with more comprehensive benchmarks and datasets, such as:</p>
 <p><a class="github reference external" href="https://github.com/bradyfu/awesome-multimodal-large-language-models">bradyfu/awesome-multimodal-large-language-models</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2229,15 +2156,17 @@ society.
 </div>
 </section>
 <section id="audio">
-<h2>Audio<a class="headerlink" href="#audio" title="Permalink to this heading">#</a></h2>
-<p>Finally, we examine automatic speech recognition (ASR) and speech translation capabilities. Rigorous open benchmark datasets are also available, e.g.</p>
+<h3>Audio<a class="headerlink" href="#audio" title="Permalink to this heading">#</a></h3>
+<p>Finally, perform automatic speech recognition (ASR) and speech translation on an audio input.</p>
+<p>Rigorous open benchmark datasets for evaluation are also available, e.g.</p>
 <p><a class="github reference external" href="https://github.com/huggingface/open_asr_leaderboard">huggingface/open_asr_leaderboard</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Perform speech-to-text on an audio file</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;assets/pork-bellies!.mp3&quot;</span>
 <span class="n">audio</span><span class="p">,</span> <span class="n">samplerate</span> <span class="o">=</span> <span class="n">soundfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-<span class="n">response</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">(</span><span class="s2">&quot;Transcribe the audio to text&quot;</span><span class="p">,</span> <span class="n">audio</span><span class="o">=</span><span class="p">[(</span><span class="n">audio</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">)],</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">(</span><span class="s2">&quot;Transcribe the audio to text&quot;</span><span class="p">,</span> 
+                <span class="n">audio</span><span class="o">=</span><span class="p">[(</span><span class="n">audio</span><span class="p">,</span> <span class="n">samplerate</span><span class="p">)],</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -2256,11 +2185,6 @@ pork belly market this morning.
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>playsound is relying on another python subprocess. Please use `pip install pygobject` if you want playsound to run more efficiently.
-</pre></div>
-</div>
-</div>
 </div>
 <p><strong>References:</strong></p>
 <ul class="simple">
@@ -2272,6 +2196,7 @@ pork belly market this morning.
 Volume 26, Issue 2, <a class="reference external" href="https://doi.org/10.1007/s10676-024-09775-5">https://doi.org/10.1007/s10676-024-09775-5</a></p></li>
 <li><p>Lim, Terence, 2010, Measuring the value of corporate philanthropy: Social impact, business benefits, and investor returns. published by CECP.</p></li>
 </ul>
+</section>
 </section>
 </section>
 
@@ -2335,7 +2260,7 @@ Volume 26, Issue 2, <a class="reference external" href="https://doi.org/10.1007/
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory">Memory</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval-augmented-generation-rag">Retrieval-augmented generation (RAG)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval-augmented-generation">Retrieval-augmented generation</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chromadb-vector-database">ChromaDB vector database</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#retrieval">Retrieval</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation">Generation</a></li>
@@ -2346,11 +2271,12 @@ Volume 26, Issue 2, <a class="reference external" href="https://doi.org/10.1007/
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#role-playing">Role playing</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-writing">Code writing</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-reasoning">Mathematical reasoning</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#audio">Audio</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multimodal">Multimodal</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multi-lingual">Multi-lingual</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vision-language">Vision language</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#audio">Audio</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
