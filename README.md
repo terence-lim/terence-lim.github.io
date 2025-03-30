@@ -81,7 +81,7 @@ __Resources__
 
 # 3. OCaml LLVM
 
-- MINIMAT Matrix Language: <https://github.com/terence-lim/minimat>
+MINIMAT Matrix Language: <https://github.com/terence-lim/minimat>
 
 
 
