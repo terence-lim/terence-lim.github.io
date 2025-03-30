@@ -407,8 +407,8 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-modeling">Sequence modeling</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recurrent-units">Recurrent units</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#long-short-term-memory-lstm-networks">Long Short-Term Memory (LSTM) networks</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gated-recurrent-unit-gru-networks">Gated Recurrent Unit (GRU) networks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lstm-networks">LSTM networks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gru-networks">GRU networks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elman-network">Elman network</a><ul class="nav section-nav flex-column">
@@ -495,9 +495,9 @@ h_t = f_h(x_t, h_{t-1}, \theta_h)
 <p>RNNs are unfolded through time, applying the same parameters (shared weights) at each step, and trained using standard backpropogation, known as <strong>Backpropagation Through Time (BPTT)</strong> when applied over multiple time steps.
 This makes training computationally expensive, and prone to <strong>vanishing gradients</strong> (gradients shrink) and <strong>exploding gradients</strong> (gradients blow up), which respectively limit the model’s ability to learn long-range dependencies and cause unstable updates.</p>
 </section>
-<section id="long-short-term-memory-lstm-networks">
-<h3>Long Short-Term Memory (LSTM) networks<a class="headerlink" href="#long-short-term-memory-lstm-networks" title="Permalink to this heading">#</a></h3>
-<p><strong>LSTMs</strong> mitigate the vanishing gradient problem by introducing a <strong>cell state</strong> and multiple <strong>gating mechanisms</strong> that regulate information flow. Key components include:</p>
+<section id="lstm-networks">
+<h3>LSTM networks<a class="headerlink" href="#lstm-networks" title="Permalink to this heading">#</a></h3>
+<p><strong>Long Short-Term Memory (LSTM)</strong> networks mitigate the vanishing gradient problem by introducing a <strong>cell state</strong> and multiple <strong>gating mechanisms</strong> that regulate information flow. Key components include:</p>
 <ul class="simple">
 <li><p>Cell state <span class="math notranslate nohighlight">\(c_t\)</span>: A “memory” that runs through the network, modified by gates.</p></li>
 <li><p>Hidden state <span class="math notranslate nohighlight">\(h_t\)</span>: Output of the LSTM at each time step.</p></li>
@@ -513,9 +513,9 @@ This makes training computationally expensive, and prone to <strong>vanishing gr
 </ul>
 <p>A cell update combines the past cell state and new input to update <span class="math notranslate nohighlight">\(c_t\)</span>. The <span class="math notranslate nohighlight">\(h_t\)</span> output is updated from <span class="math notranslate nohighlight">\(c_t\)</span> and previous its previous state <span class="math notranslate nohighlight">\(h_{t-1}\)</span>.</p>
 </section>
-<section id="gated-recurrent-unit-gru-networks">
-<h3>Gated Recurrent Unit (GRU) networks<a class="headerlink" href="#gated-recurrent-unit-gru-networks" title="Permalink to this heading">#</a></h3>
-<p><strong>GRUs</strong> are a simplified version of LSTMs that combine cell state and hidden state into a single vector, using fewer gates:</p>
+<section id="gru-networks">
+<h3>GRU networks<a class="headerlink" href="#gru-networks" title="Permalink to this heading">#</a></h3>
+<p><strong>Gated Recurrent Unit (GRU)</strong> networks are a simplified version of LSTMs that combine cell state and hidden state into a single vector, using fewer gates:</p>
 <ul class="simple">
 <li><p>Update gate (similar to combined forget/input gate): Controls what part of the past state to keep.</p></li>
 <li><p>Reset gate: Controls how to combine new input with the previous memory.</p></li>
@@ -1420,8 +1420,8 @@ Number of parameters: 31
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sequence-modeling">Sequence modeling</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recurrent-units">Recurrent units</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#long-short-term-memory-lstm-networks">Long Short-Term Memory (LSTM) networks</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gated-recurrent-unit-gru-networks">Gated Recurrent Unit (GRU) networks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lstm-networks">LSTM networks</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gru-networks">GRU networks</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#elman-network">Elman network</a><ul class="nav section-nav flex-column">

@@ -409,6 +409,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-of-speech">Part-of-speech</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#named-entity-recognition">Named entity recognition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-parsing">Dependency parsing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#semantic-similarity">Semantic similarity</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-vectors">Word vectors</a></li>
 </ul>
 </li>
@@ -2015,13 +2018,14 @@ document.write(`
 </svg></span></div></div>
 </div>
 </section>
+</section>
+<section id="semantic-similarity">
+<h2>Semantic similarity<a class="headerlink" href="#semantic-similarity" title="Permalink to this heading">#</a></h2>
 <section id="word-vectors">
 <h3>Word vectors<a class="headerlink" href="#word-vectors" title="Permalink to this heading">#</a></h3>
-<p><em>Word embeddings</em>* are numerical representations of words in a multidimensional space, capturing syntactic and semantic relationships based on co-occurrence in large text corpora.</p>
+<p>Word vectors are numerical representations of words in a multidimensional space, learned from their co-occurrence patterns in large text corpora. Words with similar syntactic and semantic meanings tend to have vector representations that are close together in this space.</p>
 <p>For example, spaCy’s <code class="docutils literal notranslate"><span class="pre">en_core_web_lg</span></code> model represents over 500,000 words using 300-dimensional vectors.</p>
-<ul class="simple">
-<li><p>Extract lemmatized noun forms from business descriptions using spaCy’s POS tagger.</p></li>
-</ul>
+<p>Extract lemmatized noun forms from business descriptions using spaCy’s POS tagger:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract nouns</span>
@@ -2051,9 +2055,7 @@ document.write(`
 </div>
 </div>
 </div>
-<ul class="simple">
-<li><p>Compute the average word vector for NVIDIA’s business description text.</p></li>
-</ul>
+<p>Compute the average word vector for NVIDIA’s business description text:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># example of word vector</span>
@@ -2128,9 +2130,7 @@ document.write(`
 </div>
 </div>
 </div>
-<ul class="simple">
-<li><p>Compute the average word vector for all companies’ business descriptions.</p></li>
-</ul>
+<p>Compute the average word vector for all companies’ business descriptions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute sentence vectors</span>
@@ -2160,9 +2160,7 @@ document.write(`
 </div>
 </div>
 </div>
-<ul class="simple">
-<li><p>Identify companies with the most similar business descriptions.</p></li>
-</ul>
+<p>Identify companies with the most similar business descriptions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">most_similar</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
@@ -2192,9 +2190,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 <section id="t-sne-visualization">
 <h3>t-SNE visualization<a class="headerlink" href="#t-sne-visualization" title="Permalink to this heading">#</a></h3>
 <p><strong>T-distributed Stochastic Neighbor Embedding (t-SNE)</strong> visualizes high-dimensional data by converting similarities between points into joint probabilities and minimizing the Kullback-Leibler divergence between the high-dimensional and lower-dimensional representations. t-SNE preserves local structures, making it effective for clustering and uncovering hidden patterns in business descriptions.</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">t-SNE in scikit-learn</a></p></li>
-</ul>
+<p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html">t-SNE in scikit-learn</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
@@ -2204,9 +2200,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 </div>
 </div>
 </div>
-<ul class="simple">
-<li><p>Reduce business description vectors to 2D using t-SNE and label points with ticker symbols.</p></li>
-</ul>
+<p>Reduce business description vectors to 2D using t-SNE and label points with ticker symbols:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
@@ -2274,9 +2268,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 </table>
 </div></div></div>
 </div>
-<ul class="simple">
-<li><p>Visualize DBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes.</p></li>
-</ul>
+<p>Visualize DBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">ColorMap</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">)</span>
@@ -2313,9 +2305,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 <img alt="_images/99f222fa309a3872e859f931fa6613710756b4291d75256d7dec66b336034b9c.png" src="_images/99f222fa309a3872e859f931fa6613710756b4291d75256d7dec66b336034b9c.png" />
 </div>
 </div>
-<ul class="simple">
-<li><p>List companies tagged as noisy samples</p></li>
-</ul>
+<p>List companies tagged as noisy samples:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Samples tagged as noise:&quot;</span><span class="p">)</span>
@@ -2605,9 +2595,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 <section id="umap-vizualization">
 <h3>UMAP vizualization<a class="headerlink" href="#umap-vizualization" title="Permalink to this heading">#</a></h3>
 <p><strong>UMAP (Uniform Manifold Approximation and Projection)</strong> is a dimensionality reduction technique that constructs a high-dimensional graph of data points and optimizes a lower-dimensional representation while preserving essential relationships. Compared to t-SNE, UMAP is faster, scales better for large datasets, and retains more global structure.</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/index.html">UMAP Documentation</a></p></li>
-</ul>
+<p><a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/index.html">UMAP Documentation</a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">umap</span>
@@ -2680,9 +2668,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 </table>
 </div></div></div>
 </div>
-<ul class="simple">
-<li><p>Visualize HDBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes.</p></li>
-</ul>
+<p>Visualize HDBSCAN clusters in 2D space. Display outlier ticker symbols with larger font sizes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">ColorMap</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">)</span>
@@ -2711,9 +2697,7 @@ U S BANCORP DEL&#39; is most similar to &#39;AMERICAN EXPRESS&#39;
 <img alt="_images/c3409ab909fb6cff3eda058c5aec5c28b5837e8ca53ddbbb557265ca3f2445a7.png" src="_images/c3409ab909fb6cff3eda058c5aec5c28b5837e8ca53ddbbb557265ca3f2445a7.png" />
 </div>
 </div>
-<ul class="simple">
-<li><p>List companies tagged as noisy samples</p></li>
-</ul>
+<p>List companies tagged as noisy samples</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Samples tagged as noise:&quot;</span><span class="p">)</span>
@@ -3235,6 +3219,9 @@ Gerard Hoberg and Gordon Phillips, 2010, Review of Financial Studies 23 (10), 37
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-of-speech">Part-of-speech</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#named-entity-recognition">Named entity recognition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependency-parsing">Dependency parsing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#semantic-similarity">Semantic similarity</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#word-vectors">Word vectors</a></li>
 </ul>
 </li>
