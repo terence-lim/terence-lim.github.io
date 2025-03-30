@@ -1,7 +1,0 @@
-finds.utils.show
-================
-
-.. automodule:: finds.utils.show
-   :members:
-   :undoc-members:
-   :show-inheritance:

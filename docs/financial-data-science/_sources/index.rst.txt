@@ -19,7 +19,6 @@ such as SQL, Redis, and MongoDB to manage and access large datasets, including:
 
 Its companion `Financial Data Science Python Notebooks <https://terence-lim.github.io/docs/financial-data-science-notebooks/>`_
 provides practical examples and templates for applying:
-In addition to data access, it provides practical examples and templates for applying:
 
 - Financial econometrics and time series modeling
 
