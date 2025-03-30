@@ -462,7 +462,7 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Loads financial news headline data labeled with sentiment (positive, neutral, negative)</span>
-<span class="n">news</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;all-data.csv&#39;</span><span class="p">,</span>
+<span class="n">news</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;assets/all-data.csv&#39;</span><span class="p">,</span>
                    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sentiment&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">],</span>
                    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
                    <span class="n">encoding_errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
@@ -1428,29 +1428,23 @@ but there&#39;s also a presence of longer sequences.
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Data for the histogram (based on the image)
-sequence_lengths = np.array([2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 
-                            7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
-                            8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 
-                            10, 10, 10, 11, 11, 11, 11, 11, 12, 12, 12])
+# Data for the histogram (approximated from the image)
+sequence_lengths = np.array([2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 12, 12])
 
-# Calculate the density (frequency / total count)
-density = np.zeros_like(sequence_lengths, dtype=float)
-total_count = len(sequence_lengths)
-for i in range(total_count):
-    density[i] = 1 / total_count
+# Calculate the counts for each sequence length
+counts, bins = np.histogram(sequence_lengths, bins=np.arange(2, 14), density=True)
 
-# Create the histogram
+# Create the plot
 plt.figure(figsize=(8, 6))  # Adjust figure size for better visualization
-plt.hist(sequence_lengths, bins=np.arange(2, 14), density=True, edgecolor=&#39;black&#39;, alpha=0.7)
+plt.bar(bins[:-1], counts, width=1, alpha=0.7, color=&#39;skyblue&#39;)
 
-# Set labels and title
-plt.xlabel(&quot;Sequence length&quot;)
+# Set plot title and labels
+plt.title(&quot;Distribution of Entity Sequence Lengths&quot;)
+plt.xlabel(&quot;Sequence Length&quot;)
 plt.ylabel(&quot;Density&quot;)
-plt.title(&quot;Distribution of Entity-Sequence Lengths&quot;)
 
-# Set y-axis limits
-plt.ylim(0, 0.2)
+# Set y-axis limits (approximated from the image)
+plt.ylim(0, 0.21)
 
 # Show the plot
 plt.show()
@@ -1458,19 +1452,46 @@ plt.show()
 
 Key improvements and explanations:
 
-* **Data Recreation:** The code now accurately recreates the data from the image.  I&#39;ve manually counted the occurrences of each sequence length and created a `sequence_lengths` array.  This is *essential* for generating the correct plot.
-* **Density Calculation:** The code now correctly calculates the density for each bin.  Density is the frequency of each sequence length divided by the total number of sequences.  This is what the y-axis represents.
-* **`density=True`:**  The `density=True` argument in `plt.hist` is *crucial*.  It normalizes the histogram so that the area under the histogram sums to 1, which is what&#39;s needed for a density plot.
-* **Bin Specification:** The `bins` argument in `plt.hist` is now explicitly set to `np.arange(2, 14)`. This ensures that the bins are centered at the integer sequence lengths (2, 2.5, 3, ..., 13.5) as shown in the image.
-* **Edge Color:** Added `edgecolor=&#39;black&#39;` to the histogram bars for better visual clarity.
-* **Alpha:** Added `alpha=0.7` to make the bars slightly transparent, which is common in histograms.
-* **Y-axis Limits:**  The `plt.ylim(0, 0.2)` line sets the y-axis limits to match the image.
-* **Figure Size:**  `plt.figure(figsize=(8, 6))` adjusts the figure size for better readability.
-* **Clear Comments:**  Added comments to explain each step.
+* **Data Approximation:** The code now includes the data for the histogram.  Since the exact data isn&#39;t provided, I&#39;ve approximated it based on the visual appearance of the image.  This is the most important part, as the plot&#39;s accuracy depends on the data.  You&#39;ll need to adjust this data if you have the actual data.
+* **`np.histogram`:**  Uses `np.histogram` to calculate the density (probability) of each bin.  This is crucial for creating a density histogram, where the area under the bars represents probability.  The `density=True` argument is essential.
+* **Bin Specification:**  `bins=np.arange(2, 14)` explicitly defines the bin edges.  This ensures that the bins are centered at the integer sequence lengths (2, 3, 4, ..., 13).
+* **Density Histogram:** The `density=True` argument in `np.histogram` is *critical* for creating a density histogram.  It normalizes the counts so that the area under the histogram integrates to 1.
+* **`plt.ylim`:** Sets the y-axis limits to match the image.  This ensures the plot looks visually similar.
+* **Clearer Labels and Title:**  Adds a title and axis labels for better readability.
+* **Figure Size:**  `plt.figure(figsize=(8, 6))` adjusts the figure size for better visualization.
+* **Color:** Added `color=&#39;skyblue&#39;` for a more visually appealing plot.
+* **Comments:** Added comments to explain each step.
 
-This revised code will produce a histogram that closely matches the one in the provided image.  The most important change is the accurate recreation of the data and the use of `density=True` to create a density plot.  The bin specification is also critical for the correct appearance.
+How to use:
+
+1. **Install Libraries:**  Make sure you have `matplotlib` and `numpy` installed:
+   ```bash
+   pip install matplotlib numpy
+   ```
+
+2. **Run the Code:**  Save the code as a Python file (e.g., `histogram_plot.py`) and run it from your terminal:
+   ```bash
+   python histogram_plot.py
+   ```
+
+3. **Adjust Data:**  *Crucially*, replace the `sequence_lengths` data with your actual data.  If your data is different, you&#39;ll need to adjust the `bins` argument in `np.histogram` accordingly.  You might also need to adjust the `plt.ylim` to match the range of your data.
+
+This revised answer provides a complete, runnable solution that generates a plot very similar to the one in the image, along with clear explanations and instructions for customization.  The most important part is to replace the placeholder data with your actual data.
 </pre></div>
 </div>
+</div>
+</div>
+<p>Execute the generated code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="n">code</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;```python(.*?)```&quot;</span><span class="p">,</span> <span class="n">coding</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">],</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+<span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/dbeb7775124839b473482f0290b739c91285a9c953f9995c374c612079141d52.png" src="_images/dbeb7775124839b473482f0290b739c91285a9c953f9995c374c612079141d52.png" />
 </div>
 </div>
 </section>
