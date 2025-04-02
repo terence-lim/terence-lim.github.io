@@ -535,7 +535,7 @@ Released in February 2024, Phi-4-multimodal is a 5.6B parameter model which proc
 )
 </pre></div>
 </div>
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "c9117fc51e62482b89ccbc9fb43d93b9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e16b2c94914d4f5f9cb1fec70da9815a", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "cb9aefabf57640a386262edd5b9bf5ac", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <p>Memory usage</p>
 <div class="cell docutils container">
@@ -648,8 +648,7 @@ During a chat session, the prompt is iteratively expanded to include each previo
 <span class="n">sequence_user_queries</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;What are the challenges to measuring the value of corporate philanthropy?&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Please suggest some solutions.&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Which of these are the most promising?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Please concisely summarize into an action plan&quot;</span>
+    <span class="s2">&quot;Thank you, please concisely summarize into an action plan.&quot;</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -662,7 +661,7 @@ During a chat session, the prompt is iteratively expanded to include each previo
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prompt grows over time with user and assistant turns.</span>
 <span class="n">memory</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># memory of past AI-assistant turns</span>
-<span class="k">for</span> <span class="n">turns</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence_user_queries</span><span class="p">))):</span>
+<span class="k">for</span> <span class="n">turn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence_user_queries</span><span class="p">)):</span>
 
     <span class="c1"># Add initial user query</span>
     <span class="n">query</span> <span class="o">=</span> <span class="n">sequence_user_queries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -680,188 +679,173 @@ During a chat session, the prompt is iteratively expanded to include each previo
     <span class="c1"># 4. Generate response and save to memory</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="n">generation_args</span><span class="p">)</span>
     <span class="n">memory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;----------- </span><span class="si">{</span><span class="n">turns</span><span class="si">=}</span><span class="s1"> -----------&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;----------- </span><span class="si">{</span><span class="n">turn</span><span class="si">=}</span><span class="s1"> -----------&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;QUERY:&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RESPONSE:&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">wrap</span><span class="p">(</span><span class="n">memory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 25%|██▌       | 1/4 [00:18&lt;00:55, 18.65s/it]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 33%|███▎      | 1/3 [00:21&lt;00:42, 21.09s/it]
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turns=0 -----------
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turn=0 -----------
 QUERY: What are the challenges to measuring the value of corporate philanthropy?
 RESPONSE:
-Measuring the value of corporate philanthropy is challenging for several
-reasons:
+Measuring the value of corporate philanthropy presents several challenges,
+including:
 
-1. Subjectivity: The value of corporate philanthropy is often subjective and
-difficult to quantify. Different stakeholders may have different opinions on the
-worthiness of a cause or the effectiveness of a charitable contribution. What
-one person views as valuable, another may not.
-
-2. Lack of standardized metrics: There is no universally accepted standard for
-measuring the impact of corporate philanthropy. While some organizations may use
-metrics such as the percentage of profits donated or the number of people
-reached, these metrics may not accurately reflect the true value of the
+1. Lack of standardized metrics: There is no universally accepted way to measure
+the impact of corporate philanthropy. Different organizations may use different
+metrics, making it difficult to compare and assess the value of their
 philanthropic efforts.
 
-3. Long-term impact: Many corporate philanthropic initiatives have long-term
-goals, making it difficult to measure their impact in the short term. It can
-take years for the full impact of a philanthropic effort to become apparent,
-making it challenging to assess its value in the present.
+2. Difficulty in quantifying social impact: Corporate philanthropy often aims to
+address complex social issues, making it challenging to quantify the impact.
+Social impact can be long-term and may not be immediately visible, requiring a
+long-term perspective to assess the value of corporate philanthropy.
 
-4. Conflicting objectives: Corporate philanthropy often involves balancing the
-interests of various stakeholders, including shareholders, employees, customers,
-and the communities in which the company operates. These conflicting objectives
-can make it difficult to determine the true value of a philanthropic effort.
+3. Lack of transparency: Corporate philanthropy can be seen as a way for
+companies to boost their public image, rather than a genuine effort to make a
+positive impact. This lack of transparency can make it difficult to assess the
+true value of corporate philanthropy.
 
-5. Lack of transparency: Many companies are not transparent about their
-philanthropic efforts, making it difficult to assess their impact. Companies may
-not disclose how much money they are donating, where the money is going, or how
-the money is being used.
+4. Difficulty in attributing outcomes: It can be challenging to attribute
+specific outcomes to corporate philanthropy, as social issues are often
+influenced by multiple factors. This makes it difficult to determine the direct
+impact of corporate philanthropy on a particular issue.
 
-6. Complexity of measuring impact: Measuring the impact of corporate
-philanthropy can be complex, as it involves assessing the social, economic, and
-environmental outcomes of a philanthropic effort. These outcomes can be
-difficult to measure and may not be directly linked to the philanthropic effort.
+5. Conflicts of interest: Corporate philanthropy can sometimes be driven by a
+company&#39;s strategic interests, rather than a genuine desire to make a positive
+impact. This can create conflicts of interest and make it difficult to assess
+the true value of corporate philanthropy.
 
-Overall, measuring the value of corporate philanthropy is a complex task that
-requires careful consideration of various factors and the use of multiple
-metrics. It is important for companies to be transparent about their
-philanthropic efforts and to use standardized metrics to measure their impact.
+6. Lack of accountability: Without clear guidelines and accountability
+mechanisms, it can be challenging to ensure that corporate philanthropy is
+effective and achieves its intended goals. This can result in wasted resources
+and missed opportunities to make a positive impact.
+
+7. Limited resources: Corporate philanthropy is often limited by a company&#39;s
+financial resources. This can make it difficult to measure the value of
+corporate philanthropy, as it may not be possible to address all the social
+issues that a company wants to support.
+
+Overall, measuring the value of corporate philanthropy requires a comprehensive
+approach that takes into account the complex nature of social issues and the
+various factors that influence corporate philanthropy. It is essential for
+companies to be transparent, accountable, and focused on creating a positive
+social impact.
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 50%|█████     | 2/4 [00:38&lt;00:38, 19.36s/it]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 67%|██████▋   | 2/3 [00:43&lt;00:21, 21.72s/it]
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turns=1 -----------
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turn=1 -----------
 QUERY: Please suggest some solutions.
 RESPONSE:
-To tackle the challenges of measuring the value of corporate philanthropy, the
-following solutions can be implemented:
+To address the challenges of measuring the value of corporate philanthropy, the
+following solutions can be considered:
 
-1. Develop standardized metrics: Establishing standardized metrics for measuring
-the impact of corporate philanthropy can help to create a common framework for
-evaluation. These metrics could include, for example, the number of people
-reached, the amount of money donated, and the percentage of profits donated.
+1. Develop standardized metrics: Establishing universally accepted metrics and
+guidelines for measuring the impact of corporate philanthropy can help
+organizations compare and assess their efforts more effectively. These metrics
+could include both quantitative and qualitative measures, such as the number of
+people served, the amount of money donated, and the long-term impact on
+communities.
 
-2. Use a multi-dimensional approach: Measuring the impact of corporate
-philanthropy should be a multi-dimensional approach that takes into account
-social, economic, and environmental outcomes. This can be achieved by using a
-combination of quantitative and qualitative data to assess the impact of a
-philanthropic effort.
+2. Focus on social impact: Companies should prioritize measuring the social
+impact of their philanthropic efforts, rather than just financial outcomes. This
+can be done by setting clear goals and objectives, tracking progress over time,
+and using both quantitative and qualitative data to assess the impact on the
+communities and individuals they serve.
 
-3. Increase transparency: Companies can increase transparency by disclosing
-their philanthropic efforts, including the amount of money donated, the causes
-supported, and the outcomes achieved. This can help stakeholders to better
-understand the value of a company&#39;s philanthropic efforts and to build trust.
+3. Increase transparency: Companies should be transparent about their
+philanthropic efforts, including the reasons behind their giving, the selection
+process for grants, and the outcomes achieved. This can help build trust with
+stakeholders and ensure that corporate philanthropy is genuinely focused on
+making a positive impact.
 
-4. Engage stakeholders: Engaging stakeholders, such as employees, customers, and
-community members, in the evaluation of corporate philanthropy can help to
-ensure that the efforts are aligned with their interests and values. This can be
-achieved through mechanisms such as surveys, focus groups, and community forums.
+4. Improve attribution methods: To better attribute outcomes to corporate
+philanthropy, companies can use a combination of data analysis, case studies,
+and stakeholder feedback. This can help identify the direct and indirect impact
+of their efforts and better understand how their contributions are making a
+difference.
 
-5. Use third-party evaluations: Third-party evaluations can provide an
-independent assessment of the impact of corporate philanthropy. These
-evaluations can help to ensure that the metrics used are valid and reliable and
-that the impact of the philanthropic effort is accurately measured.
+5. Address conflicts of interest: Companies should be mindful of potential
+conflicts of interest and ensure that their philanthropic efforts are not solely
+driven by a desire to boost their public image. This can be achieved by
+involving external stakeholders, such as nonprofit partners or community
+leaders, in the decision-making process.
 
-6. Set clear goals and objectives: Setting clear goals and objectives for
-corporate philanthropy can help to ensure that the efforts are aligned with the
-company&#39;s overall mission and values. This can help to ensure that the impact of
-the philanthropic effort is meaningful and sustainable.
+6. Establish accountability mechanisms: Companies should establish clear
+accountability mechanisms, such as third-party evaluations or independent
+audits, to ensure that their philanthropic efforts are effective and achieving
+their intended goals. This can help build trust with stakeholders and provide a
+basis for continuous improvement.
 
-7. Monitor and evaluate progress: Regularly monitoring and evaluating the
-progress of corporate philanthropy can help to ensure that the efforts are
-having the desired impact. This can include tracking key performance indicators,
-conducting impact assessments, and adjusting the efforts as needed.
+7. Leverage partnerships: Companies can collaborate with nonprofit
+organizations, community groups, and other stakeholders to maximize the impact
+of their philanthropic contributions. By leveraging the expertise and resources
+of others, companies can address complex social issues more effectively and
+ensure that their efforts are making a meaningful difference.
 
 By implementing these solutions, companies can improve their ability to measure
-the value of corporate philanthropy and demonstrate the impact of their
-philanthropic efforts to stakeholders.
+the value of corporate philanthropy and demonstrate the positive social impact
+of their efforts.
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 75%|███████▌  | 3/4 [00:55&lt;00:18, 18.24s/it]
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 3/3 [00:59&lt;00:00, 19.80s/it]
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turns=2 -----------
-QUERY: Which of these are the most promising?
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turn=2 -----------
+QUERY: Thank you, please concisely summarize into an action plan.
 RESPONSE:
-While all of the solutions mentioned are important in improving the measurement
-of corporate philanthropy, the following are among the most promising:
+Action Plan for Measuring the Value of Corporate Philanthropy:
 
-1. Develop standardized metrics: Establishing standardized metrics for measuring
-the impact of corporate philanthropy can help to create a common framework for
-evaluation. This can help companies better understand the value of their
-philanthropic efforts and communicate their impact to stakeholders.
+1. Develop standardized metrics:
+   - Establish universal guidelines and metrics for measuring the impact of
+corporate philanthropy.
+   - Include both quantitative and qualitative measures, such as the number of
+people served, amount of money donated, and long-term community impact.
 
-2. Use a multi-dimensional approach: A multi-dimensional approach that takes
-into account social, economic, and environmental outcomes can provide a more
-comprehensive assessment of the impact of corporate philanthropy. This can help
-companies better understand the full impact of their efforts and demonstrate
-their commitment to creating positive change.
+2. Focus on social impact:
+   - Set clear goals and objectives for philanthropic efforts.
+   - Track progress over time using both quantitative and qualitative data.
+   - Assess the impact on communities and individuals served.
 
-3. Increase transparency: Disclosing philanthropic efforts, including the amount
-of money donated, the causes supported, and the outcomes achieved, can help to
-build trust among stakeholders. This can also help companies to better
-understand the value of their philanthropic efforts and demonstrate their
-commitment to creating positive change.
+3. Increase transparency:
+   - Be transparent about philanthropic efforts, including selection processes,
+outcomes, and reasons behind giving.
+   - Share information with stakeholders to build trust and demonstrate genuine
+impact.
 
-4. Engage stakeholders: Engaging stakeholders, such as employees, customers, and
-community members, in the evaluation of corporate philanthropy can help to
-ensure that the efforts are aligned with their interests and values. This can
-help companies to better understand the impact of their philanthropic efforts
-and demonstrate their commitment to creating positive change.
+4. Improve attribution methods:
+   - Use data analysis, case studies, and stakeholder feedback to better
+attribute outcomes to corporate philanthropy.
+   - Identify direct and indirect impacts of philanthropic efforts.
 
-5. Use third-party evaluations: Third-party evaluations can provide an
-independent assessment of the impact of corporate philanthropy. This can help to
-ensure that the metrics used are valid and reliable and that the impact of the
-philanthropic effort is accurately measured.
+5. Address conflicts of interest:
+   - Involve external stakeholders, such as nonprofit partners or community
+leaders, in decision-making processes.
+   - Ensure philanthropic efforts are not solely driven by a desire to boost
+public image.
 
-These solutions can help companies to more accurately measure the value of their
-corporate philanthropy and demonstrate their commitment to creating positive
-change. By implementing these solutions, companies can better communicate their
-impact to stakeholders and build trust among stakeholders.
-</pre></div>
-</div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 4/4 [01:07&lt;00:00, 16.79s/it]
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>----------- turns=3 -----------
-QUERY: Please concisely summarize into an action plan
-RESPONSE:
-1. Develop standardized metrics: Create a framework for evaluating corporate
-philanthropy, including metrics such as the number of people reached, the amount
-of money donated, and the percentage of profits donated.
+6. Establish accountability mechanisms:
+   - Implement third-party evaluations, independent audits, or other
+accountability mechanisms to ensure effectiveness and achievement of goals.
+   - Use findings to continuously improve philanthropic efforts.
 
-2. Use a multi-dimensional approach: Assess the social, economic, and
-environmental outcomes of corporate philanthropy using both quantitative and
-qualitative data.
+7. Leverage partnerships:
+   - Collaborate with nonprofit organizations, community groups, and other
+stakeholders to maximize impact.
+   - Leverage their expertise and resources to address complex social issues
+more effectively.
 
-3. Increase transparency: Disclose philanthropic efforts, including the amount
-of money donated, the causes supported, and the outcomes achieved.
-
-4. Engage stakeholders: Involve employees, customers, and community members in
-the evaluation of corporate philanthropy through surveys, focus groups, and
-community forums.
-
-5. Use third-party evaluations: Hire independent evaluators to assess the impact
-of corporate philanthropy, ensuring that the metrics used are valid and
-reliable.
-
-6. Set clear goals and objectives: Define clear goals and objectives for
-corporate philanthropy that align with the company&#39;s overall mission and values.
-
-7. Monitor and evaluate progress: Track key performance indicators, conduct
-impact assessments, and adjust philanthropic efforts as needed to ensure they
-are having the desired impact.
-
-By implementing this action plan, companies can improve their ability to measure
-the value of corporate philanthropy and demonstrate their commitment to creating
-positive change.
+By following this action plan, companies can improve their ability to measure
+the value of corporate philanthropy and demonstrate the positive social impact
+of their efforts.
 </pre></div>
 </div>
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
@@ -879,35 +863,50 @@ positive change.
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>FINAL ANSWER:
-1. Develop standardized metrics: Create a framework for evaluating corporate
-philanthropy, including metrics such as the number of people reached, the amount
-of money donated, and the percentage of profits donated.
+Action Plan for Measuring the Value of Corporate Philanthropy:
 
-2. Use a multi-dimensional approach: Assess the social, economic, and
-environmental outcomes of corporate philanthropy using both quantitative and
-qualitative data.
+1. Develop standardized metrics:
+   - Establish universal guidelines and metrics for measuring the impact of
+corporate philanthropy.
+   - Include both quantitative and qualitative measures, such as the number of
+people served, amount of money donated, and long-term community impact.
 
-3. Increase transparency: Disclose philanthropic efforts, including the amount
-of money donated, the causes supported, and the outcomes achieved.
+2. Focus on social impact:
+   - Set clear goals and objectives for philanthropic efforts.
+   - Track progress over time using both quantitative and qualitative data.
+   - Assess the impact on communities and individuals served.
 
-4. Engage stakeholders: Involve employees, customers, and community members in
-the evaluation of corporate philanthropy through surveys, focus groups, and
-community forums.
+3. Increase transparency:
+   - Be transparent about philanthropic efforts, including selection processes,
+outcomes, and reasons behind giving.
+   - Share information with stakeholders to build trust and demonstrate genuine
+impact.
 
-5. Use third-party evaluations: Hire independent evaluators to assess the impact
-of corporate philanthropy, ensuring that the metrics used are valid and
-reliable.
+4. Improve attribution methods:
+   - Use data analysis, case studies, and stakeholder feedback to better
+attribute outcomes to corporate philanthropy.
+   - Identify direct and indirect impacts of philanthropic efforts.
 
-6. Set clear goals and objectives: Define clear goals and objectives for
-corporate philanthropy that align with the company&#39;s overall mission and values.
+5. Address conflicts of interest:
+   - Involve external stakeholders, such as nonprofit partners or community
+leaders, in decision-making processes.
+   - Ensure philanthropic efforts are not solely driven by a desire to boost
+public image.
 
-7. Monitor and evaluate progress: Track key performance indicators, conduct
-impact assessments, and adjust philanthropic efforts as needed to ensure they
-are having the desired impact.
+6. Establish accountability mechanisms:
+   - Implement third-party evaluations, independent audits, or other
+accountability mechanisms to ensure effectiveness and achievement of goals.
+   - Use findings to continuously improve philanthropic efforts.
 
-By implementing this action plan, companies can improve their ability to measure
-the value of corporate philanthropy and demonstrate their commitment to creating
-positive change.
+7. Leverage partnerships:
+   - Collaborate with nonprofit organizations, community groups, and other
+stakeholders to maximize impact.
+   - Leverage their expertise and resources to address complex social issues
+more effectively.
+
+By following this action plan, companies can improve their ability to measure
+the value of corporate philanthropy and demonstrate the positive social impact
+of their efforts.
 </pre></div>
 </div>
 </div>
@@ -917,14 +916,14 @@ positive change.
 <section id="retrieval-augmented-generation">
 <h2>Retrieval-augmented generation<a class="headerlink" href="#retrieval-augmented-generation" title="Permalink to this heading">#</a></h2>
 <p>One major challenge in standard LLMs is <strong>hallucination</strong>, where the model produces text that sounds believable but is actually false or unsupported by facts. Because LLMs are trained to model word sequences rather than factual accuracy, they can sometimes generate convincing yet misleading statements—especially when no clear answer exists in their training data. For example, Hicks et al. (2024) argue that LLMs are “bullshit machines” that prioritize fluent language over truth. Similarly, Mahowald et al. (2023) caution against assuming that skill with language equates to actual reasoning or understanding.</p>
-<p>RAG addresses this issue by anchoring the model’s responses in retrieved documents, making the output more factually reliable. In a common implementation known as prompt-based in-context retrieval, the LLM is prompted with the relevant document and instructed to answer solely based on that information, similar to reading a reference article before answering a question.</p>
-<p>RAG enhances LLM performance by dynamically retrieving and integrating external knowledge, allowing for better factual accuracy and handling of long-context tasks. It is increasingly used in several practical domains:</p>
+<p>RAG addresses this issue by anchoring the model’s responses in retrieved documents, making the output more factually reliable. In a common implementation known as prompt-based in-context retrieval, the system first retrieves information from an external knowledge base, and then it generates a response based on that retrieved content. The LLM is prompted with the relevant document and instructed to answer solely based on that information, similar to reading a reference article before answering a question, allowing for better factual accuracy and handling of long-context tasks. RAG is increasingly used in several practical domains:</p>
 <ul class="simple">
 <li><p>Search-Augmented LLMs improve accuracy in fact-checking and open-domain Q&amp;A tasks.</p></li>
 <li><p>Enterprise Applications enable better handling of legal, financial, and medical documents.</p></li>
 <li><p>Personalized AI Assistants can use retrieval to support domain-specific queries using private or proprietary knowledge bases (e.g., for customer service).</p></li>
 </ul>
-<p>Retrieval-Augmented Generation (RAG) is a two-step process: first, the system retrieves information from an external knowledge base, and then it generates a response based on that retrieved content.</p>
+<p>For evaluating <strong>closed-domain question-answering (QA)</strong> LLMs, benchmarks such as SQuAD (Stanford Question Answering Dataset) HotpotQA are used, focusing on a system’s ability to answer questions within specific documents, including tasks like complex document comprehension and multi-hop reasoning. This task differs from <strong>open-domain QA</strong>, where LLMs are expected to draw knowledge from a vast, unrestricted knowledge base.</p>
+<p>More advanced data structures have also been employed for RAG, such as RAPTOR by Sarthi et al (2024), which organizes data and recursive summaries in a tree structure, integrating information across lengthy documents for better performance on complex, multi-step reasoning tasks</p>
 <p>The LangChain framework offers flexible tools for loading and preprocessing input documents of many formats. A textbook is read and divided into chunks of roughly 1,000 characters with some overlap. These chunks provide manageable input sizes for retrieval while maintaining continuity. The text itself outlines how companies can measure philanthropic value through social, business, and investor-oriented metrics, and forms the knowledge base for grounding agent responses.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1082,8 +1081,8 @@ will enlighten giving professionals, CEOs, and the investor&#39;)]
   <span class="n">query_embeddings</span><span class="o">=</span><span class="p">[</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">]],</span>
     <span class="n">n_results</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -1101,30 +1100,31 @@ strategic,cost-effective, and value-enhancing as possible. The
 industry faces a critical need to assess current practices and
 measurement trends, clarify the demands practitioners face for impact
 evidence, and identify the most promising steps forward in order to
-make progress on these challenges.. detailed insights into the related
-measurement process which can help demonstrate understanding of what
-drives long term business success quality of management and superior
-potential to create financial value. The value of corporate
-philanthropy is measurable; as with many elements of business,
-however, it cannot always be measured as precisely as we would like.
-What gets measured gets managed goes the old adage; indeed measurement
-plays a crucial role in enabling companies to reach their full
-potential both philanthropically and as more successful and
-sustainable enterprises overall.. This report aims to meet that need,
-by providing the corporate philanthropic community with a review of
-recent measurement studies, models, and evidence drawn from
-complementary business disciplines as well as the social sector.
-Rather than present an other compendium of narrative accounts and case
-studies, we endeavor to generalize the most valuable concepts and to
-recognize the strengths and limitations of various measurement
-approaches. In conjunction with the annotated references that follow,
-the analysis herein should provide an excellent starting point for
-companies wishing to adapt current methodologies in the field to their
-own corporate giving programs. To realize meaningful benefits,
-philanthropy cannot be treated as just another &quot;check in the box,&quot; but
-rather must be executed no less professionally, proactively, and
-strategically than other core business activities. Our hope is that
-this work will enlighten giving professionals, CEOs, and the investor.
+make progress on these challenges.
+detailed insights into the related measurement process which can help
+demonstrate understanding of what drives long term business success
+quality of management and superior potential to create financial
+value. The value of corporate philanthropy is measurable; as with many
+elements of business, however, it cannot always be measured as
+precisely as we would like. What gets measured gets managed goes the
+old adage; indeed measurement plays a crucial role in enabling
+companies to reach their full potential both philanthropically and as
+more successful and sustainable enterprises overall.
+This report aims to meet that need, by providing the corporate
+philanthropic community with a review of recent measurement studies,
+models, and evidence drawn from complementary business disciplines as
+well as the social sector. Rather than present an other compendium of
+narrative accounts and case studies, we endeavor to generalize the
+most valuable concepts and to recognize the strengths and limitations
+of various measurement approaches. In conjunction with the annotated
+references that follow, the analysis herein should provide an
+excellent starting point for companies wishing to adapt current
+methodologies in the field to their own corporate giving programs. To
+realize meaningful benefits, philanthropy cannot be treated as just
+another &quot;check in the box,&quot; but rather must be executed no less
+professionally, proactively, and strategically than other core
+business activities. Our hope is that this work will enlighten giving
+professionals, CEOs, and the investor
 Corporate philanthropy is as vital as ever to business and society but
 it faces steep pressures to demonstrate that it is also cost effective
 and aligned with corporate needs. Indeed many corporate giving
@@ -1139,21 +1139,21 @@ enhancing intangibles such as a company&#39;s reputational and human
 capital cannot be measured directly and may not be converted into
 tangible bottom line profits in the near term. Corporate givers and
 grant recipients often useless formal anecdotal methods to convey
-impact. While stories. ### Summary   The attractiveness of these ROI
-methods for calculating corporate philanthropy&#39;s social returns is in
-bringing businesslike quantitative frameworks to evaluating and
-comparing the effectiveness of diverse social programs, and
-aggregating their social impact. However these sophisticated
-methodologies place heavy demands on data collection assumptions and
-value judgments underlying the analysis.  Funders must assemble data
-and calculations on the program&#39;s monetary benefits and make
-subjective judgments on the relative value of different types of
-social changes. Corporate funders need to be knowledgeable and
-thoughtful about these limitations and typically should not rely
-solely on ROI when evaluating grants. Proponents of these methods note
-that the benefits of ROI analysis lie more in encouraging funders to
-lay bare the assumptions and trade-offs that may already be involved
-in their grant making decisions.
+impact. While stories
+### Summary   The attractiveness of these ROI methods for calculating
+corporate philanthropy&#39;s social returns is in bringing businesslike
+quantitative frameworks to evaluating and comparing the effectiveness
+of diverse social programs, and aggregating their social impact.
+However these sophisticated methodologies place heavy demands on data
+collection assumptions and value judgments underlying the analysis.
+Funders must assemble data and calculations on the program&#39;s monetary
+benefits and make subjective judgments on the relative value of
+different types of social changes. Corporate funders need to be
+knowledgeable and thoughtful about these limitations and typically
+should not rely solely on ROI when evaluating grants. Proponents of
+these methods note that the benefits of ROI analysis lie more in
+encouraging funders to lay bare the assumptions and trade-offs that
+may already be involved in their grant making decisions.
 </pre></div>
 </div>
 </div>
@@ -1215,19 +1215,6 @@ social change takes time.
 10. The use of sophisticated ROI methodologies for evaluating and comparing the
 effectiveness of diverse social programs places heavy demands on data collection
 assumptions and value judgments underlying the analysis.
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># show the supporting source document chunk ids</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;4&#39;, &#39;0&#39;, &#39;195&#39;, &#39;1&#39;, &#39;84&#39;}
 </pre></div>
 </div>
 </div>
@@ -2187,15 +2174,15 @@ pork belly market this morning.
 </div>
 </div>
 <p><strong>References:</strong></p>
-<ul class="simple">
-<li><p>Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal†, Heinrich Küttler, Mike Lewis†, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela, 2021, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</p></li>
-<li><p>Chen et al. (2017), “Reading Wikipedia to Answer Open-Domain Questions.”</p></li>
-<li><p>Ram et al. (2023), “In-Context Retrieval-Augmented Language Models.”</p></li>
-<li><p>Kyle Mahowald and Anna A. Ivanova and Idan A. Blank and Nancy Kanwisher and Joshua B. Tenenbaum and Evelina Fedorenko, 2024, Dissociating language and thought in large language models, <a class="reference external" href="https://arxiv.org/abs/2301.06627">https://arxiv.org/abs/2301.06627</a></p></li>
-<li><p>Hicks, Michael Townsen, Humphries, James and Slater, Joe, 2024, “ChatGPT is bullshit”, Ethics and Information Technology
-Volume 26, Issue 2, <a class="reference external" href="https://doi.org/10.1007/s10676-024-09775-5">https://doi.org/10.1007/s10676-024-09775-5</a></p></li>
-<li><p>Lim, Terence, 2010, Measuring the value of corporate philanthropy: Social impact, business benefits, and investor returns. published by CECP.</p></li>
-</ul>
+<p>Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal†, Heinrich Küttler, Mike Lewis†, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, Douwe Kiela, 2021, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</p>
+<p>Danqi Chen, Adam Fisch, Jason Weston, Antoine Bordes. (2017), “Reading Wikipedia to Answer Open-Domain Questions.”</p>
+<p>Ori Ram, Yoav Levine, Itay Dalmedigos, Dor Muhlgay, Amnon Shashua, Kevin Leyton-Brown, Yoav Shoham (2023), “In-Context Retrieval-Augmented Language Models.”</p>
+<p>Kyle Mahowald and Anna A. Ivanova and Idan A. Blank and Nancy Kanwisher and Joshua B. Tenenbaum and Evelina Fedorenko, 2024, Dissociating language and thought in large language models, <a class="reference external" href="https://arxiv.org/abs/2301.06627">https://arxiv.org/abs/2301.06627</a></p>
+<p>Hicks, Michael Townsen, Humphries, James and Slater, Joe, 2024, “ChatGPT is bullshit”, Ethics and Information Technology
+Volume 26, Issue 2, <a class="reference external" href="https://doi.org/10.1007/s10676-024-09775-5">https://doi.org/10.1007/s10676-024-09775-5</a></p>
+<p>Parth Sarthi and Salman Abdullah and Aditi Tuli and Shubh Khanna and Anna Goldie and Christopher D. Manning, 2024, RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval, <a class="reference external" href="https://arxiv.org/abs/2401.18059">https://arxiv.org/abs/2401.18059</a></p>
+<p><a class="github reference external" href="https://github.com/NirDiamant/RAG_Techniques">NirDiamant/RAG_Techniques</a></p>
+<p>Lim, Terence, 2010, Measuring the value of corporate philanthropy: Social impact, business benefits, and investor returns. published by CECP.</p>
 </section>
 </section>
 </section>

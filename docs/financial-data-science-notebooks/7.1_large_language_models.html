@@ -405,7 +405,7 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openai-gpt-models">OpenAI GPT models</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-framework">LangChain framework</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-source-models">Open-source models</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-and-closed-models">Open and closed models</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deepseek-r1-model">DeepSeek-R1 model</a><ul class="nav section-nav flex-column">
@@ -479,7 +479,38 @@ document.write(`
 <li><p><strong>Instruction tuning</strong> guides the model to follow specific types of tasks or instructions.</p></li>
 <li><p><strong>RLHF</strong> improves output quality by training the model to reflect human preferences.</p></li>
 </ul>
-<p>OpenAI’s GPT series, from GPT-2 to GPT-o3, has demonstrated increasingly powerful capabilities due to the scale of their parameters and training data, containing millions or billions, and now trillions of adjustable weights in their deep neural networks. GPT-3 represented a fundamental shift in AI, demonstrating how scaling models alone could achieve generalization. It also introduced <em>In-Context Learning</em>, allowing models to learn from examples in the prompt without fine-tuning. GPT-4 expanded the context length to 128K <strong>tokens</strong> (which are how LLMs represent the fundamental units of text, which can be as small as single characters or as large as whole words), significantly improving its ability to understand and summarize long documents. These models, however, are only available through proprietary APIs.</p>
+<p>BERT (Bidirectional Encoder Representations from Transformers), released by Google in October 2018 not long after the seminal “Attention is All You Need” paper, pioneered transformers-based models for NLP tasks.</p>
+<p>OpenAI’s GPT series, from GPT-2 to GPT-o3, demonstrated increasingly powerful capabilities due to the scale of their parameters and training data, containing billions and now trillions of adjustable weights in their deep neural networks. GPT-3 represented a fundamental shift in AI, demonstrating how scaling models alone could achieve generalization. It also introduced <em>In-Context Learning</em>, allowing models to learn from examples in the prompt without fine-tuning. GPT-4 expanded the context length to 128K <strong>tokens</strong> (which are how LLMs represent the fundamental units of text, which can be as small as single characters or as large as whole words), significantly improving its ability to understand and summarize long documents. These models, however, are only available through proprietary APIs.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>LLM</p></th>
+<th class="head"><p>Number of Parameters</p></th>
+<th class="head"><p>Context Length</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BERT-Base</p></td>
+<td><p>110 million</p></td>
+<td><p>512</p></td>
+</tr>
+<tr class="row-odd"><td><p>BERT-Large</p></td>
+<td><p>340 million</p></td>
+<td><p>512</p></td>
+</tr>
+<tr class="row-even"><td><p>GPT-2</p></td>
+<td><p>1.5 billion</p></td>
+<td><p>1K</p></td>
+</tr>
+<tr class="row-odd"><td><p>GPT-3.5</p></td>
+<td><p>175 billion</p></td>
+<td><p>4K</p></td>
+</tr>
+<tr class="row-even"><td><p>GPT-4</p></td>
+<td><p>~1 trillion</p></td>
+<td><p>128K</p></td>
+</tr>
+</tbody>
+</table>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gpt_name</span> <span class="o">=</span> <span class="s2">&quot;gpt-4o-mini&quot;</span>
@@ -515,8 +546,8 @@ document.write(`
 </div>
 <p><strong>Temperature</strong> controls randomness in generation: lower values yield more deterministic responses, while higher values lead to more creative or diverse outputs.</p>
 </section>
-<section id="open-source-models">
-<h3>Open-source models<a class="headerlink" href="#open-source-models" title="Permalink to this heading">#</a></h3>
+<section id="open-and-closed-models">
+<h3>Open and closed models<a class="headerlink" href="#open-and-closed-models" title="Permalink to this heading">#</a></h3>
 <p>A large language model consists of three key components:</p>
 <ul class="simple">
 <li><p>Architecture: The structure of the model (e.g., Transformer-based).</p></li>
@@ -529,53 +560,6 @@ document.write(`
 <li><p><strong>Open models</strong>: Model weights are available, but full training details are not (e.g., LLaMA, Qwen).</p></li>
 <li><p><strong>Open-source models</strong>: Full transparency including architecture, code, data, and weights (e.g., DeepSeek-R1).</p></li>
 </ul>
-<p>BERT (Bidirectional Encoder Representations from Transformers), released by Google in October 2018 not long after the seminal “Attention is All You Need” paper, pioneered transformers-based models for NLP tasks. Llama-2 and Llama-3 from Meta continued this trend with larger and more efficient architectures. Instruction-tuned models like Alpaca was built Meta’s LLaMA model to improve task performance with minimal resources.</p>
-<table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>LLM</p></th>
-<th class="head"><p>Number of Parameters</p></th>
-<th class="head"><p>Context Length</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>BERT-Base</p></td>
-<td><p>110 million</p></td>
-<td><p>512</p></td>
-</tr>
-<tr class="row-odd"><td><p>BERT-Large</p></td>
-<td><p>340 million</p></td>
-<td><p>512</p></td>
-</tr>
-<tr class="row-even"><td><p>Llama-2-7B</p></td>
-<td><p>7 billion</p></td>
-<td><p>4K</p></td>
-</tr>
-<tr class="row-odd"><td><p>Alpaca</p></td>
-<td><p>7 billion</p></td>
-<td><p>4K</p></td>
-</tr>
-<tr class="row-even"><td><p>Llama-3-8B</p></td>
-<td><p>8 billion</p></td>
-<td><p>8K</p></td>
-</tr>
-<tr class="row-odd"><td><p>Llama-3-70B</p></td>
-<td><p>70 billion</p></td>
-<td><p>8K</p></td>
-</tr>
-<tr class="row-even"><td><p>GPT-2</p></td>
-<td><p>1.5 billion</p></td>
-<td><p>1K</p></td>
-</tr>
-<tr class="row-odd"><td><p>GPT-3.5</p></td>
-<td><p>175 billion</p></td>
-<td><p>4K</p></td>
-</tr>
-<tr class="row-even"><td><p>GPT-4</p></td>
-<td><p>~1 trillion</p></td>
-<td><p>128K</p></td>
-</tr>
-</tbody>
-</table>
 </section>
 </section>
 <section id="deepseek-r1-model">
@@ -4323,7 +4307,7 @@ financial risks to protect its operations and profitability.
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openai-gpt-models">OpenAI GPT models</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#langchain-framework">LangChain framework</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-source-models">Open-source models</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-and-closed-models">Open and closed models</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deepseek-r1-model">DeepSeek-R1 model</a><ul class="nav section-nav flex-column">
