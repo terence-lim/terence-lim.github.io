@@ -1,2 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terence Lim</title>
+  <style>
+    :root {
+      --bg: #f6f6f3;
+      --surface: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --border: #e5e5e0;
+      --accent: #111111;
+    }
 
-<meta http-equiv="Refresh" content="0; url=README.html" />
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1100px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+    }
+
+    .hero {
+      padding: 40px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      border-color: #cfcfca;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-header {
+      margin-bottom: 14px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: -0.03em;
+    }
+
+    .section-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .projects-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .two-col {
+      grid-template-columns: 0.8fr 1.2fr;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .project-title {
+      margin: 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .project-subtitle {
+      margin: 10px 0 0;
+      font-size: 1.25rem;
+      line-height: 1.3;
+    }
+
+    .project-description {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.92rem;
+      background: #fafaf8;
+    }
+
+    .list {
+      margin: 0px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .list li {
+      color: #222;
+    }
+
+    .publication {
+	margin: 0;
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+      color: #2c2c2c;
+      font-size: 0.98rem;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    footer {
+      padding-top: 18px;
+      margin-top: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 900px) {
+      .projects-grid,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .hero,
+      .panel {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="card hero">
+      <p class="eyebrow">Terence Lim</p>
+      <div class="actions">
+        <a class="button primary" href="https://www.linkedin.com/in/terencelim" target="_blank" rel="noreferrer">LinkedIn</a>
+        <a class="button" href="https://github.com/terence-lim" target="_blank" rel="noreferrer">View Projects</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Selected projects</h2>
+      </div>
+      <div id="projects" class="grid projects-grid"></div>
+    </section>
+
+    <section class="section card panel">
+    <!-- <section class="section grid two-col"> -->
+      <div class="card panel">
+        <div class="section-header">
+          <h2>Publications</h2>
+        </div>
+        <div id="publications" class="stack"></div>
+      </div>
+    </section>
+    
+    <section class="section grid two-col"> 
+        <div class="card panel">
+          <div class="section-header">
+            <h2>Experience</h2>
+          </div>
+	  <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+            <ul id="experience" class="list"></ul>
+	  </div>
+        </div>
+
+        <div class="card panel">
+          <div class="section-header">
+            <h2>Education</h2>
+          </div>
+	  <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+            <ul id="education" class="list"></ul>
+	    </div>
+      </div>
+    </section>
+
+    <section class="section card panel">
+      <div class="section-header">
+        <h2>Credentials</h2>
+      </div>
+      <!--
+      <div id="certifications" class="chip-row"></div>
+      -->
+      <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+
+        <strong>Certifications</strong>
+        <div class="muted" style="margin-top:8px;">
+	Associate of the Society of Actuaries (ASA). ID No. 358609.<br>
+	Chartered Alternative Investment Analyst (CAIA). Charter No. 659.<br>
+	Chartered Financial Analyst (CFA). Charter No. 143287.<br>
+	Certified Financial Planner (CFP). CFP Board ID: 107488.<br>
+	Certified Management Accountant (CMA), Institute of Management Accountants. Certificate No. 140947.<br>
+	Certified Public Accountant (CPA), South Dakota Board of Accountancy. Certificate No. 1361.<br>
+	Financial Risk Manager (FRM), Global Association of Risk Professionals. GARP ID: 1806536.
+        </div>
+	<br>
+        <strong>Awards</strong>
+        <div class="muted" style="margin-top:8px;">
+          Chase Manhattan International Foundation Scholarship (four-year full-ride).<br>
+          Q-Group research grant ($10,000).
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const featuredWork = [
+      {
+        title: "QRAFTI",
+        subtitle: "Quantitative Research Assistants with Financial Tools and Intelligence",
+        description: "A multi-agent framework for empirical research in quantitative finance, designed to support idea generation, data access, factor construction, backtesting, robustness analysis, and reproducible reporting.",
+        links: [
+          { label: "GitHub", href: "https://github.com/terence-lim/quant-agents" }
+        ]
+      },
+      {
+        title: "Financial Data Science",
+        subtitle: "Python notebooks and FinDS package",
+        description: "A practical resource for analysts, researchers, and data scientists applying Python to financial analysis, econometrics, machine learning, NLP, and large-scale data workflows.",
+        links: [
+          { label: "Notebooks", href: "https://terence-lim.github.io/docs/financial-data-science-notebooks/" },
+          { label: "PDF Book", href: "https://terence-lim.github.io/docs/financial-data-science-notebooks.pdf" },
+          { label: "FinDS API", href: "https://terence-lim.github.io/docs/financial-data-science/" },
+          { label: "FinDS Repo", href: "https://github.com/terence-lim/financial-data-science" }
+        ]
+      },
+      {
+        title: "Actuarial Math with Python",
+        subtitle: "The actuarialmath Python package",
+        description: "A Python package implementing core methods for modeling life contingent risks, aligned with actuarial exam topics and standard texts.",
+        links: [
+          { label: "User Guide", href: "https://actuarialmath-guide.readthedocs.io/en/latest/" },
+          { label: "API Reference", href: "https://actuarialmath.readthedocs.io/en/latest/" },
+          { label: "Colab", href: "https://colab.research.google.com/github/terence-lim/terence-lim.github.io/blob/master/notes/faml.ipynb" },
+          { label: "GitHub", href: "https://github.com/terence-lim/actuarialmath.git" }
+        ]
+      },
+      {
+        title: "MiniMat",
+        subtitle: "OCaml LLVM matrix language",
+        description: "A compact OCaml/LLVM project exploring a matrix-oriented programming language.",
+        links: [
+          { label: "GitHub", href: "https://github.com/terence-lim/minimat" }
+        ]
+      }
+    ];
+
+    const publications = [
+      {
+        text: "Lim, T., Muthuraman, K., & Sury, M. (2026). QRAFTI: An agentic framework for empirical research in quantitative finance [Preprint]. arXiv.",
+        href: "https://arxiv.org"
+      },
+      {
+        text: "Yi, S., Nguyen, J., Xu, H., Lim, T., Skrovan, J., Beri, M., Modi, H., Well, A., Mery, C. M., Zhang, Y., Markey, M. K., & Ding, Y. (2026). Automated thematic analysis for clinical qualitative data: Iterative codebook refinement with full provenance [Preprint]. arXiv.",
+        href: "https://doi.org/10.48550/arXiv.2603.08989"
+      },
+      {
+        text: "Yi, S., Nguyen, J., Lim, T., Well, A., Skrovan, J., Beri, M., Lee, Y., Radhakrishnan, K., Leqi, L., Markey, M., & Ding, Y. (2025). Position: Thematic analysis of unstructured clinical transcripts with large language models [Conference workshop presentation]. GenAI4Health Workshop at NeurIPS 2025, Vancouver, Canada.",
+        href: "https://doi.org/10.48550/arXiv.2509.14597"
+      },
+      {
+        text: "Yi, S., Nguyen, J., Xu, H., Lim, T., Skrovan, J., Beri, M., Modi, H., Well, A., Leqi, L., Markey, M., & Ding, Y. (2025). SFT-TA: Supervised fine-tuned agents in multi-agent LLMs for automated inductive thematic analysis [Preprint]. arXiv.",
+        href: "https://doi.org/10.48550/arXiv.2509.17167"
+      },
+      {
+        text: "Yi, S., Nguyen, J., Xu, H., Lim, T., Well, A., & Ding, Y. (2025). Auto-TA: Towards scalable automated thematic analysis (TA) via multi-agent large language models with reinforcement learning [Preprint]. arXiv.",
+        href: "https://doi.org/10.48550/arXiv.2506.23998"
+      },
+      {
+        text: "Xu, H., Yi, S., Lim, T., Xu, J., Well, A., Mery, C., Zhang, A., Zhang, Y., Ji, H., Pingali, K., Leng, Y., & Ding, Y. (2025). TAMA: A human-AI collaborative thematic analysis framework using multi-agent LLMs for clinical interviews [Preprint]. arXiv.",
+        href: "https://arxiv.org/abs/2503.20666"
+      },
+      {
+        text: "Raza, M. Z., Xu, J., Lim, T., Boddy, L., Mery, C. M., Well, A., & Ding, Y. (2025). LLM-TA: An LLM-enhanced thematic analysis pipeline for transcripts from parents of children with congenital heart disease [Conference workshop presentation]. GenAI4Health Workshop at AAAI 2025, Philadelphia, Pennsylvania.",
+        href: "https://doi.org/10.48550/arXiv.2502.01620"
+      },
+      {
+        text: "Alford, A., Jones, R., & Lim, T. (2012). Quantitative equity portfolio management. In F. J. Fabozzi (Ed.), Encyclopedia of financial models. John Wiley & Sons.",
+        href: "https://doi.org/10.1002/9781118182635.efm0048"
+      },
+      {
+        text: "Alford, A., Jones, R., & Lim, T. (2011). Quantitative equity portfolio management. In F. J. Fabozzi & H. M. Markowitz (Eds.), The theory and practice of investment management: Asset allocation, valuation, portfolio construction, and strategies (2nd ed.). John Wiley & Sons.",
+        href: "https://doi.org/10.1002/9781118267028.ch11"
+      },
+      {
+        text: "Alford, A., Jones, R., & Lim, T. (2008). Quantitative equity portfolio management. In F. J. Fabozzi (Ed.), Handbook of finance (Vol. 2). John Wiley & Sons.",
+        href: "https://doi.org/10.1002/9780470404324.hof002029"
+      },
+      {
+        text: "Lim, T. (2010). Measuring the value of corporate philanthropy: Social impact, business benefits, and investor returns. Committee Encouraging Corporate Philanthropy.",
+        href: "https://hollis.harvard.edu/discovery/fulldisplay?context=L&vid=01HVD_INST:HVD2&lang=en&search_scope=MyInst_and_CI&adaptor=Local%20Search%20Engine&tab=Everything&docid=alma990133746670203941"
+      },
+      {
+        text: "Jones, R. C., Lim, T., & Zangari, P. J. (2007). The Black-Litterman model for structured equity portfolios. The Journal of Portfolio Management, 33(2), 24–33.",
+        href: "https://doi.org/10.3905/jpm.2007.674791"
+      },
+      {
+        text: "Lim, T., Lo, A. W., Merton, R. C., & Scholes, M. S. (2006). The derivatives sourcebook. Foundations and Trends in Finance, 1(5–6), 365–643.",
+        href: "https://doi.org/10.1561/0500000005"
+      },
+      {
+        text: "Lim, T. (2001). Rationality and analysts’ forecast bias. The Journal of Finance, 56(1), 369–385.",
+        href: "https://doi.org/10.1111/0022-1082.00329"
+      },
+      {
+        text: "Hong, H., Lim, T., & Stein, J. C. (2000). Bad news travels slowly: Size, analyst coverage, and the profitability of momentum strategies. The Journal of Finance, 55(1), 265–295.",
+        href: "https://doi.org/10.1111/0022-1082.00206"
+      }
+    ];    
+    
+    const experience = [
+      "Silver Fern Healthcare, Old Saybrook, CT",
+      "Graphen Inc, New York, NY",
+      "Goldman Sachs Asset Management, New York, NY",
+      "Chief Executives for Corporate Purpose (CECP), New York, NY",
+      "Dartmouth College, Tuck School of Business, Hanover, NH",
+      "Koeneman Capital Management, Singapore"
+    ];
+
+    const education = [
+      "Massachusetts Institute of Technology — PhD in Finance, Sloan School of Management",
+      "Stanford University — MS in Electrical Engineering, School of Engineering",
+      "Columbia University — MS in Computer Science, School of Engineering and Applied Science",
+      "The University of Texas at Austin — MS in Artificial Intelligence and MS in Data Science, School of Natural Sciences",
+      "Harvard University — Master of Public Health (expected 2028), Chan School of Public Health",
+      "Johns Hopkins University — MS in Applied Biomedical Engineering (expected 2030), Whiting School of Engineering",
+      "University of Pennsylvania — BS in Economics (Wharton School) and BS in Engineering summa cum laude, Jerome Fisher M&T Program"
+    ];
+
+    const certifications = [
+      "ASA",
+      "CAIA",
+      "CFA",
+      "CFP",
+      "CMA",
+      "CPA",
+      "FRM"
+    ];
+
+    function createProjectCard(project) {
+      const article = document.createElement('article');
+      article.className = 'card panel';
+      article.innerHTML = `
+        <p class="project-title">${project.title}</p>
+        <h3 class="project-subtitle">${project.subtitle}</h3>
+        <p class="project-description">${project.description}</p>
+        <div class="chip-row">
+          ${project.links.map(link => `<a class="chip" href="${link.href}" target="_blank" rel="noreferrer">${link.label}</a>`).join('')}
+        </div>
+      `;
+      return article;
+    }
+
+    featuredWork.forEach(project => {
+      document.getElementById('projects').appendChild(createProjectCard(project));
+    });
+
+    publications.forEach(item => {
+      const p = document.createElement('p');
+      p.className = 'publication';
+      const a = document.createElement('a');
+      a.href = item.href;
+      a.target = '_blank';
+      a.rel = 'noreferrer';
+      a.textContent = item.text;
+      p.appendChild(a);
+      document.getElementById('publications').appendChild(p);
+    });
+    
+    experience.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      document.getElementById('experience').appendChild(li);
+    });
+
+    education.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      document.getElementById('education').appendChild(li);
+    });
+
+    certifications.forEach(item => {
+      const span = document.createElement('span');
+      span.className = 'chip';
+      span.textContent = item;
+      document.getElementById('certifications').appendChild(span);
+    });
+  </script>
+</body>
+</html>
