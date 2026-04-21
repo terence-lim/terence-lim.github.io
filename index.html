@@ -130,7 +130,7 @@
     }
 
     .two-col {
-      grid-template-columns: 1fr 1.3fr;
+      grid-template-columns: 1.3fr 1fr;
       align-items: start;
     }
 
@@ -253,50 +253,40 @@
       </div>
     </section>
 
-    <section class="section grid two-col"> 
-        <div class="card panel">
-          <div class="section-header">
-            <h2>Experience</h2>
-          </div>
-	  <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
-            <ul id="experience" class="list"></ul>
-	  </div>
-        </div>
-
-        <div class="card panel">
-          <div class="section-header">
-            <h2>Education</h2>
-          </div>
-	  <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
-            <ul id="education" class="list"></ul>
-	    </div>
+    <section class="section card panel">
+      <div class="section-header">
+        <h2>Experience</h2>
+      </div>
+      <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+        <ul id="experience" class="list"></ul>
       </div>
     </section>
 
-    <section class="section card panel">
-      <div class="section-header">
-        <h2>Credentials</h2>
-      </div>
-      <!--
-      <div id="certifications" class="chip-row"></div>
-      -->
-      <div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
-
-        <strong>Certifications</strong>
-        <div class="muted" style="margin-top:8px;">
-	Associate of the Society of Actuaries (ASA). ID No. 358609.<p>
-	Chartered Alternative Investment Analyst (CAIA). Charter No. 659.<p>
-	Chartered Financial Analyst (CFA). Charter No. 143287.<p>
-	Certified Financial Planner (CFP). CFP Board ID: 107488.<p>
-	Certified Management Accountant (CMA), Institute of Management Accountants. Certificate No. 140947.<p>
-	Certified Public Accountant (CPA), South Dakota Board of Accountancy. Certificate No. 1361.<p>
-	Financial Risk Manager (FRM), Global Association of Risk Professionals. GARP ID: 1806536.
+    <section class="section grid two-col"> 
+      
+      <div class="card panel">
+        <div class="section-header">
+          <h2>Education</h2>
         </div>
-	<p>
-        <strong>Awards</strong>
-        <div class="muted" style="margin-top:8px;">
-          Chase Manhattan International Foundation Scholarship (four-year full-ride).<p>
-          Q-Group research grant.
+	<div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+          <ul id="education" class="list"></ul>
+	</div>
+      </div>
+      <div class="card panel">
+	<div class="section-header">
+          <h2>Credentials</h2>
+	</div>
+	<div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
+          <div class="muted" style="margin-top:8px;">
+	    Associate of the Society of Actuaries (ASA). ID No. 358609.<p>
+	      Chartered Alternative Investment Analyst (CAIA). Charter No. 659.<p>
+	      Chartered Financial Analyst (CFA). Charter No. 143287.<p>
+	      Certified Financial Planner (CFP). CFP Board ID: 107488.<p>
+	      Certified Management Accountant (CMA), Institute of Management Accountants. Certificate No. 140947.<p>
+	      Certified Public Accountant (CPA), South Dakota Board of Accountancy. Certificate No. 1361.<p>
+	      Financial Risk Manager (FRM), Global Association of Risk Professionals. GARP ID: 1806536.
+          </div>
+	  <p>
         </div>
       </div>
     </section>
@@ -311,7 +301,7 @@
         description: "A multi-agent framework for empirical research in quantitative finance, designed to support idea generation, data access, factor construction, backtesting, robustness analysis, and reproducible reporting.",
         links: [
             { label: "GitHub", href: "https://github.com/terence-lim/quant-agents" },
-            { label: "arXiv", href: "https://github.com/terence-lim/quant-agents" },	    
+            { label: "arXiv", href: "https://arxiv.org/abs/2604.18500" },
         ]
       },
       {
@@ -350,7 +340,7 @@
     const publications = [
       {
         text: "Lim, T., Muthuraman, K., & Sury, M. (2026). QRAFTI: An agentic framework for empirical research in quantitative finance [Preprint]. arXiv.",
-        href: "https://arxiv.org"
+        href: "https://arxiv.org/abs/2604.18500"
       },
       {
         text: "Yi, S., Nguyen, J., Xu, H., Lim, T., Skrovan, J., Beri, M., Modi, H., Well, A., Mery, C. M., Zhang, Y., Markey, M. K., & Ding, Y. (2026). Automated thematic analysis for clinical qualitative data: Iterative codebook refinement with full provenance [Preprint]. arXiv.",
@@ -427,10 +417,10 @@
       "Massachusetts Institute of Technology — PhD in Finance, Sloan School of Management",
       "Stanford University — MS in Electrical Engineering, School of Engineering",
       "Columbia University — MS in Computer Science, School of Engineering and Applied Science",
-      "The University of Texas at Austin — MS in Artificial Intelligence and MS in Data Science, School of Natural Sciences",
+      "The University of Texas at Austin — MS in Artificial Intelligence and MS in Data Science, College of Natural Sciences",
       "Harvard University — Master of Public Health (expected 2028), Chan School of Public Health",
       "Johns Hopkins University — MS in Applied Biomedical Engineering (expected 2030), Whiting School of Engineering",
-      "University of Pennsylvania — BS in Economics, Wharton School, and BS in Engineering (computer science and engineering) summa cum laude, Jerome Fisher M&T Program"
+      "University of Pennsylvania — BS in Economics, Wharton School, and BS in Engineering (computer science and engineering) summa cum laude, Jerome Fisher M&T Program. Chase Foundation Scholarship (four-year full-ride)."
     ];
 
     const certifications = [
