@@ -243,17 +243,6 @@
       </div>
     </section>
 
-    <section id="publications-section" class="section card panel cv-hidden">
-    <!-- <section class="section grid two-col"> -->
-      <div class="card panel">
-        <div class="section-header">
-          <h2>Publications</h2>
-        </div>
-        <div id="publications" class="stack"></div>
-      </div>
-    </section>
-
-
     <section id="experience-section" class="section card panel cv-hidden">
       <div class="section-header">
         <h2>Experience</h2>
@@ -288,6 +277,16 @@
           </div>
 	  <p>
         </div>
+      </div>
+    </section>
+
+    <section id="publications-section" class="section card panel cv-hidden">
+    <!-- <section class="section grid two-col"> -->
+      <div class="card panel">
+        <div class="section-header">
+          <h2>Publications</h2>
+        </div>
+        <div id="publications" class="stack"></div>
       </div>
     </section>
 
@@ -461,9 +460,26 @@
       document.getElementById('publications').appendChild(p);
     });
     
+    const experienceLinks = {
+      "Silver Fern Healthcare, Old Saybrook, CT — Interim Chief Technology Officer": "https://www.silverfernhealthcare.com/team.html",
+      "Graphen Inc, New York, NY — Distinguished Research Scientist": "https://www.graphen.ai/about/team"
+    };
+
     experience.forEach(item => {
       const li = document.createElement('li');
-      li.textContent = item;
+      const href = experienceLinks[item];
+
+      if (href) {
+        const a = document.createElement('a');
+        a.href = href;
+        a.target = '_blank';
+        a.rel = 'noreferrer';
+        a.textContent = item;
+        li.appendChild(a);
+      } else {
+        li.textContent = item;
+      }
+
       document.getElementById('experience').appendChild(li);
     });
 
