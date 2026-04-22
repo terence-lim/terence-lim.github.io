@@ -78,16 +78,17 @@
     }
 
     .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 18px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 12px 18px;
+	border-radius: 999px;
+	border: 1px solid var(--border);
+	background: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+	cursor: pointer;
     }
 
     .button.primary {
@@ -125,6 +126,10 @@
       gap: 18px;
     }
 
+    .cv-hidden {
+	display: none;
+    }
+    
     .projects-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -225,6 +230,7 @@
       }
     }
   </style>
+  
 </head>
 <body>
   <main class="container">
@@ -233,17 +239,11 @@
       <div class="actions">
         <a class="button primary" href="https://www.linkedin.com/in/terencelim" target="_blank" rel="noreferrer">LinkedIn</a>
         <a class="button" href="https://github.com/terence-lim" target="_blank" rel="noreferrer">View Projects</a>
+	<button id="cvButton" class="button primary" type="button">CV</button>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-header">
-        <h2>Selected projects</h2>
-      </div>
-      <div id="projects" class="grid projects-grid"></div>
-    </section>
-
-    <section class="section card panel">
+    <section id="publications-section" class="section card panel cv-hidden">
     <!-- <section class="section grid two-col"> -->
       <div class="card panel">
         <div class="section-header">
@@ -253,7 +253,8 @@
       </div>
     </section>
 
-    <section class="section card panel">
+
+    <section id="experience-section" class="section card panel cv-hidden">
       <div class="section-header">
         <h2>Experience</h2>
       </div>
@@ -262,8 +263,7 @@
       </div>
     </section>
 
-    <section class="section grid two-col"> 
-      
+    <section id="cv-details-section" class="section grid two-col cv-hidden">  
       <div class="card panel">
         <div class="section-header">
           <h2>Education</h2>
@@ -291,6 +291,14 @@
       </div>
     </section>
 
+    <section class="section">
+      <div class="section-header">
+        <h2>Selected projects</h2>
+      </div>
+      <div id="projects" class="grid projects-grid"></div>
+    </section>
+
+    
   </main>
 
   <script>
@@ -423,16 +431,6 @@
       "University of Pennsylvania — BS in Economics, Wharton School, and BS in Engineering (computer science and engineering) summa cum laude, Jerome Fisher M&T Program. Chase Foundation Scholarship (four-year full-ride)."
     ];
 
-    const certifications = [
-      "ASA",
-      "CAIA",
-      "CFA",
-      "CFP",
-      "CMA",
-      "CPA",
-      "FRM"
-    ];
-
     function createProjectCard(project) {
       const article = document.createElement('article');
       article.className = 'card panel';
@@ -475,12 +473,26 @@
       document.getElementById('education').appendChild(li);
     });
 
-    certifications.forEach(item => {
-      const span = document.createElement('span');
-      span.className = 'chip';
-      span.textContent = item;
-      document.getElementById('certifications').appendChild(span);
+
+    </script>
+<script>
+  const cvSections = [
+    document.getElementById('publications-section'),
+    document.getElementById('experience-section'),
+    document.getElementById('cv-details-section')
+  ];
+
+  const cvButton = document.getElementById('cvButton');
+
+  cvButton.addEventListener('click', () => {
+    const isHidden = cvSections[0].classList.contains('cv-hidden');
+
+    cvSections.forEach(section => {
+      section.classList.toggle('cv-hidden', !isHidden);
     });
-  </script>
+
+    cvButton.textContent = isHidden ? 'Hide CV' : 'CV';
+  });
+</script>  
 </body>
 </html>
