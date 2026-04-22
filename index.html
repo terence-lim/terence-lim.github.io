@@ -135,7 +135,7 @@
     }
 
     .two-col {
-      grid-template-columns: 1.3fr 1fr;
+      grid-template-columns: 1.35fr 1fr;
       align-items: start;
     }
 
@@ -258,7 +258,14 @@
           <h2>Education</h2>
         </div>
 	<div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
-          <ul id="education" class="list"></ul>
+	  <!--          <ul id="education" class="list"></ul>-->
+      Massachusetts Institute of Technology — PhD in Finance, Sloan School of Management<p>
+      Stanford University — MS in Electrical Engineering, School of Engineering<p>
+      Columbia University — MS in Computer Science, School of Engineering and Applied Science<p>
+      The University of Texas at Austin — MS in Artificial Intelligence and MS in Data Science, College of Natural Sciences<p>
+      Harvard University — Master of Public Health (expected 2028), Chan School of Public Health<p>
+      Johns Hopkins University — MS in Applied Biomedical Engineering (expected 2030), Whiting School of Engineering<p>
+      University of Pennsylvania — BS in Economics (finance and accounting), Wharton School, and BS in Engineering (computer science and engineering) <i>summa cum laude</i>, Jerome Fisher Management & Technology Program. Chase Foundation Scholarship (four-year full-ride)
 	</div>
       </div>
       <div class="card panel">
@@ -266,15 +273,13 @@
           <h2>Credentials</h2>
 	</div>
 	<div style="margin-top:20px; padding:16px; border-radius:20px; background:#fafaf8; border:1px solid var(--border);">
-          <div class="muted" style="margin-top:8px; color: #222">
-	    Associate of the Society of Actuaries (ASA>), SOA ID No. 358609.<p>
-	      Chartered Alternative Investment Analyst (CAIA), Charter No. 659.<p>
-	      Chartered Financial Analyst (CFA), Charter No. 143287.<p>
-	      Certified Financial Planner (CFP), CFP Board ID No. 107488.<p>
-	      Certified Management Accountant (CMA), Institute of Management Accountants, Certificate No. 140947.<p>
-	      Certified Public Accountant (CPA), South Dakota Board of Accountancy, Certificate No. 1361.<p>
-	      Financial Risk Manager (FRM), Global Association of Risk Professionals, GARP ID No. 1806536.
-          </div>
+	  <i>Associate of the Society of Actuaries</i> (ASA), SOA ID No. 358609.<p>
+	    <i>Chartered Alternative Investment Analyst</i> (CAIA), Charter No. 659.<p>
+	    <i>Chartered Financial Analyst</i> (CFA), Charter No. 143287.<p>
+	    <i>Certified Financial Planner</i> (CFP), CFP Board ID No. 107488.<p>
+	    <i>Certified Management Accountant</i> (CMA), Institute of Management Accountants, Certificate No. 140947.<p>
+	    <i>Certified Public Accountant</i> (CPA), South Dakota Board of Accountancy, Certificate No. 1361.<p>
+	    <i>Financial Risk Manager</i> (FRM), Global Association of Risk Professionals, GARP ID No. 1806536.
 	  <p>
         </div>
       </div>
@@ -420,16 +425,6 @@
       "Koeneman Capital Management, Singapore — Investment Manager"
     ];
 
-    const education = [
-      "Massachusetts Institute of Technology — PhD in Finance, Sloan School of Management",
-      "Stanford University — MS in Electrical Engineering, School of Engineering",
-      "Columbia University — MS in Computer Science, School of Engineering and Applied Science",
-      "The University of Texas at Austin — MS in Artificial Intelligence and MS in Data Science, College of Natural Sciences",
-      "Harvard University — Master of Public Health (expected 2028), Chan School of Public Health",
-      "Johns Hopkins University — MS in Applied Biomedical Engineering (expected 2030), Whiting School of Engineering",
-      "University of Pennsylvania — BS in Economics, Wharton School, and BS in Engineering (computer science and engineering) summa cum laude, Jerome Fisher M&T Program. Chase Foundation Scholarship (four-year full-ride)."
-    ];
-
     function createProjectCard(project) {
       const article = document.createElement('article');
       article.className = 'card panel';
@@ -483,15 +478,6 @@
       document.getElementById('experience').appendChild(li);
     });
 
-    education.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = item;
-      document.getElementById('education').appendChild(li);
-    });
-
-
-    </script>
-<script>
   const cvSections = [
     document.getElementById('publications-section'),
     document.getElementById('experience-section'),
