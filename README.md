@@ -1,42 +1,26 @@
-# Contact
+# Terence Lim
 
-[https://www.linkedin.com/in/terencelim](https://www.linkedin.com/in/terencelim)
+Home: [https://terence-lim.github.io](https://terence-lim.github.io)
+
+LinkedIn: [https://www.linkedin.com/in/terencelim](https://www.linkedin.com/in/terencelim)
+
+## 1. QRAFTI Agents
+
+### Quantitative Research Assistants with Financial Tools and Intelligence
+
+A multi-agent framework intended to emulate a quantitative research team and support equity factor research on large financial panel datasets. QRAFTI integrates a research toolkit for panel data with MCP servers that expose data access, factor construction, and custom coding operations as callable tools. It can help replicate established factors, formulate and test new signals, and generate standardized research reports accompanied by narrative analysis and computational traces.
+
+Lim, T., Muthuraman, K., & Sury, M. (2026). QRAFTI: An agentic framework for empirical research in quantitative finance [Preprint]. arXiv. [https://arxiv.org/abs/2604.18500](https://arxiv.org/abs/2604.18500)
+
+- [GitHub repo](https://github.com/terence-lim/quant-agents)
+
 
 <!-- #region -->
-# 1. Financial Data Science
+## 2. Financial Data Science
 
-As financial markets produce vast volumes of structured and unstructured data,
-the ability to extract insights and develop predictive models has become increasingly important.
-[Financial Data Science Python Notebooks](https://terence-lim.github.io/docs/financial-data-science-notebooks/)
-provide a practical guide for analysts, researchers, and data scientists looking to apply Python
-and its broad ecosystem of libraries, tools, frameworks, and community resources
-to financial analysis, econometrics, and machine learning.
+### Python notebooks and FinDS package
 
-Designed to support financial data science workflows,
-the companion [FinDS Python package](https://github.com/terence-lim/financial-data-science)
-demonstrates how to use database engines such as SQL, Redis, and MongoDB to manage and access large datasets, including:
-
-- Core financial databases such as CRSP, Compustat, IBES, and TAQ
-
-- Public economic data APIs from sources like FRED and the Bureau of Economic Analysis (BEA)
-
-- Structured and unstructured data from academic and research websites
-
-In addition to data access, it provides practical examples and templates for applying:
-
-- Financial econometrics and time series modeling
-
-- Graph analytics, event studies, and backtesting strategies
-
-- Machine learning for predictive analytics
-
-- Natural language processing (NLP) to extract insights from financial text
-
-- Neural networks and large language models (LLMs) for advanced decision-making
-
-
-**March 2025:** Updated with data through early 2025 and incorporated the latest LLMs -- Microsoft Phi-4-multimodal (released Feb 2025), Google Gemma-3-12B (March 2025), DeepSeek-R1-14B (January 2025), Meta Llama-3.1-8B (July 2024), GPT-4o-mini (July 2024).
-
+Financial data science notebooks which provide a practical guide for analysts, researchers, and data scientists applying Python to financial analysis, econometrics, machine learning, NLP and large-scale data workflows. The companion FinDS Python package demonstrates the use of database and web tools to access and manage large structured and unstructured financial datasets.
 
 **Documentation**
 
@@ -56,9 +40,11 @@ In addition to data access, it provides practical examples and templates for app
 <!-- #endregion -->
 
 <!-- #region -->
-# 2. Solving Actuarial Math with Python
+## 3. Solving Actuarial Math with Python
 
-The _actuarialmath_ Python package implements fundamental methods for modeling life contingent risks, and closely follows traditional topics covered in actuarial exams and standard texts such as the "Fundamentals of Actuarial Math - Long-term" exam syllabus by the Society of Actuaries, and "Actuarial Mathematics for Life Contingent Risks" by Dickson, Hardy and Waters.
+### The actuarialmath Python package
+
+A Python package implementing core methods for modeling life contingent risks, and closely follows traditional topics covered in actuarial exams and standard texts such as the "Fundamentals of Actuarial Math - Long-term" exam syllabus by the Society of Actuaries, and "Actuarial Mathematics for Life Contingent Risks" by Dickson, Hardy and Waters.
 
 __Installation__
 
@@ -79,18 +65,10 @@ __Resources__
 
 <!-- #endregion -->
 
-# 3. OCaml LLVM
+## 4. OCaml LLVM matrix language
 
-MiniMat matrix language: <https://github.com/terence-lim/minimat>
+### Minimat
 
+A compact OCaml/LLVM project exploring a matrix-oriented programming language
 
-
-
-# 4. Miscellaneous
-
-Review notes motivated by:
-
-- FDP syllabus (CAIA Association): <https://terence-lim.github.io/notes/FDP.pdf>
-
-- SRM/PA syllabus (Society of Actuaries): <https://terence-lim.github.io/notes/SRM.pdf>
-
+- [Github repo](https://github.com/terence-lim/minimat)
