@@ -24,7 +24,7 @@ Financial data science notebooks which provide a practical guide for analysts, r
 
 **Documentation**
 
-- [Financial Data Science Notebooks](https://terence-lim.github.io/docs/financial-data-science-notebooks/)
+- [Financial Data Science Notebooks](https://financial-data-science.readthedocs.io/en/latest/README.html)
 
 - [Download PDF](https://terence-lim.github.io/docs/financial-data-science-notebooks.pdf)
 
