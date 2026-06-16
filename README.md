@@ -22,16 +22,16 @@ Lim, T., Muthuraman, K., & Sury, M. (2026). QRAFTI: An agentic framework for emp
 
 Financial data science notebooks which provide a practical guide for analysts, researchers, and data scientists applying Python to financial analysis, econometrics, machine learning, NLP and large-scale data workflows. The companion FinDS Python package demonstrates the use of database and web tools to access and manage large structured and unstructured financial datasets.
 
-**Documentation**
+**Online Documentation**
 
 - [Financial Data Science Notebooks](https://financial-data-science.readthedocs.io/en/latest/README.html)
 
-- [Download PDF](https://terence-lim.github.io/docs/financial-data-science-notebooks.pdf)
+- [PDF Book](https://terence-lim.github.io/docs/financial-data-science-notebooks.pdf)
 
 - [FinDS API reference](https://terence-lim.github.io/docs/financial-data-science/)
 
 
-**Github repos**
+**Github Repos**
 
 - [FinDS package](https://github.com/terence-lim/financial-data-science)
 
